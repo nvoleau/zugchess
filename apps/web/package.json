@@ -13,8 +13,10 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.4",
+    "@lichess-org/chessground": "^10.4.2",
     "@prisma/client": "^6.1.0",
     "@zugchess/core": "workspace:*",
+    "chess.js": "^1.4.0",
     "next": "^15.1.0",
     "next-auth": "5.0.0-beta.25",
     "next-intl": "^3.26.3",

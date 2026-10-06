@@ -25,6 +25,22 @@
     "explanations": "Explanations left: {count}",
     "unlimited": "unlimited"
   },
+  "Play": {
+    "title": "Game engine (prototype)",
+    "intro": "Minimal demo of the shared judge wired to a real board — not the final content, just the engine.",
+    "kpkTitle": "King + pawn vs king",
+    "methodTitle": "Method line — Lucena",
+    "backToApp": "Back to my space",
+    "Kpk": {
+      "tempoLabel": "Queen in {count} {count, plural, one {move} other {moves}}",
+      "won": "Won: the queen is about to appear, the technique is proven.",
+      "reset": "Restart this position"
+    },
+    "Method": {
+      "tempoLabel": "Method: {done} / {total}",
+      "complete": "Line complete: the technique is proven on this position."
+    }
+  },
   "Theme": {
     "light": "Light",
     "dark": "Dark",

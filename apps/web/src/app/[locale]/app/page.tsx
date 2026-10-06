@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { auth, signOut } from "@/auth";
-import { redirect } from "@/i18n/navigation";
+import { Link, redirect } from "@/i18n/navigation";
 import { getEntitlementsForUser } from "@/lib/entitlements";
 
 // Dépend de la session (cookies) et des quotas du jour : jamais mis en cache statique.
@@ -21,6 +21,7 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
   const user = session!.user;
 
   const t = await getTranslations("Dashboard");
+  const playT = await getTranslations("Play");
   const entitlements = await getEntitlementsForUser(user.id);
 
   async function handleSignOut() {
@@ -55,6 +56,13 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
           <li>{t("explanations", { count: formatCount(entitlements.remaining.explanations, t("unlimited")) })}</li>
         </ul>
       </section>
+
+      <Link
+        href="/app/play"
+        className="w-fit rounded-md border border-neutral-300 px-3 py-1.5 text-sm dark:border-neutral-700"
+      >
+        {playT("title")}
+      </Link>
     </div>
   );
 }

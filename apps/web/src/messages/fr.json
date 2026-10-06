@@ -25,6 +25,22 @@
     "explanations": "Explications restantes : {count}",
     "unlimited": "illimité"
   },
+  "Play": {
+    "title": "Moteur de jeu (prototype)",
+    "intro": "Démo minimale du juge partagé branché sur un vrai échiquier — pas le contenu final, juste le moteur.",
+    "kpkTitle": "Roi + pion contre roi",
+    "methodTitle": "Ligne de méthode — Lucena",
+    "backToApp": "Retour à mon espace",
+    "Kpk": {
+      "tempoLabel": "Dame dans {count} {count, plural, one {coup} other {coups}}",
+      "won": "Gagné : la dame va apparaître, la méthode est acquise.",
+      "reset": "Recommencer cette position"
+    },
+    "Method": {
+      "tempoLabel": "Méthode : {done} / {total}",
+      "complete": "Ligne terminée : la méthode est acquise sur cette position."
+    }
+  },
   "Theme": {
     "light": "Clair",
     "dark": "Sombre",
