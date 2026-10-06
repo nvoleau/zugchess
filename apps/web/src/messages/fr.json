@@ -1,0 +1,37 @@
+{
+  "Home": {
+    "title": "ZugChess",
+    "tagline": "Apprends, comprends et joue toutes les finales d'échecs.",
+    "cta": "Commencer une position",
+    "loginCta": "Se connecter"
+  },
+  "Login": {
+    "title": "Se connecter",
+    "emailLabel": "Adresse e-mail",
+    "emailPlaceholder": "toi@exemple.com",
+    "emailSubmit": "Recevoir un lien de connexion",
+    "emailSent": "Si un compte existe pour cette adresse, un lien de connexion vient d'être envoyé.",
+    "or": "ou",
+    "lichessCta": "Continuer avec Lichess"
+  },
+  "Dashboard": {
+    "title": "Mon espace",
+    "greeting": "Bonjour {name} !",
+    "signOut": "Se déconnecter",
+    "entitlementsTitle": "Quotas du jour",
+    "plan": "Offre : {plan}",
+    "newPositions": "Nouvelles positions restantes : {count}",
+    "reviews": "Révisions restantes : {count}",
+    "explanations": "Explications restantes : {count}",
+    "unlimited": "illimité"
+  },
+  "Theme": {
+    "light": "Clair",
+    "dark": "Sombre",
+    "system": "Système"
+  },
+  "Locale": {
+    "fr": "FR",
+    "en": "EN"
+  }
+}

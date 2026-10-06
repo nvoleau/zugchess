@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  DATABASE_URL: "postgresql://user:password@localhost:5432/zugchess"
+  AUTH_SECRET: "ci-dummy-secret-not-for-production"
+  AUTH_URL: "http://localhost:3000"
+  LICHESS_CLIENT_ID: "ci-dummy"
+  LICHESS_CLIENT_SECRET: "ci-dummy"
+  EMAIL_FROM: "ZugChess <login@zugchess.app>"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.3
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Unit tests (packages/core)
+        run: pnpm --filter core test
+
+      - name: Generate Prisma client
+        run: pnpm prisma:generate
+
+      - name: Build
+        run: pnpm build

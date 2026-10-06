@@ -1,0 +1,37 @@
+{
+  "Home": {
+    "title": "ZugChess",
+    "tagline": "Learn, understand and play every chess endgame.",
+    "cta": "Start a position",
+    "loginCta": "Sign in"
+  },
+  "Login": {
+    "title": "Sign in",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "you@example.com",
+    "emailSubmit": "Send me a sign-in link",
+    "emailSent": "If an account exists for this address, a sign-in link was just sent.",
+    "or": "or",
+    "lichessCta": "Continue with Lichess"
+  },
+  "Dashboard": {
+    "title": "My space",
+    "greeting": "Hello {name}!",
+    "signOut": "Sign out",
+    "entitlementsTitle": "Today's quotas",
+    "plan": "Plan: {plan}",
+    "newPositions": "New positions left: {count}",
+    "reviews": "Reviews left: {count}",
+    "explanations": "Explanations left: {count}",
+    "unlimited": "unlimited"
+  },
+  "Theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "Locale": {
+    "fr": "FR",
+    "en": "EN"
+  }
+}

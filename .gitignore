@@ -1,0 +1,17 @@
+node_modules/
+.pnpm-store/
+.next/
+out/
+dist/
+build/
+coverage/
+.env
+.env.local
+.env*.local
+*.log
+.DS_Store
+.vercel/
+.turbo/
+prisma/*.db
+.claude/
+*.tsbuildinfo
