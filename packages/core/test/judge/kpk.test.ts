@@ -138,6 +138,19 @@ describe("bestKpkReply", () => {
     const fen = "8/8/8/8/8/6k1/5p2/7K w - - 0 1"; // pat : Rh1 (défenseur) n'a aucun coup légal
     expect(() => bestKpkReply(fen)).toThrow();
   });
+
+  it("l'attaquant sans gain forcé (position nulle, entraînement en défense) joue un coup légal quelconque plutôt que d'échouer", () => {
+    const fen = "8/4k3/8/4K3/4P3/8/8/8 w - - 0 1"; // opposition tenue par les Noirs : nulle, Blancs (attaquant) au trait
+    expect(kpkResult(fen)).toBe("draw");
+    const random = seededRandom(1);
+    for (let i = 0; i < 20; i++) {
+      const move = bestKpkReply(fen, random);
+      const after = applyMove(fen, move);
+      // un attaquant ne peut jamais perdre au K+P vs K : un coup sous-optimal depuis une position
+      // nulle ne peut que la laisser nulle, jamais la transformer en gain.
+      expect(kpkResult(after)).toBe("draw");
+    }
+  });
 });
 
 describe("randomWinningKpkFen", () => {

@@ -418,10 +418,12 @@ function unflip(sq: number, attackerIsWhite: boolean): number {
 /**
  * Calcule la réponse du juge pour l'autre camp (celui que le joueur n'incarne pas) : le coup le
  * plus rapide pour l'attaquant, ou le plus résistant pour le défenseur (nulle si elle existe,
- * sinon la suite qui tient le plus longtemps). Lève une erreur si la position est déjà terminée
- * (aucun coup ne peut plus changer le résultat côté attaquant, ou le défenseur est mat/pat).
+ * sinon la suite qui tient le plus longtemps). Si l'attaquant n'a aucun coup gagnant (position
+ * nulle — cas de l'entraînement en défense, où l'élève tient la nulle), un coup légal quelconque
+ * est joué : il ne peut pas forcer le gain par définition, inutile de chercher mieux. Lève une
+ * erreur seulement si le camp à jouer n'a plus aucun coup légal (mat ou pat).
  */
-export function bestKpkReply(fen: string): SquareMove {
+export function bestKpkReply(fen: string, random: () => number = Math.random): SquareMove {
   const { attackerKing: wk, defenderKing: bk, pawnSquare: pawnSq, attackerToMove, attackerIsWhite } = parseKpkFen(fen);
   const table = getTable();
 
@@ -436,7 +438,11 @@ export function bestKpkReply(fen: string): SquareMove {
         best = move;
       }
     }
-    if (!best) throw new Error("Aucun coup gagnant disponible pour l'attaquant : la position est nulle.");
+    if (!best) {
+      const legalMoves = attackerMoves(wk, bk, pawnSq);
+      if (legalMoves.length === 0) throw new Error("L'attaquant n'a aucun coup légal (mat ou pat).");
+      best = legalMoves[Math.floor(random() * legalMoves.length)]!;
+    }
 
     const pawnMoved = best.pawnSq !== pawnSq;
     const fromSq = pawnMoved ? pawnSq : wk;

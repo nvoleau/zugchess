@@ -36,19 +36,50 @@
     "unlimited": "unlimited"
   },
   "Play": {
-    "title": "Game engine (prototype)",
-    "intro": "Minimal demo of the shared judge wired to a real board — not the final content, just the engine.",
-    "kpkTitle": "King + pawn vs king",
-    "methodTitle": "Method line — Lucena",
+    "title": "Endgames at tempo",
+    "intro": "Announce the result, then play. Every move is judged by an exact table or by the expected method: a wasted tempo shows up right away.",
     "backToApp": "Back to my space",
+    "Session": {
+      "categoryPawns": "Pawn endgames",
+      "categoryRooks": "Rook endgames",
+      "backToLibrary": "Back to the list"
+    },
+    "Announce": {
+      "question": "{side} to move. What's the result with best play?",
+      "whiteWins": "White wins",
+      "draw": "Draw",
+      "blackWins": "Black wins",
+      "sideWhite": "White",
+      "sideBlack": "Black"
+    },
+    "Card": {
+      "announceCorrect": "Correct call.",
+      "announceWrong": "Wrong call — play it out to see why.",
+      "nextCard": "Next position"
+    },
     "Kpk": {
       "tempoLabel": "Queen in {count} {count, plural, one {move} other {moves}}",
+      "defenderTempoLabel": "Draw held {held} / {total}",
       "won": "Won: the queen is about to appear, the technique is proven.",
-      "reset": "Restart this position"
+      "heldDraw": "Held: the pawn won't get through, draw secured.",
+      "reset": "Restart this position",
+      "sideWhite": "White",
+      "sideBlack": "Black",
+      "feedEngine": "{side} play {san}.",
+      "feedGoodTempo": "{san}: good tempo.",
+      "feedTempoLost": "{san} still wins, but costs tempo.",
+      "feedHeld": "{san}: it holds.",
+      "feedCapture": "{san}: the pawn falls, draw.",
+      "feedPromotion": "{san}: the queen is coming.",
+      "blunderAttacker": "{san} lets the win slip. What wins: {hints}.",
+      "blunderDefender": "{san} loses: the king gets through. What holds: {hints}."
     },
     "Method": {
       "tempoLabel": "Method: {done} / {total}",
-      "complete": "Line complete: the technique is proven on this position."
+      "complete": "Line complete: the technique is proven on this position.",
+      "sideWhite": "White",
+      "sideBlack": "Black",
+      "feedEngine": "{side} play {san}."
     }
   },
   "Theme": {

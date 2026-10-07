@@ -36,7 +36,7 @@ pnpm prisma:migrate          # créer/appliquer une migration en dev
 ## État des lots
 
 - [x] Lot 1 — Socle : Next.js/Vercel, Neon/Prisma, Auth.js (e-mail + Lichess), i18n, thèmes, EntitlementService et quotas, CI, config préproduction.
-- [ ] Lot 2 — Moteur de jeu
+- [x] Lot 2 — Moteur de jeu : échiquier chessground, juge KPK partagé (+ réponse automatique `bestKpkReply`, attaquant et défenseur), lignes de méthode, barre de tempo, annonce du résultat avant de jouer, les 12 positions du prototype « Finales au tempo » reprises (`apps/web/src/content/finales-tempo.ts`).
 - [ ] Lot 3 — Juges complets
 - [ ] Lot 4 — Contenu (300 positions)
 - [ ] Lot 5 — Répétition espacée

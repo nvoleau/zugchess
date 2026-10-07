@@ -36,19 +36,50 @@
     "unlimited": "illimité"
   },
   "Play": {
-    "title": "Moteur de jeu (prototype)",
-    "intro": "Démo minimale du juge partagé branché sur un vrai échiquier — pas le contenu final, juste le moteur.",
-    "kpkTitle": "Roi + pion contre roi",
-    "methodTitle": "Ligne de méthode — Lucena",
+    "title": "Finales au tempo",
+    "intro": "Annonce le résultat, puis joue. Chaque coup est jugé par une table exacte ou par la méthode attendue : un temps perdu se voit tout de suite.",
     "backToApp": "Retour à mon espace",
+    "Session": {
+      "categoryPawns": "Finales de pions",
+      "categoryRooks": "Finales de tours",
+      "backToLibrary": "Retour à la liste"
+    },
+    "Announce": {
+      "question": "Trait aux {side}. Quel est le résultat avec le meilleur jeu ?",
+      "whiteWins": "Les Blancs gagnent",
+      "draw": "Nulle",
+      "blackWins": "Les Noirs gagnent",
+      "sideWhite": "Blancs",
+      "sideBlack": "Noirs"
+    },
+    "Card": {
+      "announceCorrect": "Annonce juste.",
+      "announceWrong": "Annonce fausse — joue la position pour voir pourquoi.",
+      "nextCard": "Position suivante"
+    },
     "Kpk": {
       "tempoLabel": "Dame dans {count} {count, plural, one {coup} other {coups}}",
+      "defenderTempoLabel": "Nulle tenue {held} / {total}",
       "won": "Gagné : la dame va apparaître, la méthode est acquise.",
-      "reset": "Recommencer cette position"
+      "heldDraw": "Tenu : le pion ne passera pas, nulle acquise.",
+      "reset": "Recommencer cette position",
+      "sideWhite": "Blancs",
+      "sideBlack": "Noirs",
+      "feedEngine": "Les {side} jouent {san}.",
+      "feedGoodTempo": "{san} : bon tempo.",
+      "feedTempoLost": "{san} gagne encore, mais coûte du temps.",
+      "feedHeld": "{san} : ça tient.",
+      "feedCapture": "{san} : le pion tombe, nulle.",
+      "feedPromotion": "{san} : la dame va apparaître.",
+      "blunderAttacker": "{san} laisse filer le gain. Ce qui gagne : {hints}.",
+      "blunderDefender": "{san} perd : le roi passe. Ce qui tient : {hints}."
     },
     "Method": {
       "tempoLabel": "Méthode : {done} / {total}",
-      "complete": "Ligne terminée : la méthode est acquise sur cette position."
+      "complete": "Ligne terminée : la méthode est acquise sur cette position.",
+      "sideWhite": "Blancs",
+      "sideBlack": "Noirs",
+      "feedEngine": "Les {side} jouent {san}."
     }
   },
   "Theme": {

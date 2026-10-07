@@ -4,15 +4,11 @@ import { randomWinningKpkFen } from "@zugchess/core";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Link } from "@/i18n/navigation";
+import { attackerColorOf } from "./chess-move-dests";
 import { KpkTrainer } from "./kpk-trainer";
 
 const TRIAL_SIZE = 3;
 const STORAGE_KEY = "zugchess:guestTrialProgress";
-
-/** `randomWinningKpkFen` place toujours l'attaquant au trait : sa couleur se lit donc sur la FEN. */
-function playerSideFromFen(fen: string): "white" | "black" {
-  return fen.split(" ")[1] === "b" ? "black" : "white";
-}
 
 function readStoredProgress(): number {
   const raw = window.localStorage.getItem(STORAGE_KEY);
@@ -68,7 +64,7 @@ export function GuestTrial() {
   return (
     <div className="flex flex-col items-center gap-4">
       <p className="text-sm text-neutral-600 dark:text-neutral-400">{t("progress", { current: index + 1, total: TRIAL_SIZE })}</p>
-      <KpkTrainer key={index} initialFen={positions[index]!} playerSide={playerSideFromFen(positions[index]!)} onWin={handleWin} />
+      <KpkTrainer key={index} initialFen={positions[index]!} userColor={attackerColorOf(positions[index]!)} onWin={handleWin} />
       {currentWon && (
         <button
           type="button"

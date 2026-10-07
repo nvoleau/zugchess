@@ -17,3 +17,18 @@ export function queenPromotionIfNeeded(chess: Chess, from: string, to: string): 
   const piece = chess.get(from as Parameters<Chess["get"]>[0]);
   return piece?.type === "p" && (to.endsWith("8") || to.endsWith("1")) ? "q" : undefined;
 }
+
+const FRENCH_PIECE_LETTER: Record<string, string> = { K: "R", Q: "D", R: "T", B: "F", N: "C" };
+
+/** Traduit la notation SAN (anglaise, chess.js) en notation française : K/Q/R/B/N -> R/D/T/F/C. */
+export function frenchSan(san: string): string {
+  return san.replace(/^[KQRBN]/, (letter) => FRENCH_PIECE_LETTER[letter]!).replace(/=([QRBN])/, (_, p) => `=${FRENCH_PIECE_LETTER[p]}`);
+}
+
+export type Color = "white" | "black";
+
+/** Couleur réelle du camp qui possède le pion dans une FEN roi + pion contre roi. */
+export function attackerColorOf(fen: string): Color {
+  const placement = fen.split(" ")[0]!;
+  return placement.includes("P") ? "white" : "black";
+}

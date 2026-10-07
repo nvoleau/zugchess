@@ -6,36 +6,46 @@ import { useTranslations } from "next-intl";
 import { useReducer, useRef, useState } from "react";
 import { ChessBoard } from "@/components/chess-board";
 import { TempoBar, type TempoBoxState } from "@/components/tempo-bar";
-import { legalDests, queenPromotionIfNeeded } from "./chess-move-dests";
-
-/** Joue automatiquement les coups du juge (camp adverse) tant que ce n'est pas le tour de l'élève. */
-function playAutoSteps(chess: Chess, line: MethodLine, fromIndex: number): number {
-  let index = fromIndex;
-  while (index < line.steps.length && !isPlayerStep(line, index)) {
-    const step = line.steps[index]!;
-    chess.move({ from: step.move.from, to: step.move.to, promotion: step.move.promotion });
-    index += 1;
-  }
-  return index;
-}
+import { frenchSan, legalDests, queenPromotionIfNeeded } from "./chess-move-dests";
 
 /**
  * Entraîneur « ligne de méthode » : positions théoriques (Lucena, Philidor, etc.) où le coup
  * attendu à chaque étape de l'élève est fixé à l'avance. Le juge compare le coup tenté au coup de
  * la ligne ; un coup différent est refusé avec un indice, les coups du camp adverse s'enchaînent
- * automatiquement.
+ * automatiquement — chacun commenté dans le fil, comme ceux de l'élève.
  */
-export function MethodLineTrainer({ line }: { line: MethodLine }) {
+export function MethodLineTrainer({ line, onComplete }: { line: MethodLine; onComplete?: () => void }) {
   const t = useTranslations("Play.Method");
   const chessRef = useRef<Chess | null>(null);
   const [stepIndex, setStepIndex] = useState(0);
   const [fen, setFen] = useState(line.fen);
   const [hint, setHint] = useState<string | null>(null);
+  const [feed, setFeed] = useState<string[]>([]);
   const [, forceSync] = useReducer((n: number) => n + 1, 0);
+
+  function pushFeed(text: string) {
+    setFeed((lines) => [...lines, text]);
+  }
+
+  /** Joue automatiquement les coups du juge (camp adverse) tant que ce n'est pas le tour de l'élève. */
+  function playAutoSteps(chess: Chess, fromIndex: number): number {
+    let index = fromIndex;
+    while (index < line.steps.length && !isPlayerStep(line, index)) {
+      const step = line.steps[index]!;
+      const played = chess.move({ from: step.move.from, to: step.move.to, promotion: step.move.promotion });
+      if (played) {
+        const side = played.color === "w" ? t("sideWhite") : t("sideBlack");
+        const san = frenchSan(played.san);
+        pushFeed(step.comment.fr ? `${t("feedEngine", { side, san })} ${step.comment.fr}` : t("feedEngine", { side, san }));
+      }
+      index += 1;
+    }
+    return index;
+  }
 
   if (!chessRef.current) {
     const chess = new Chess(line.fen);
-    const resolvedIndex = playAutoSteps(chess, line, 0);
+    const resolvedIndex = playAutoSteps(chess, 0);
     chessRef.current = chess;
     if (resolvedIndex !== 0) {
       setStepIndex(resolvedIndex);
@@ -65,10 +75,12 @@ export function MethodLineTrainer({ line }: { line: MethodLine }) {
 
     setHint(null);
     const expected = line.steps[stepIndex]!.move;
-    chess.move({ from: expected.from, to: expected.to, promotion: expected.promotion });
-    const nextIndex = playAutoSteps(chess, line, stepIndex + 1);
+    const played = chess.move({ from: expected.from, to: expected.to, promotion: expected.promotion });
+    if (played) pushFeed(`${frenchSan(played.san)} — ${judgement.comment?.fr ?? ""}`.trim());
+    const nextIndex = playAutoSteps(chess, stepIndex + 1);
     setStepIndex(nextIndex);
     setFen(chess.fen());
+    if (nextIndex >= line.steps.length) onComplete?.();
   }
 
   return (
@@ -83,6 +95,15 @@ export function MethodLineTrainer({ line }: { line: MethodLine }) {
       <TempoBar label={t("tempoLabel", { done: donePlayerSteps, total: playerStepIndices.length })} boxes={boxes} />
       {complete && <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">{t("complete")}</p>}
       {hint && !complete && <p className="text-sm text-amber-600 dark:text-amber-400">{hint}</p>}
+      {feed.length > 0 && (
+        <ul className="flex w-full max-w-[360px] flex-col gap-1.5 text-sm">
+          {feed.map((lineText, i) => (
+            <li key={i} className="rounded-md bg-neutral-100 px-3 py-1.5 dark:bg-neutral-800">
+              {lineText}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
