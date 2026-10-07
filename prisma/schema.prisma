@@ -1,6 +1,6 @@
-// ZugChess — schéma Prisma, lots 1 (socle : auth + quotas) et 3 (cache tablebase).
-// Les tables du modèle de données complet (positions, cards, review_logs, etc.)
-// seront ajoutées lot par lot (voir SPEC.md).
+// ZugChess — schéma Prisma, lots 1 (socle : auth + quotas), 3 (cache tablebase) et 4 (contenu).
+// Les tables du modèle de données complet (cards, review_logs, etc.) seront ajoutées lot par lot
+// (voir SPEC.md).
 
 generator client {
   provider = "prisma-client-js"
@@ -138,4 +138,105 @@ model TablebaseCache {
   fenNormalized String   @id
   payload       Json
   fetchedAt     DateTime @default(now())
+}
+
+// --- Contenu (lot 4) ---------------------------------------------------------
+
+/// Camp réel (pas un rôle attaquant/défenseur) — utilisé pour `Position.userSide`.
+enum Side {
+  white
+  black
+}
+
+/// Résultat attendu avec le meilleur jeu (SPEC.md : annonce « Blancs gagnent / Nulle / Noirs gagnent »).
+enum ExpectedResult {
+  white
+  draw
+  black
+}
+
+/// Juge chargé de cette position (SPEC.md, « Types de juge »). `stockfish` est jugé côté
+/// navigateur (worker WASM) ; les trois autres sont jugés côté serveur par `JudgeService`.
+enum JudgeType {
+  kpk
+  syzygy
+  stockfish
+  line
+}
+
+enum PositionStatus {
+  draft
+  published
+  archived
+}
+
+/// Thème pédagogique (SPEC.md, « Thèmes de départ ») : famille (pions, tours, dames, pièces
+/// mineures, tour contre pièce mineure, études, mats élémentaires) + sous-thème (opposition, Lucena…).
+model Theme {
+  id     String  @id @default(cuid())
+  slug   String  @unique
+  family String
+  order  Int
+  /// `{ fr: "...", en: "..." }`
+  title  Json
+  free   Boolean @default(false)
+
+  lessons   Lesson[]
+  positions Position[]
+}
+
+/// Leçon courte associée à un thème (5 à 8 écrans), rédigée en Markdown.
+model Lesson {
+  id      String @id @default(cuid())
+  themeId String
+  order   Int
+  /// `{ fr: "markdown...", en: "markdown..." }`
+  content Json
+  free    Boolean @default(false)
+
+  theme Theme @relation(fields: [themeId], references: [id], onDelete: Cascade)
+
+  @@index([themeId])
+}
+
+/// Position jouable (SPEC.md, « Bibliothèque de positions »). `lineMoves` n'est renseigné que pour
+/// `judgeType = line` (ligne de méthode) : steps sérialisés au format `MethodLineStep[]` de
+/// `packages/core`. `texts` porte la consigne courte, l'intro et la conclusion par langue.
+model Position {
+  id              String         @id @default(cuid())
+  themeId         String
+  fen             String
+  userSide        Side
+  expectedResult  ExpectedResult
+  judgeType       JudgeType
+  lineMoves       Json?
+  /// `{ fr: { title, intro, goal, conclusion }, en: { ... } }`
+  texts           Json
+  /// Origine du contenu : théorie classique, puzzle Lichess, etc. (texte libre, pas d'enum fermée).
+  source          String?
+  rating          Float          @default(1500)
+  ratingDeviation Float          @default(350)
+  free            Boolean        @default(false)
+  status          PositionStatus @default(draft)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  theme    Theme          @relation(fields: [themeId], references: [id])
+  outLinks PositionLink[] @relation("PositionLinkFrom")
+  inLinks  PositionLink[] @relation("PositionLinkTo")
+
+  @@index([themeId])
+  @@index([status])
+}
+
+/// Variante reliée (trait inversé, symétrie) — SPEC.md, table `position_links`.
+model PositionLink {
+  positionId String
+  linkedId   String
+  kind       String
+
+  position Position @relation("PositionLinkFrom", fields: [positionId], references: [id], onDelete: Cascade)
+  linked   Position @relation("PositionLinkTo", fields: [linkedId], references: [id], onDelete: Cascade)
+
+  @@id([positionId, linkedId])
 }
