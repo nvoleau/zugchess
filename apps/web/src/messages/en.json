@@ -1,10 +1,133 @@
 {
-  "Home": {
-    "title": "ZugChess",
-    "tagline": "Learn, understand and play every chess endgame.",
-    "cta": "Start a position",
-    "tryCta": "Try without an account",
-    "loginSecondary": "I already have an account"
+  "Marketing": {
+    "nav": {
+      "method": "Method",
+      "programme": "Programme",
+      "progression": "Progression",
+      "pricing": "Pricing",
+      "login": "Log in",
+      "signup": "Start for free"
+    },
+    "hero": {
+      "kicker": "Chess endgames · 600 to 1800 Elo",
+      "titleLine1": "Every move counts.",
+      "titleEm": "Especially at the end.",
+      "body": "Understand the plan through short lessons, announce the result, then prove it on the board against an exact judge. Five to ten minutes a day is enough.",
+      "ctaPrimary": "Create my account",
+      "ctaSecondary": "Try without an account",
+      "stat1Value": "300",
+      "stat1Label": "validated positions",
+      "stat2Value": "7",
+      "stat2Label": "endgame families",
+      "stat3Value": "0",
+      "stat3Label": "approximation: exact judge"
+    },
+    "heroDemo": {
+      "label": "Free demo",
+      "badge": "King and pawn vs king",
+      "cta": "Create my account"
+    },
+    "quote": {
+      "text": "In order to improve your game, you must first study the endgame.",
+      "author": "— José Raúl Capablanca"
+    },
+    "method": {
+      "title": "Understand, announce,",
+      "titleEm": "prove.",
+      "body": "Every position plays out in two steps, identical across every mode. That's what turns a vague idea into a reflex.",
+      "step1Title": "Understand the plan",
+      "step1Body": "Every theme opens with a 5-to-8-screen lesson: the key idea, typical positions, arrows and highlighted squares, one mini-exercise per screen.",
+      "step2Title": "Announce the result",
+      "step2Body": "Win, draw, or loss? Before touching a piece, you evaluate the position. A correct announcement earns points; a wrong one comes back sooner.",
+      "step3Title": "Prove it on the board",
+      "step3Body": "The judge defends with the best move. A losing move is undone and the correct moves are shown. You continue until promotion, mate, or a held draw."
+    },
+    "tempo": {
+      "kicker": "The tempo bar",
+      "title": "Winning isn't enough. Win",
+      "titleEm": "without wasting time.",
+      "body": "On attack, it counts the moves to the queen or mate. Every wasted tempo adds a red box and the most direct move is shown to you. On defense, it counts the moves held.",
+      "attackLabel": "Attack",
+      "attackValue": "Queen in 4 moves",
+      "attackNote": "1 tempo lost — the most direct was {move}",
+      "defenseLabel": "Defense · Philidor",
+      "defenseValue": "5 / 8 moves held"
+    },
+    "programme": {
+      "title": "Every endgame, from the most common to the rarest.",
+      "body": "300 positions across 7 families. The « Fundamentals » path — 40 positions — is free.",
+      "positionsLabel": "positions",
+      "families": [
+        { "num": "01", "name": "Pawn endgames", "themes": "Opposition, key squares, rule of the square, triangulation, distant passed pawn, breakthrough.", "count": "90", "free": "20 free", "glyph": "♟" },
+        { "num": "02", "name": "Rook endgames", "themes": "Lucena, Philidor, frontal defense, Vancura, cut-off king, rook behind the pawn.", "count": "80", "free": "Premium", "glyph": "♜" },
+        { "num": "03", "name": "Minor pieces", "themes": "Bishop vs pawns, opposite-colored bishops, knight vs pawns, bad bishop.", "count": "55", "free": "Premium", "glyph": "♝" },
+        { "num": "04", "name": "Queen endgames", "themes": "Queen vs pawn on the 7th, queen vs rook, queen and pawn vs queen.", "count": "25", "free": "Premium", "glyph": "♛" },
+        { "num": "05", "name": "Basic mates", "themes": "Mating with the queen, the rook, two bishops, then bishop and knight.", "count": "20", "free": "20 free", "glyph": "♚" },
+        { "num": "06", "name": "Rook vs minor piece", "themes": "Rook vs bishop, rook vs knight, rook and bishop vs rook.", "count": "20", "free": "Premium", "glyph": "♞" },
+        { "num": "07", "name": "Famous studies", "themes": "Reti, Saavedra, Troitzky and other classics to replay.", "count": "10", "free": "Premium", "glyph": "★" }
+      ]
+    },
+    "progression": {
+      "kicker": "Spaced repetition · FSRS",
+      "title": "Revisit every position",
+      "titleEm": "right before you'd forget it.",
+      "body": "Your daily session surfaces due positions first, then new ones matched to your level. The grade is computed automatically from your moves: you never self-assess.",
+      "cards": [
+        { "label": "Endgame Elo", "value": "1524", "sub": "+24", "body": "A Glicko-2 rating specific to endgames. Positions have one too: difficulty calibrates itself." },
+        { "label": "Streak", "value": "12", "sub": "days", "body": "A streak freeze earned every 7 days protects a missed day. A reminder at 7 PM if the streak is at risk." },
+        { "label": "Mastery by theme", "value": "", "sub": "", "body": "A badge per theme, based on how solid your memory is: 7, 21, 60, then 180 days." },
+        { "label": "Trophies and leaderboards", "value": "30", "sub": "trophies", "body": "Global and weekly leaderboards. Consistency and accuracy are rewarded, never raw volume." }
+      ],
+      "features": [
+        { "title": "Local table", "body": "King and pawn vs king, computed in your browser. Works offline." },
+        { "title": "Syzygy tables", "body": "Exact judgment up to 7 pieces, via Lichess's endgame tables." },
+        { "title": "Method lines", "body": "Lucena, Philidor, Vancura: the expected continuation, commented move by move." },
+        { "title": "Stockfish", "body": "Beyond 7 pieces, the engine evaluates every move in the browser." }
+      ]
+    },
+    "pricing": {
+      "title": "Start for free.",
+      "subtitle": "Go Premium whenever you want every endgame.",
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "annualBadge": "−30%",
+      "free": {
+        "name": "Free",
+        "price": "€0",
+        "priceSub": "forever",
+        "features": ["Fundamentals path (40 positions)", "3 new positions per day", "20 reviews per day", "First lesson of every family", "3 error explanations per day", "Streak, XP, Elo, leaderboards"],
+        "cta": "Create an account"
+      },
+      "premium": {
+        "name": "Premium",
+        "priceMonthly": "€6.99",
+        "priceMonthlySub": "per month",
+        "priceAnnual": "€59",
+        "priceAnnualSub": "per year · €4.92/month",
+        "features": ["All 300 positions and every new one", "Unlimited new positions and reviews", "Every lesson", "Free play from any FEN", "Unlimited error explanations", "Mastery by theme, history, weak spots"],
+        "cta": "Go Premium"
+      },
+      "founder": {
+        "title": "Founding member — 40% off for life",
+        "body": "The first 100 sign-ups get 3 months of Premium free, then {price}.",
+        "priceMonthly": "€4.19 per month",
+        "priceAnnual": "€35.40 per year",
+        "note": "Refund within 14 days · cancel anytime"
+      }
+    },
+    "finalCta": {
+      "title": "The next endgame you win",
+      "titleEm": "starts tonight.",
+      "body": "Tell us your level or import your Lichess Elo: the first positions adapt to you.",
+      "ctaPrimary": "Create my account",
+      "ctaSecondary": "Continue with Lichess"
+    },
+    "footer": {
+      "copyright": "© 2026 ZugChess · Hosted in the European Union",
+      "legal": "Legal notice",
+      "privacy": "Privacy",
+      "contact": "Contact"
+    }
   },
   "Try": {
     "title": "Try it without creating an account",
@@ -24,16 +147,39 @@
     "or": "or",
     "lichessCta": "Continue with Lichess"
   },
-  "Dashboard": {
-    "title": "My space",
-    "greeting": "Hello {name}!",
-    "signOut": "Sign out",
-    "entitlementsTitle": "Today's quotas",
-    "plan": "Plan: {plan}",
-    "newPositions": "New positions left: {count}",
-    "reviews": "Reviews left: {count}",
-    "explanations": "Explanations left: {count}",
-    "unlimited": "unlimited"
+  "App": {
+    "Nav": {
+      "home": "Home",
+      "session": "Session",
+      "lessons": "Lessons",
+      "ranking": "Leaderboard",
+      "planFree": "Free",
+      "planPremium": "Premium"
+    },
+    "Home": {
+      "greeting": "Hello {name}",
+      "titleLine1": "Your session",
+      "titleEm": "is waiting.",
+      "dueCount": "{count} due",
+      "newCount": "{count} new",
+      "cta": "Start the session",
+      "allDoneTitle": "All caught up",
+      "allDoneBody": "No reviews due right now. Come back later, or explore free play.",
+      "quotasTitle": "Today",
+      "newPositions": "New positions",
+      "reviews": "Reviews",
+      "explanations": "Explanations",
+      "unlimited": "unlimited",
+      "signOut": "Sign out",
+      "freePlayCta": "Free play"
+    },
+    "ComingSoon": {
+      "lessonsTitle": "Lessons",
+      "lessonsBody": "Lessons by theme are coming soon — the content already exists in the database (lot 4), the reading page is still missing.",
+      "rankingTitle": "Leaderboard",
+      "rankingBody": "Leaderboards arrive with gamification (lot 6): XP, endgame Elo, streaks.",
+      "backToApp": "Back to home"
+    }
   },
   "Play": {
     "title": "Endgames at tempo",

@@ -1,24 +1,22 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { auth } from "@/auth";
 import { FreePlay } from "@/components/play/free-play";
-import { Link, redirect } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 
 // Jeu libre (lot 3) : juge Syzygy (tablebase.lichess.ovh, caché dans Neon), jusqu'à 7 pièces.
+// Garde d'authentification centralisée dans app/layout.tsx.
 export const dynamic = "force-dynamic";
 
 export default async function FreePlayPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const session = await auth();
-  if (!session?.user) {
-    redirect({ href: "/login", locale });
-  }
-
   const t = await getTranslations("Play.FreePlay");
 
   return (
-    <div className="flex flex-col gap-8">
+    // `dark` forcé : cette page garde sa mise en page Tailwind claire/sombre existante, qu'il
+    // faut rendre lisible sur le fond sombre de l'habillage de marque désormais imposé par
+    // app/layout.tsx (qui n'a plus de bouton clair/sombre).
+    <div className="dark flex flex-col gap-8">
       <div>
         <Link href="/app" className="text-sm text-neutral-500 underline dark:text-neutral-400">
           {t("backToApp")}

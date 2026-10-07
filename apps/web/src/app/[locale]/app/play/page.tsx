@@ -1,21 +1,16 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { auth } from "@/auth";
 import { FinaleSession } from "@/components/play/finale-session";
-import { Link, redirect } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
 
 // Les 12 positions du lot 2 (reprises du prototype « Finales au tempo ») : annonce du résultat,
 // puis juge KPK partagé ou ligne de méthode. Pas de répétition espacée ici, c'est le lot 5.
+// Garde d'authentification centralisée dans app/layout.tsx.
 export const dynamic = "force-dynamic";
 
 export default async function PlayPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
-
-  const session = await auth();
-  if (!session?.user) {
-    redirect({ href: "/login", locale });
-  }
 
   const t = await getTranslations("Play");
 

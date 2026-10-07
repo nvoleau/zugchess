@@ -1,10 +1,133 @@
 {
-  "Home": {
-    "title": "ZugChess",
-    "tagline": "Apprends, comprends et joue toutes les finales d'échecs.",
-    "cta": "Commencer une position",
-    "tryCta": "Essayer sans compte",
-    "loginSecondary": "J'ai déjà un compte"
+  "Marketing": {
+    "nav": {
+      "method": "Méthode",
+      "programme": "Programme",
+      "progression": "Progression",
+      "pricing": "Tarifs",
+      "login": "Se connecter",
+      "signup": "Commencer gratuitement"
+    },
+    "hero": {
+      "kicker": "Finales d'échecs · 600 à 1800 Elo",
+      "titleLine1": "Chaque coup compte.",
+      "titleEm": "Surtout à la fin.",
+      "body": "Comprenez le plan grâce à des leçons courtes, annoncez le résultat, puis prouvez-le sur l'échiquier face à un juge exact. Cinq à dix minutes par jour suffisent.",
+      "ctaPrimary": "Créer mon compte",
+      "ctaSecondary": "Essayer sans compte",
+      "stat1Value": "300",
+      "stat1Label": "positions validées",
+      "stat2Value": "7",
+      "stat2Label": "familles de finales",
+      "stat3Value": "0",
+      "stat3Label": "approximation : juge exact"
+    },
+    "heroDemo": {
+      "label": "Démo gratuite",
+      "badge": "Roi et pion contre roi",
+      "cta": "Créer mon compte"
+    },
+    "quote": {
+      "text": "Pour progresser, il faut d'abord étudier les finales.",
+      "author": "— d'après José Raúl Capablanca"
+    },
+    "method": {
+      "title": "Comprendre, annoncer,",
+      "titleEm": "prouver.",
+      "body": "Chaque position se joue en deux temps, identiques dans tous les modes. C'est ce qui transforme une connaissance vague en réflexe.",
+      "step1Title": "Comprendre le plan",
+      "step1Body": "Chaque thème s'ouvre sur une leçon de 5 à 8 écrans : l'idée clé, les positions types, des flèches et des cases surlignées, un mini-exercice par écran.",
+      "step2Title": "Annoncer le résultat",
+      "step2Body": "Gain, nulle ou perte ? Avant de toucher une pièce, vous évaluez la position. Une annonce juste rapporte des points, une annonce fausse se révise plus tôt.",
+      "step3Title": "Prouver sur l'échiquier",
+      "step3Body": "Le juge défend avec le meilleur coup. Un coup perdant est annulé et les coups justes s'affichent. Vous continuez jusqu'à la promotion, au mat ou à la nulle tenue."
+    },
+    "tempo": {
+      "kicker": "La barre de tempo",
+      "title": "Gagner ne suffit pas. Gagner",
+      "titleEm": "sans perdre de temps.",
+      "body": "En attaque, elle compte les coups jusqu'à la dame ou au mat. Chaque temps perdu ajoute une case rouge et le coup le plus direct vous est montré. En défense, elle compte les coups tenus.",
+      "attackLabel": "Attaque",
+      "attackValue": "Dame dans 4 coups",
+      "attackNote": "1 temps perdu — le plus direct était {move}",
+      "defenseLabel": "Défense · Philidor",
+      "defenseValue": "5 / 8 coups tenus"
+    },
+    "programme": {
+      "title": "Toutes les finales, de la plus fréquente à la plus rare.",
+      "body": "300 positions réparties en 7 familles. Le parcours « Fondamentaux » — 40 positions — est gratuit.",
+      "positionsLabel": "positions",
+      "families": [
+        { "num": "01", "name": "Finales de pions", "themes": "Opposition, cases clés, règle du carré, triangulation, pion passé éloigné, percée.", "count": "90", "free": "20 gratuites", "glyph": "♟" },
+        { "num": "02", "name": "Finales de tours", "themes": "Lucena, Philidor, défense frontale, Vancura, roi coupé, tour derrière le pion.", "count": "80", "free": "Premium", "glyph": "♜" },
+        { "num": "03", "name": "Pièces mineures", "themes": "Fou contre pions, couleurs opposées, cavalier contre pions, mauvais fou.", "count": "55", "free": "Premium", "glyph": "♝" },
+        { "num": "04", "name": "Finales de dame", "themes": "Dame contre pion en 7e, dame contre tour, dame et pion contre dame.", "count": "25", "free": "Premium", "glyph": "♛" },
+        { "num": "05", "name": "Mats élémentaires", "themes": "Mat avec la dame, la tour, les deux fous, puis fou et cavalier.", "count": "20", "free": "20 gratuites", "glyph": "♚" },
+        { "num": "06", "name": "Tour contre pièce mineure", "themes": "Tour contre fou, tour contre cavalier, tour et fou contre tour.", "count": "20", "free": "Premium", "glyph": "♞" },
+        { "num": "07", "name": "Études célèbres", "themes": "Réti, Saavedra, Troitzky et autres classiques à rejouer.", "count": "10", "free": "Premium", "glyph": "★" }
+      ]
+    },
+    "progression": {
+      "kicker": "Répétition espacée · FSRS",
+      "title": "Revoir chaque position",
+      "titleEm": "juste avant de l'oublier.",
+      "body": "Votre séance quotidienne propose d'abord les positions dues, puis des nouvelles adaptées à votre niveau. La note est calculée automatiquement à partir de vos coups : vous n'avez rien à évaluer.",
+      "cards": [
+        { "label": "Elo de finales", "value": "1524", "sub": "+24", "body": "Une cote Glicko-2 propre aux finales. Les positions ont aussi la leur : la difficulté se calibre seule." },
+        { "label": "Série", "value": "12", "sub": "jours", "body": "Un gel de série gagné tous les 7 jours protège un jour manqué. Un rappel à 19 h si la série est en danger." },
+        { "label": "Maîtrise par thème", "value": "", "sub": "", "body": "Un blason par thème, selon la solidité de votre mémoire : 7, 21, 60 puis 180 jours." },
+        { "label": "Trophées et classements", "value": "30", "sub": "trophées", "body": "Classement global et hebdomadaire. La régularité et la précision sont récompensées, jamais le volume brut." }
+      ],
+      "features": [
+        { "title": "Table locale", "body": "Roi et pion contre roi, calculé dans votre navigateur. Fonctionne hors ligne." },
+        { "title": "Tables Syzygy", "body": "Jugement exact jusqu'à 7 pièces, via les tables de finales de Lichess." },
+        { "title": "Lignes de méthode", "body": "Lucena, Philidor, Vancura : la suite attendue, commentée coup par coup." },
+        { "title": "Stockfish", "body": "Au-delà de 7 pièces, le moteur évalue chaque coup dans le navigateur." }
+      ]
+    },
+    "pricing": {
+      "title": "Commencez gratuitement.",
+      "subtitle": "Passez Premium quand vous voulez toutes les finales.",
+      "monthly": "Mensuel",
+      "annual": "Annuel",
+      "annualBadge": "−30 %",
+      "free": {
+        "name": "Gratuit",
+        "price": "0 €",
+        "priceSub": "pour toujours",
+        "features": ["Parcours Fondamentaux (40 positions)", "3 nouvelles positions par jour", "20 révisions par jour", "Première leçon de chaque famille", "3 explications d'erreur par jour", "Série, XP, Elo, classements"],
+        "cta": "Créer un compte"
+      },
+      "premium": {
+        "name": "Premium",
+        "priceMonthly": "6,99 €",
+        "priceMonthlySub": "par mois",
+        "priceAnnual": "59 €",
+        "priceAnnualSub": "par an · soit 4,92 € / mois",
+        "features": ["Les 300 positions et toutes les nouvelles", "Nouvelles positions et révisions illimitées", "Toutes les leçons", "Jeu libre depuis n'importe quelle FEN", "Explications d'erreur illimitées", "Maîtrise par thème, historique, points faibles"],
+        "cta": "Passer Premium"
+      },
+      "founder": {
+        "title": "Membre fondateur — −40 % à vie",
+        "body": "Les 100 premiers inscrits : 3 mois de Premium offerts, puis {price}.",
+        "priceMonthly": "4,19 € par mois",
+        "priceAnnual": "35,40 € par an",
+        "note": "Remboursement sous 14 jours · résiliation à tout moment"
+      }
+    },
+    "finalCta": {
+      "title": "La prochaine finale gagnée",
+      "titleEm": "commence ce soir.",
+      "body": "Indiquez votre niveau ou importez votre Elo Lichess : les premières positions s'adaptent à vous.",
+      "ctaPrimary": "Créer mon compte",
+      "ctaSecondary": "Continuer avec Lichess"
+    },
+    "footer": {
+      "copyright": "© 2026 ZugChess · Hébergé dans l'Union européenne",
+      "legal": "Mentions légales",
+      "privacy": "Confidentialité",
+      "contact": "Contact"
+    }
   },
   "Try": {
     "title": "Essaie sans créer de compte",
@@ -24,16 +147,39 @@
     "or": "ou",
     "lichessCta": "Continuer avec Lichess"
   },
-  "Dashboard": {
-    "title": "Mon espace",
-    "greeting": "Bonjour {name} !",
-    "signOut": "Se déconnecter",
-    "entitlementsTitle": "Quotas du jour",
-    "plan": "Offre : {plan}",
-    "newPositions": "Nouvelles positions restantes : {count}",
-    "reviews": "Révisions restantes : {count}",
-    "explanations": "Explications restantes : {count}",
-    "unlimited": "illimité"
+  "App": {
+    "Nav": {
+      "home": "Accueil",
+      "session": "Séance",
+      "lessons": "Leçons",
+      "ranking": "Classement",
+      "planFree": "Gratuit",
+      "planPremium": "Premium"
+    },
+    "Home": {
+      "greeting": "Bonjour {name}",
+      "titleLine1": "Votre séance",
+      "titleEm": "vous attend.",
+      "dueCount": "{count} dues",
+      "newCount": "{count} nouvelles",
+      "cta": "Commencer la séance",
+      "allDoneTitle": "Tout est à jour",
+      "allDoneBody": "Aucune révision due pour l'instant. Revenez plus tard, ou explorez le jeu libre.",
+      "quotasTitle": "Aujourd'hui",
+      "newPositions": "Nouvelles positions",
+      "reviews": "Révisions",
+      "explanations": "Explications",
+      "unlimited": "illimité",
+      "signOut": "Se déconnecter",
+      "freePlayCta": "Jeu libre"
+    },
+    "ComingSoon": {
+      "lessonsTitle": "Leçons",
+      "lessonsBody": "Les leçons par thème arrivent bientôt — elles existent déjà en base (lot 4), il manque la page qui les affiche.",
+      "rankingTitle": "Classement",
+      "rankingBody": "Les classements arrivent avec la gamification (lot 6) : XP, Elo de finales, séries.",
+      "backToApp": "Retour à l'accueil"
+    }
   },
   "Play": {
     "title": "Finales au tempo",
