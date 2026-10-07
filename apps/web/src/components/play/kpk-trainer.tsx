@@ -14,7 +14,15 @@ import { legalDests, queenPromotionIfNeeded } from "./chess-move-dests";
  * refusé (annulé) ; un coup qui gagne encore mais plus lentement est accepté et compte un temps
  * perdu sur la barre.
  */
-export function KpkTrainer({ initialFen, playerSide }: { initialFen: string; playerSide: "white" | "black" }) {
+export function KpkTrainer({
+  initialFen,
+  playerSide,
+  onWin,
+}: {
+  initialFen: string;
+  playerSide: "white" | "black";
+  onWin?: () => void;
+}) {
   const t = useTranslations("Play.Kpk");
   const chessRef = useRef(new Chess(initialFen));
   const [fen, setFen] = useState(initialFen);
@@ -45,6 +53,7 @@ export function KpkTrainer({ initialFen, playerSide }: { initialFen: string; pla
     if (played.promotion) {
       setFen(chess.fen());
       setWon(true);
+      onWin?.();
       return;
     }
 

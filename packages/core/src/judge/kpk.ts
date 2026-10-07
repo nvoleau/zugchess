@@ -478,4 +478,69 @@ export function bestKpkReply(fen: string): SquareMove {
   };
 }
 
+function piecePlacementFen(pieces: Array<{ sq: number; char: string }>): string {
+  const grid: (string | null)[] = new Array(BOARD_SIZE).fill(null);
+  for (const { sq, char } of pieces) grid[sq] = char;
+
+  const rows: string[] = [];
+  for (let rank = 7; rank >= 0; rank--) {
+    let row = "";
+    let empty = 0;
+    for (let file = 0; file < 8; file++) {
+      const piece = grid[rank * 8 + file];
+      if (piece) {
+        if (empty > 0) {
+          row += empty;
+          empty = 0;
+        }
+        row += piece;
+      } else {
+        empty += 1;
+      }
+    }
+    if (empty > 0) row += empty;
+    rows.push(row);
+  }
+  return rows.join("/");
+}
+
+/**
+ * Génère une FEN roi + pion contre roi aléatoire et gagnante pour l'attaquant à trait. Sert
+ * l'essai sans compte (3 positions tirées au hasard, cf. SPEC.md « Visiteur ») : aucune position
+ * n'est codée en dur, elle est tirée par essais successifs puis validée par la table KPK elle-même.
+ */
+export function randomWinningKpkFen(random: () => number = Math.random): string {
+  const pick = (n: number) => Math.floor(random() * n);
+
+  for (let attempt = 0; attempt < 500; attempt++) {
+    const attackerIsWhite = pick(2) === 0;
+    const pawnSq = squareIndex(pick(8), 1 + pick(5)); // rangées 2 à 6 : jamais déjà promu ni sur la 1ère
+    const attackerKing = pick(BOARD_SIZE);
+    const defenderKing = pick(BOARD_SIZE);
+    if (!isLegalState(attackerKing, defenderKing, pawnSq, ATTACKER)) continue;
+
+    const position: KpkPosition = {
+      attackerKing,
+      defenderKing,
+      pawnSquare: pawnSq,
+      attackerToMove: true,
+      attackerIsWhite,
+    };
+    if (classify(position).result !== "win") continue;
+
+    const atkKingSq = unflip(attackerKing, attackerIsWhite);
+    const defKingSq = unflip(defenderKing, attackerIsWhite);
+    const pawnRealSq = unflip(pawnSq, attackerIsWhite);
+    const placement = piecePlacementFen([
+      { sq: attackerIsWhite ? atkKingSq : defKingSq, char: "K" },
+      { sq: attackerIsWhite ? defKingSq : atkKingSq, char: "k" },
+      { sq: pawnRealSq, char: attackerIsWhite ? "P" : "p" },
+    ]);
+    const sideToMove = attackerIsWhite ? "w" : "b";
+    return `${placement} ${sideToMove} - - 0 1`;
+  }
+
+  throw new Error("Impossible de générer une position roi + pion contre roi gagnante après 500 tentatives.");
+}
+
 export { algebraicToSquare };

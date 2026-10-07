@@ -17,11 +17,16 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <h1 className="text-4xl font-bold">{t("title")}</h1>
       <p className="text-lg text-neutral-600 dark:text-neutral-400">{t("tagline")}</p>
       <Link
-        href={session ? "/app" : "/login"}
+        href={session ? "/app" : "/try"}
         className="rounded-md bg-neutral-900 px-5 py-2.5 font-medium text-white dark:bg-white dark:text-neutral-900"
       >
-        {session ? t("cta") : t("loginCta")}
+        {session ? t("cta") : t("tryCta")}
       </Link>
+      {!session && (
+        <Link href="/login" className="text-sm text-neutral-500 underline dark:text-neutral-400">
+          {t("loginSecondary")}
+        </Link>
+      )}
     </div>
   );
 }

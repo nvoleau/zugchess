@@ -3,7 +3,17 @@
     "title": "ZugChess",
     "tagline": "Learn, understand and play every chess endgame.",
     "cta": "Start a position",
-    "loginCta": "Sign in"
+    "tryCta": "Try without an account",
+    "loginSecondary": "I already have an account"
+  },
+  "Try": {
+    "title": "Try it without creating an account",
+    "intro": "3 random king + pawn vs king positions. No email, no sign-up — your progress stays on this device.",
+    "progress": "Position {current} / {total}",
+    "nextPosition": "Next position",
+    "seeResult": "See results",
+    "done": "All 3 positions solved! Create an account to keep your progress and unlock every endgame.",
+    "signUpCta": "Create a free account"
   },
   "Login": {
     "title": "Sign in",

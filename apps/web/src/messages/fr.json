@@ -3,7 +3,17 @@
     "title": "ZugChess",
     "tagline": "Apprends, comprends et joue toutes les finales d'échecs.",
     "cta": "Commencer une position",
-    "loginCta": "Se connecter"
+    "tryCta": "Essayer sans compte",
+    "loginSecondary": "J'ai déjà un compte"
+  },
+  "Try": {
+    "title": "Essaie sans créer de compte",
+    "intro": "3 positions roi + pion contre roi tirées au hasard. Pas d'e-mail, pas d'inscription — ta progression reste sur cet appareil.",
+    "progress": "Position {current} / {total}",
+    "nextPosition": "Position suivante",
+    "seeResult": "Voir le bilan",
+    "done": "Les 3 positions sont gagnées ! Crée un compte pour garder ta progression et débloquer toutes les finales.",
+    "signUpCta": "Créer un compte gratuit"
   },
   "Login": {
     "title": "Se connecter",

@@ -1,6 +1,18 @@
 import { Chess } from "chess.js";
 import { describe, expect, it } from "vitest";
-import { bestKpkReply, judgeKpkMove, kpkResult } from "../../src/judge/kpk.js";
+import { bestKpkReply, judgeKpkMove, kpkResult, parseKpkFen, randomWinningKpkFen } from "../../src/judge/kpk.js";
+
+/** Générateur pseudo-aléatoire déterministe (mulberry32), pour des tests reproductibles. */
+function seededRandom(seed: number): () => number {
+  let state = seed;
+  return () => {
+    state |= 0;
+    state = (state + 0x6d2b79f5) | 0;
+    let t = Math.imul(state ^ (state >>> 15), 1 | state);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
 
 function applyMove(fen: string, move: { from: string; to: string; promotion?: string }): string {
   const chess = new Chess(fen);
@@ -125,5 +137,29 @@ describe("bestKpkReply", () => {
   it("lève une erreur si le défenseur au trait est pat", () => {
     const fen = "8/8/8/8/8/6k1/5p2/7K w - - 0 1"; // pat : Rh1 (défenseur) n'a aucun coup légal
     expect(() => bestKpkReply(fen)).toThrow();
+  });
+});
+
+describe("randomWinningKpkFen", () => {
+  it("génère 50 positions légales, gagnantes, avec l'attaquant au trait", () => {
+    const random = seededRandom(42);
+    for (let i = 0; i < 50; i++) {
+      const fen = randomWinningKpkFen(random);
+      expect(kpkResult(fen)).toBe("win");
+      expect(parseKpkFen(fen).attackerToMove).toBe(true);
+      // la FEN doit être rejouable par chess.js (deux rois, un pion, rien d'autre)
+      const chess = new Chess(fen);
+      const pieces = chess.board().flat().filter((p) => p !== null);
+      expect(pieces).toHaveLength(3);
+    }
+  });
+
+  it("varie la couleur de l'attaquant sur un grand nombre de tirages", () => {
+    const random = seededRandom(7);
+    const colors = new Set<string>();
+    for (let i = 0; i < 30; i++) {
+      colors.add(new Chess(randomWinningKpkFen(random)).turn());
+    }
+    expect(colors.size).toBe(2);
   });
 });
