@@ -37,7 +37,7 @@ pnpm prisma:migrate          # créer/appliquer une migration en dev
 
 - [x] Lot 1 — Socle : Next.js/Vercel, Neon/Prisma, Auth.js (e-mail + Lichess), i18n, thèmes, EntitlementService et quotas, CI, config préproduction.
 - [x] Lot 2 — Moteur de jeu : échiquier chessground, juge KPK partagé (+ réponse automatique `bestKpkReply`, attaquant et défenseur), lignes de méthode, barre de tempo, annonce du résultat avant de jouer, les 12 positions du prototype « Finales au tempo » reprises (`apps/web/src/content/finales-tempo.ts`).
-- [ ] Lot 3 — Juges complets
+- [ ] Lot 3 — Juges complets : **en cours**. Fait — juge Syzygy pur et testé (`packages/core/src/judge/syzygy.ts`), `TablebaseCache` (modèle Prisma + migration `20261007090000_tablebase_cache`, pas encore appliquée faute d'accès DB depuis ce sandbox), `TablebaseClient` (cache + limite 1 req/s), `POST/GET /api/judge/syzygy`, jeu libre (`/app/free-play`, coller une FEN ou choisir une famille). **Non vérifié en conditions réelles** : la forme exacte des réponses `tablebase.lichess.ovh` n'a pas pu être confirmée (réseau indisponible ici) — à vérifier une fois déployé. Reste à faire : Stockfish WASM (+7 pièces), explication d'erreur détaillée (suite principale 5 coups + principe du thème), les 30 positions de tours + 20 de pièces mineures de l'acceptance du lot.
 - [ ] Lot 4 — Contenu (300 positions)
 - [ ] Lot 5 — Répétition espacée
 - [ ] Lot 6 — Gamification et e-mails

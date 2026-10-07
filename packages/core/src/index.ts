@@ -4,3 +4,4 @@ export * from "./entitlement/usageDay.js";
 export * from "./judge/types.js";
 export * from "./judge/kpk.js";
 export * from "./judge/methodLine.js";
+export * from "./judge/syzygy.js";

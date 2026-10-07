@@ -22,6 +22,7 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
 
   const t = await getTranslations("Dashboard");
   const playT = await getTranslations("Play");
+  const freePlayT = await getTranslations("Play.FreePlay");
   const entitlements = await getEntitlementsForUser(user.id);
 
   async function handleSignOut() {
@@ -57,12 +58,20 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
         </ul>
       </section>
 
-      <Link
-        href="/app/play"
-        className="w-fit rounded-md border border-neutral-300 px-3 py-1.5 text-sm dark:border-neutral-700"
-      >
-        {playT("title")}
-      </Link>
+      <div className="flex flex-wrap gap-2">
+        <Link
+          href="/app/play"
+          className="w-fit rounded-md border border-neutral-300 px-3 py-1.5 text-sm dark:border-neutral-700"
+        >
+          {playT("title")}
+        </Link>
+        <Link
+          href="/app/free-play"
+          className="w-fit rounded-md border border-neutral-300 px-3 py-1.5 text-sm dark:border-neutral-700"
+        >
+          {freePlayT("title")}
+        </Link>
+      </div>
     </div>
   );
 }

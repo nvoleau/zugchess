@@ -80,6 +80,41 @@
       "sideWhite": "Blancs",
       "sideBlack": "Noirs",
       "feedEngine": "Les {side} jouent {san}."
+    },
+    "Syzygy": {
+      "evaluating": "Analyse de la position…",
+      "evalError": "Impossible de joindre le juge pour le moment. Réessaie plus tard.",
+      "serverError": "Le juge n'a pas pu répondre — le coup n'est pas joué, réessaie.",
+      "tempoLabel": "Gagné dans {count} {count, plural, one {coup} other {coups}}",
+      "defenderTempoLabel": "Nulle tenue {held} / {total}",
+      "goalWin": "Objectif : gagner cette position.",
+      "goalLoss": "Position difficile : résiste du mieux possible.",
+      "won": "Gagné.",
+      "drawn": "Nulle tenue.",
+      "lost": "Perdu — la position l'imposait, rejoue pour t'entraîner.",
+      "sideWhite": "Blancs",
+      "sideBlack": "Noirs",
+      "feedEngine": "Les {side} jouent {san}.",
+      "feedGoodTempo": "{san} : bon tempo.",
+      "feedTempoLost": "{san} gagne encore, mais coûte du temps.",
+      "feedHeld": "{san} : ça tient.",
+      "feedMove": "{san}.",
+      "blunderAttacker": "{san} laisse filer le gain. Ce qui gagne : {hints}.",
+      "blunderDefender": "{san} perd. Ce qui tient : {hints}."
+    },
+    "FreePlay": {
+      "title": "Jeu libre",
+      "intro": "Colle une FEN ou choisis une famille de finale (jusqu'à 7 pièces), puis joue contre le juge Syzygy jusqu'au bout.",
+      "backToApp": "Retour à mon espace",
+      "fenLabel": "FEN de départ",
+      "invalidFen": "Cette FEN n'est pas valide.",
+      "start": "Commencer",
+      "newPosition": "Nouvelle position",
+      "orChooseFamily": "Ou choisis une famille :",
+      "presetRook": "Tour contre roi",
+      "presetQueenVsRook": "Dame contre tour",
+      "presetBishopKnight": "Fou et cavalier contre roi",
+      "presetTwoBishops": "Deux fous contre roi"
     }
   },
   "Theme": {

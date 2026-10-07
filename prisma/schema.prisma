@@ -1,4 +1,4 @@
-// ZugChess — schéma Prisma, lot 1 (socle : auth + quotas).
+// ZugChess — schéma Prisma, lots 1 (socle : auth + quotas) et 3 (cache tablebase).
 // Les tables du modèle de données complet (positions, cards, review_logs, etc.)
 // seront ajoutées lot par lot (voir SPEC.md).
 
@@ -127,4 +127,15 @@ model DailyUsage {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, day])
+}
+
+// --- Juge Syzygy (lot 3) -----------------------------------------------------
+
+/// Cache des réponses de l'API tablebase de Lichess (SPEC.md, table `tablebase_cache`), pour ne
+/// pas interroger `tablebase.lichess.ovh` plus d'une fois par position normalisée (limite d'1
+/// requête/s imposée par Lichess).
+model TablebaseCache {
+  fenNormalized String   @id
+  payload       Json
+  fetchedAt     DateTime @default(now())
 }

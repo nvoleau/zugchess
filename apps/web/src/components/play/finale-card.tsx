@@ -3,6 +3,7 @@
 import { kpkResult, type GameResult } from "@zugchess/core";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { ChessBoard } from "@/components/chess-board";
 import type { FinaleCard as FinaleCardData } from "@/content/finales-tempo";
 import { attackerColorOf } from "./chess-move-dests";
 import { AnnounceStep } from "./announce-step";
@@ -51,7 +52,12 @@ export function FinaleCard({ card, locale, onComplete }: { card: FinaleCardData;
         <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">{card.intro[locale]}</p>
       </div>
 
-      {phase === "announce" && <AnnounceStep sideToMove={sideToMoveOf(fen)} onAnswer={handleAnnounce} />}
+      {phase === "announce" && (
+        <>
+          <ChessBoard fen={fen} orientation={card.userColor} />
+          <AnnounceStep sideToMove={sideToMoveOf(fen)} onAnswer={handleAnnounce} />
+        </>
+      )}
 
       {phase !== "announce" && (
         <>

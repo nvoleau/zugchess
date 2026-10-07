@@ -80,6 +80,41 @@
       "sideWhite": "White",
       "sideBlack": "Black",
       "feedEngine": "{side} play {san}."
+    },
+    "Syzygy": {
+      "evaluating": "Evaluating the position…",
+      "evalError": "Can't reach the judge right now. Try again later.",
+      "serverError": "The judge couldn't respond — the move wasn't played, try again.",
+      "tempoLabel": "Won in {count} {count, plural, one {move} other {moves}}",
+      "defenderTempoLabel": "Draw held {held} / {total}",
+      "goalWin": "Goal: win this position.",
+      "goalLoss": "Tough position: resist as best you can.",
+      "won": "Won.",
+      "drawn": "Draw held.",
+      "lost": "Lost — the position called for it, try again for practice.",
+      "sideWhite": "White",
+      "sideBlack": "Black",
+      "feedEngine": "{side} play {san}.",
+      "feedGoodTempo": "{san}: good tempo.",
+      "feedTempoLost": "{san} still wins, but costs tempo.",
+      "feedHeld": "{san}: it holds.",
+      "feedMove": "{san}.",
+      "blunderAttacker": "{san} lets the win slip. What wins: {hints}.",
+      "blunderDefender": "{san} loses. What holds: {hints}."
+    },
+    "FreePlay": {
+      "title": "Free play",
+      "intro": "Paste a FEN or pick a family (up to 7 pieces), then play against the Syzygy judge to the end.",
+      "backToApp": "Back to my space",
+      "fenLabel": "Starting FEN",
+      "invalidFen": "This FEN isn't valid.",
+      "start": "Start",
+      "newPosition": "New position",
+      "orChooseFamily": "Or pick a family:",
+      "presetRook": "Rook vs king",
+      "presetQueenVsRook": "Queen vs rook",
+      "presetBishopKnight": "Bishop and knight vs king",
+      "presetTwoBishops": "Two bishops vs king"
     }
   },
   "Theme": {
