@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useReducer, useRef, useState } from "react";
 import { ChessBoard } from "@/components/chess-board";
 import { TempoBar, type TempoBoxState } from "@/components/tempo-bar";
-import { frenchSan, legalDests, queenPromotionIfNeeded } from "./chess-move-dests";
+import { frenchSan, legalDests } from "./chess-move-dests";
 
 const HELD_TO_DRAW = 8;
 
@@ -103,12 +103,11 @@ export function SyzygyTrainer({ initialFen }: { initialFen: string }) {
       .join(", ");
   }
 
-  async function handleMove(from: string, to: string) {
+  async function handleMove(from: string, to: string, promotion?: "q" | "r" | "b" | "n") {
     if (status !== "playing" || pending) return;
     const chess = chessRef.current;
     if (chess.turn() !== playerColor) return;
 
-    const promotion = queenPromotionIfNeeded(chess, from, to);
     const uci = `${from}${to}${promotion ?? ""}`;
 
     setPending(true);

@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useReducer, useRef, useState } from "react";
 import { ChessBoard } from "@/components/chess-board";
 import { TempoBar, type TempoBoxState } from "@/components/tempo-bar";
-import { attackerColorOf, frenchSan, legalDests, queenPromotionIfNeeded, type Color } from "./chess-move-dests";
+import { attackerColorOf, frenchSan, legalDests, type Color } from "./chess-move-dests";
 
 const HELD_TO_DRAW = 8;
 
@@ -99,13 +99,12 @@ export function KpkTrainer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetCount]);
 
-  function handleMove(from: string, to: string) {
+  function handleMove(from: string, to: string, promotion?: "q" | "r" | "b" | "n") {
     if (won) return;
     const chess = chessRef.current;
     if (chess.turn() !== playerColor) return;
 
     const fenBefore = chess.fen();
-    const promotion = queenPromotionIfNeeded(chess, from, to);
     const played = chess.move({ from, to, promotion });
     if (!played) return;
 

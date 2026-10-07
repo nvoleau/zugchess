@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { useReducer, useRef, useState } from "react";
 import { ChessBoard } from "@/components/chess-board";
 import { TempoBar, type TempoBoxState } from "@/components/tempo-bar";
-import { frenchSan, legalDests, queenPromotionIfNeeded } from "./chess-move-dests";
+import { frenchSan, legalDests } from "./chess-move-dests";
 
 /**
  * Entraîneur « ligne de méthode » : positions théoriques (Lucena, Philidor, etc.) où le coup
@@ -60,12 +60,11 @@ export function MethodLineTrainer({ line, onComplete }: { line: MethodLine; onCo
   const donePlayerSteps = playerStepIndices.filter((i) => i < stepIndex).length;
   const boxes: TempoBoxState[] = playerStepIndices.map((_, i): TempoBoxState => (i < donePlayerSteps ? "done" : "pending"));
 
-  function handleMove(from: string, to: string) {
+  function handleMove(from: string, to: string, promotion?: "q" | "r" | "b" | "n") {
     if (complete) return;
     const chess = chessRef.current;
     if (!chess || chess.turn() !== playerColor) return;
 
-    const promotion = queenPromotionIfNeeded(chess, from, to);
     const judgement = judgeMethodLineMove(line, stepIndex, { from, to, promotion });
     if (!judgement.correct) {
       setHint(judgement.hint?.fr ?? null);

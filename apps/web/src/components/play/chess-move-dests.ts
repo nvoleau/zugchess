@@ -12,12 +12,6 @@ export function legalDests(chess: Chess, color: "w" | "b"): Map<string, string[]
   return dests;
 }
 
-/** Promotion dame si le coup en est une, sinon `undefined` — ne force la promotion que si le pion atteint la dernière rangée. */
-export function queenPromotionIfNeeded(chess: Chess, from: string, to: string): "q" | undefined {
-  const piece = chess.get(from as Parameters<Chess["get"]>[0]);
-  return piece?.type === "p" && (to.endsWith("8") || to.endsWith("1")) ? "q" : undefined;
-}
-
 const FRENCH_PIECE_LETTER: Record<string, string> = { K: "R", Q: "D", R: "T", B: "F", N: "C" };
 
 /** Traduit la notation SAN (anglaise, chess.js) en notation française : K/Q/R/B/N -> R/D/T/F/C. */
