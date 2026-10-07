@@ -3,13 +3,18 @@
 import { Chess } from "chess.js";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { pieceCountOf } from "./chess-move-dests";
+import { StockfishTrainer } from "./stockfish-trainer";
 import { SyzygyTrainer } from "./syzygy-trainer";
+
+const SYZYGY_MAX_PIECES = 7;
 
 const PRESETS: Array<{ labelKey: string; fen: string }> = [
   { labelKey: "presetRook", fen: "4k3/8/4K3/8/8/8/8/4R3 w - - 0 1" },
   { labelKey: "presetQueenVsRook", fen: "4k3/8/8/8/8/4K3/8/3QR3 w - - 0 1" },
   { labelKey: "presetBishopKnight", fen: "7k/8/5K2/8/8/4BN2/8/8 w - - 0 1" },
   { labelKey: "presetTwoBishops", fen: "7k/8/5K2/8/8/4BB2/8/8 w - - 0 1" },
+  { labelKey: "presetRookEnding", fen: "r3k2r/5ppp/8/8/8/8/5PPP/R3K2R w - - 0 1" },
 ];
 
 function isValidFen(fen: string): boolean {
@@ -42,12 +47,13 @@ export function FreePlay() {
   }
 
   if (fen) {
+    const useStockfish = pieceCountOf(fen) > SYZYGY_MAX_PIECES;
     return (
       <div className="flex flex-col items-center gap-4">
         <button type="button" onClick={() => setFen(null)} className="text-sm text-neutral-500 underline dark:text-neutral-400">
           {t("newPosition")}
         </button>
-        <SyzygyTrainer key={fen} initialFen={fen} />
+        {useStockfish ? <StockfishTrainer key={fen} initialFen={fen} /> : <SyzygyTrainer key={fen} initialFen={fen} />}
       </div>
     );
   }

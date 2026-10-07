@@ -16,6 +16,32 @@ function applyUci(chess: Chess, uci: string) {
   return chess.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci.slice(4) || undefined });
 }
 
+/**
+ * Suite principale (SPEC.md, « explication d'erreur ») : rejoue `bestSyzygyMove` des deux côtés en
+ * alternance depuis `fen`, en interrogeant la tablebase à chaque demi-coup (caché par
+ * `getTablebasePosition`). Boucle courte (5 coups par défaut) : acceptable pour un indice affiché
+ * une fois après une erreur, pas pour un usage répété.
+ */
+async function syzygyPrincipalVariation(fen: string, plies = 5): Promise<string[]> {
+  const line: string[] = [];
+  const chess = new Chess(fen);
+  for (let i = 0; i < plies; i++) {
+    let position;
+    try {
+      position = await getTablebasePosition(chess.fen());
+    } catch {
+      break;
+    }
+    if (position.moves.length === 0) break;
+    const move = bestSyzygyMove(position);
+    const played = applyUci(chess, move.uci);
+    if (!played) break;
+    line.push(move.uci);
+    if (chess.isGameOver()) break;
+  }
+  return line;
+}
+
 type GameOverReason = "checkmate" | "stalemate" | "draw";
 
 function gameOverReason(chess: Chess): GameOverReason | null {
@@ -92,7 +118,8 @@ export async function POST(request: Request) {
 
   if (judgement.blundered) {
     const hints = safeSyzygyMoves(before).map((m) => m.uci);
-    return NextResponse.json({ judgement, hints });
+    const principalVariation = await syzygyPrincipalVariation(fen);
+    return NextResponse.json({ judgement, hints, principalVariation });
   }
 
   const endAfterPlayerMove = gameOverReason(chess);

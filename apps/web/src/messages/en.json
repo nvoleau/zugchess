@@ -72,7 +72,8 @@
       "feedCapture": "{san}: the pawn falls, draw.",
       "feedPromotion": "{san}: the queen is coming.",
       "blunderAttacker": "{san} lets the win slip. What wins: {hints}.",
-      "blunderDefender": "{san} loses: the king gets through. What holds: {hints}."
+      "blunderDefender": "{san} loses: the king gets through. What holds: {hints}.",
+      "principalVariation": "Main line: {line}"
     },
     "Method": {
       "tempoLabel": "Method: {done} / {total}",
@@ -100,11 +101,32 @@
       "feedHeld": "{san}: it holds.",
       "feedMove": "{san}.",
       "blunderAttacker": "{san} lets the win slip. What wins: {hints}.",
-      "blunderDefender": "{san} loses. What holds: {hints}."
+      "blunderDefender": "{san} loses. What holds: {hints}.",
+      "principalVariation": "Main line: {line}"
+    },
+    "Stockfish": {
+      "evaluating": "Evaluating the position…",
+      "evalError": "Can't load the engine right now. Try again later.",
+      "engineError": "The engine couldn't respond — the move wasn't played, try again.",
+      "thinking": "The engine is thinking…",
+      "evalLabel": "Evaluation: {score}",
+      "mateFor": "Mate in {n}",
+      "mateAgainst": "Mated in {n}",
+      "won": "Won.",
+      "drawn": "Draw.",
+      "lost": "Lost — try again for practice.",
+      "sideWhite": "White",
+      "sideBlack": "Black",
+      "feedEngine": "{side} play {san}.",
+      "feedMove": "{san}.",
+      "feedGoodMove": "{san}: excellent move.",
+      "feedImprecise": "{san}: a bit imprecise, but it holds.",
+      "blunder": "{san} gives up too much ground. The best move was {best}.",
+      "principalVariation": "Main line: {line}"
     },
     "FreePlay": {
       "title": "Free play",
-      "intro": "Paste a FEN or pick a family (up to 7 pieces), then play against the Syzygy judge to the end.",
+      "intro": "Paste a FEN or pick a family, then play against the judge to the end — exact table up to 7 pieces, Stockfish beyond.",
       "backToApp": "Back to my space",
       "fenLabel": "Starting FEN",
       "invalidFen": "This FEN isn't valid.",
@@ -114,7 +136,8 @@
       "presetRook": "Rook vs king",
       "presetQueenVsRook": "Queen vs rook",
       "presetBishopKnight": "Bishop and knight vs king",
-      "presetTwoBishops": "Two bishops vs king"
+      "presetTwoBishops": "Two bishops vs king",
+      "presetRookEnding": "Rook ending (Stockfish, 12 pieces)"
     }
   },
   "Theme": {

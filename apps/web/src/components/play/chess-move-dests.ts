@@ -1,4 +1,5 @@
-import type { Chess } from "chess.js";
+import type { SquareMove } from "@zugchess/core";
+import { Chess } from "chess.js";
 
 /** Construit la map `case de départ -> cases d'arrivée légales` attendue par chessground. */
 export function legalDests(chess: Chess, color: "w" | "b"): Map<string, string[]> {
@@ -25,4 +26,22 @@ export type Color = "white" | "black";
 export function attackerColorOf(fen: string): Color {
   const placement = fen.split(" ")[0]!;
   return placement.includes("P") ? "white" : "black";
+}
+
+/** Nombre de pièces (tous camps confondus) sur l'échiquier décrit par une FEN. */
+export function pieceCountOf(fen: string): number {
+  const placement = fen.split(" ")[0]!;
+  return placement.replace(/[^a-zA-Z]/g, "").length;
+}
+
+/** Rejoue une suite de coups depuis une FEN et renvoie la notation française, coup par coup. */
+export function sanSequence(fen: string, moves: SquareMove[]): string[] {
+  const chess = new Chess(fen);
+  const sans: string[] = [];
+  for (const move of moves) {
+    const played = chess.move({ from: move.from, to: move.to, promotion: move.promotion });
+    if (!played) break;
+    sans.push(frenchSan(played.san));
+  }
+  return sans;
 }

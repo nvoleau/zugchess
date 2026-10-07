@@ -1,12 +1,12 @@
 "use client";
 
-import { bestKpkReply, judgeKpkMove } from "@zugchess/core";
+import { bestKpkReply, judgeKpkMove, kpkPrincipalVariation } from "@zugchess/core";
 import { Chess, type Move } from "chess.js";
 import { useTranslations } from "next-intl";
 import { useEffect, useReducer, useRef, useState } from "react";
 import { ChessBoard } from "@/components/chess-board";
 import { TempoBar, type TempoBoxState } from "@/components/tempo-bar";
-import { attackerColorOf, frenchSan, legalDests, type Color } from "./chess-move-dests";
+import { attackerColorOf, frenchSan, legalDests, sanSequence, type Color } from "./chess-move-dests";
 
 const HELD_TO_DRAW = 8;
 
@@ -116,6 +116,8 @@ export function KpkTrainer({
       const safe = findSafeMoves(chess, playerColor, role);
       const hints = safe.map((m) => frenchSan(m.san)).join(", ");
       pushFeed(t(role === "attacker" ? "blunderAttacker" : "blunderDefender", { san: frenchSan(played.san), hints }));
+      const pv = kpkPrincipalVariation(fenBefore, 5);
+      if (pv.length > 0) pushFeed(t("principalVariation", { line: sanSequence(fenBefore, pv).join(" ") }));
       forceSync(); // le coup n'est pas appliqué : on force chessground à revenir à la position réelle.
       return;
     }

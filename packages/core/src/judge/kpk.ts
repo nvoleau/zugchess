@@ -549,4 +549,30 @@ export function randomWinningKpkFen(random: () => number = Math.random): string 
   throw new Error("Impossible de générer une position roi + pion contre roi gagnante après 500 tentatives.");
 }
 
+/**
+ * Suite principale (SPEC.md, « explication d'erreur » : coup juste + suite de quelques coups) :
+ * rejoue `bestKpkReply` des deux côtés en alternance, pour montrer au joueur comment la position se
+ * joue optimalement après une erreur. S'arrête plus tôt si la ligne atteint une promotion (la
+ * position sort alors du domaine K+P vs K) ou l'absence de coup légal (mat/pat).
+ */
+export function kpkPrincipalVariation(fen: string, plies = 5, random: () => number = Math.random): SquareMove[] {
+  const line: SquareMove[] = [];
+  const chess = new Chess(fen);
+
+  for (let i = 0; i < plies; i++) {
+    let move: SquareMove;
+    try {
+      move = bestKpkReply(chess.fen(), random);
+    } catch {
+      break;
+    }
+    const played = chess.move({ from: move.from, to: move.to, promotion: move.promotion });
+    if (!played) break;
+    line.push(move);
+    if (played.promotion || chess.isGameOver()) break;
+  }
+
+  return line;
+}
+
 export { algebraicToSquare };

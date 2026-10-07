@@ -1,6 +1,6 @@
 import { Chess } from "chess.js";
 import { describe, expect, it } from "vitest";
-import { bestKpkReply, judgeKpkMove, kpkResult, parseKpkFen, randomWinningKpkFen } from "../../src/judge/kpk.js";
+import { bestKpkReply, judgeKpkMove, kpkPrincipalVariation, kpkResult, parseKpkFen, randomWinningKpkFen } from "../../src/judge/kpk.js";
 
 /** Générateur pseudo-aléatoire déterministe (mulberry32), pour des tests reproductibles. */
 function seededRandom(seed: number): () => number {
@@ -174,5 +174,39 @@ describe("randomWinningKpkFen", () => {
       colors.add(new Chess(randomWinningKpkFen(random)).turn());
     }
     expect(colors.size).toBe(2);
+  });
+});
+
+describe("kpkPrincipalVariation", () => {
+  it("rejoue la suite optimale des deux côtés jusqu'à la promotion", () => {
+    const fen = "7k/8/8/8/8/1P6/8/7K w - - 0 1"; // gagnant, marge confortable
+    const line = kpkPrincipalVariation(fen, 9, seededRandom(1));
+    expect(line.length).toBeGreaterThan(0);
+
+    // chaque coup de la ligne doit être légal et correspondre au coup réellement joué sur l'échiquier
+    const chess = new Chess(fen);
+    for (const move of line) {
+      const played = chess.move({ from: move.from, to: move.to, promotion: move.promotion });
+      expect(played).not.toBeNull();
+    }
+    // la ligne se termine à la promotion (plus de pion à partir de là) ou au nombre de demi-coups demandé
+    const last = line[line.length - 1]!;
+    expect(last.promotion === "q" || line.length === 9).toBe(true);
+  });
+
+  it("s'arrête net si on lui demande 0 coup", () => {
+    const fen = "7k/8/8/8/8/1P6/8/7K w - - 0 1";
+    expect(kpkPrincipalVariation(fen, 0)).toEqual([]);
+  });
+
+  it("fonctionne aussi quand l'attaquant est noir (conversion de couleur correcte)", () => {
+    const fen = "7k/8/1p6/8/8/8/8/7K b - - 0 1";
+    const line = kpkPrincipalVariation(fen, 9, seededRandom(2));
+    expect(line.length).toBeGreaterThan(0);
+    const chess = new Chess(fen);
+    for (const move of line) {
+      const played = chess.move({ from: move.from, to: move.to, promotion: move.promotion });
+      expect(played).not.toBeNull();
+    }
   });
 });

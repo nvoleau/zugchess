@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useReducer, useRef, useState } from "react";
 import { ChessBoard } from "@/components/chess-board";
 import { TempoBar, type TempoBoxState } from "@/components/tempo-bar";
-import { frenchSan, legalDests } from "./chess-move-dests";
+import { frenchSan, legalDests, sanSequence } from "./chess-move-dests";
 
 const HELD_TO_DRAW = 8;
 
@@ -25,6 +25,7 @@ interface MoveResponse {
   error?: string;
   judgement?: Judgement;
   hints?: string[];
+  principalVariation?: string[];
   reply?: string;
   gameOverReason?: "checkmate" | "stalemate" | "draw";
 }
@@ -132,6 +133,14 @@ export function SyzygyTrainer({ initialFen }: { initialFen: string }) {
         const attemptedSan = attempted ? frenchSan(attempted.san) : uci;
         if (attempted) probe.undo();
         setHint(t(goal === "draw" ? "blunderDefender" : "blunderAttacker", { san: attemptedSan, hints: hintSanList(data.hints ?? []) }));
+        if (data.principalVariation && data.principalVariation.length > 0) {
+          const pvMoves = data.principalVariation.map((pvUci) => ({
+            from: pvUci.slice(0, 2),
+            to: pvUci.slice(2, 4),
+            promotion: (pvUci.slice(4) || undefined) as "q" | "r" | "b" | "n" | undefined,
+          }));
+          pushFeed(t("principalVariation", { line: sanSequence(chessRef.current.fen(), pvMoves).join(" ") }));
+        }
         forceSync();
         return;
       }

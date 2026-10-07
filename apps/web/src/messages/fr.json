@@ -72,7 +72,8 @@
       "feedCapture": "{san} : le pion tombe, nulle.",
       "feedPromotion": "{san} : la dame va apparaître.",
       "blunderAttacker": "{san} laisse filer le gain. Ce qui gagne : {hints}.",
-      "blunderDefender": "{san} perd : le roi passe. Ce qui tient : {hints}."
+      "blunderDefender": "{san} perd : le roi passe. Ce qui tient : {hints}.",
+      "principalVariation": "Suite principale : {line}"
     },
     "Method": {
       "tempoLabel": "Méthode : {done} / {total}",
@@ -100,11 +101,32 @@
       "feedHeld": "{san} : ça tient.",
       "feedMove": "{san}.",
       "blunderAttacker": "{san} laisse filer le gain. Ce qui gagne : {hints}.",
-      "blunderDefender": "{san} perd. Ce qui tient : {hints}."
+      "blunderDefender": "{san} perd. Ce qui tient : {hints}.",
+      "principalVariation": "Suite principale : {line}"
+    },
+    "Stockfish": {
+      "evaluating": "Analyse de la position…",
+      "evalError": "Impossible de charger le moteur pour le moment. Réessaie plus tard.",
+      "engineError": "Le moteur n'a pas pu répondre — le coup n'est pas joué, réessaie.",
+      "thinking": "Le moteur réfléchit…",
+      "evalLabel": "Évaluation : {score}",
+      "mateFor": "Mat en {n}",
+      "mateAgainst": "Maté en {n}",
+      "won": "Gagné.",
+      "drawn": "Nulle.",
+      "lost": "Perdu — rejoue pour t'entraîner.",
+      "sideWhite": "Blancs",
+      "sideBlack": "Noirs",
+      "feedEngine": "Les {side} jouent {san}.",
+      "feedMove": "{san}.",
+      "feedGoodMove": "{san} : excellent coup.",
+      "feedImprecise": "{san} : léger flottement, mais ça passe.",
+      "blunder": "{san} perd trop de terrain. Le meilleur coup était {best}.",
+      "principalVariation": "Suite principale : {line}"
     },
     "FreePlay": {
       "title": "Jeu libre",
-      "intro": "Colle une FEN ou choisis une famille de finale (jusqu'à 7 pièces), puis joue contre le juge Syzygy jusqu'au bout.",
+      "intro": "Colle une FEN ou choisis une famille de finale, puis joue contre le juge jusqu'au bout — table exacte jusqu'à 7 pièces, Stockfish au-delà.",
       "backToApp": "Retour à mon espace",
       "fenLabel": "FEN de départ",
       "invalidFen": "Cette FEN n'est pas valide.",
@@ -114,7 +136,8 @@
       "presetRook": "Tour contre roi",
       "presetQueenVsRook": "Dame contre tour",
       "presetBishopKnight": "Fou et cavalier contre roi",
-      "presetTwoBishops": "Deux fous contre roi"
+      "presetTwoBishops": "Deux fous contre roi",
+      "presetRookEnding": "Finale de tours (Stockfish, 12 pièces)"
     }
   },
   "Theme": {
