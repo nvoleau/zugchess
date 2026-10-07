@@ -52,6 +52,11 @@ model VerificationToken {
 
 // --- Compte joueur ----------------------------------------------------------
 
+enum Role {
+  player
+  admin
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -66,12 +71,18 @@ model User {
   publicProfile Boolean @default(true)
   founder       Boolean @default(false)
   lichessId     String? @unique
+  /// Back-office interne (hors SPEC.md : rôle "administrateur" y est scopé au contenu, pas aux
+  /// comptes). Jamais modifiable depuis l'UI admin elle-même — seulement via `ADMIN_EMAILS` + seed,
+  /// pour éviter qu'un admin ne puisse s'auto-élever ou élever quelqu'un d'autre par erreur.
+  role          Role    @default(player)
 
   accounts     Account[]
   sessions     Session[]
   settings     UserSettings?
   subscription Subscription?
   dailyUsages  DailyUsage[]
+  cards        Card[]
+  reviewLogs   ReviewLog[]
 }
 
 model UserSettings {
@@ -221,9 +232,11 @@ model Position {
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
 
-  theme    Theme          @relation(fields: [themeId], references: [id])
-  outLinks PositionLink[] @relation("PositionLinkFrom")
-  inLinks  PositionLink[] @relation("PositionLinkTo")
+  theme      Theme          @relation(fields: [themeId], references: [id])
+  outLinks   PositionLink[] @relation("PositionLinkFrom")
+  inLinks    PositionLink[] @relation("PositionLinkTo")
+  cards      Card[]
+  reviewLogs ReviewLog[]
 
   @@index([themeId])
   @@index([status])
@@ -239,4 +252,51 @@ model PositionLink {
   linked   Position @relation("PositionLinkTo", fields: [linkedId], references: [id], onDelete: Cascade)
 
   @@id([positionId, linkedId])
+}
+
+// --- Répétition espacée (lot 5) ----------------------------------------------
+
+/// État FSRS d'une position pour un joueur (SPEC.md, table `cards`). `fsrsState` sérialise le
+/// `Card` de `ts-fsrs` (stability, difficulty, due, reps, lapses, state...) tel que renvoyé par
+/// `packages/core`'s `scheduleNextReview` — aucun champ FSRS individuel n'est dupliqué en colonnes
+/// pour rester agnostique d'une éventuelle évolution de la librairie.
+model Card {
+  userId     String
+  positionId String
+  /// Sérialisation JSON du `Card` ts-fsrs (`FsrsCardState` de `packages/core`).
+  fsrsState  Json
+  /// Dupliqué hors du JSON pour permettre `WHERE due <= now()` sans extraction JSON côté requête.
+  due        DateTime
+  suspended  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  position Position @relation(fields: [positionId], references: [id], onDelete: Cascade)
+
+  @@id([userId, positionId])
+  @@index([userId, due])
+}
+
+/// Historique des révisions (SPEC.md, table `review_logs`) : une ligne par position terminée,
+/// source de l'XP et des statistiques (`GET /api/me/stats`).
+model ReviewLog {
+  id          String   @id @default(cuid())
+  userId      String
+  positionId  String
+  /// Note FSRS 1 à 4 (Again/Hard/Good/Easy), calculée par `rateReview` (`packages/core`).
+  rating      Int
+  announceOk  Boolean
+  errors      Int      @default(0)
+  tempoLost   Boolean  @default(false)
+  durationMs  Int
+  /// Coups joués au format UCI, dans l'ordre.
+  moves       Json
+  reviewedAt  DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  position Position @relation(fields: [positionId], references: [id], onDelete: Cascade)
+
+  @@index([userId, reviewedAt])
+  @@index([positionId])
 }

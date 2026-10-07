@@ -148,5 +148,72 @@
   "Locale": {
     "fr": "FR",
     "en": "EN"
+  },
+  "Admin": {
+    "nav": {
+      "users": "Utilisateurs",
+      "positions": "Positions"
+    },
+    "Users": {
+      "title": "Utilisateurs",
+      "searchPlaceholder": "Rechercher par e-mail",
+      "search": "Rechercher",
+      "columns": {
+        "email": "E-mail",
+        "plan": "Offre",
+        "status": "Statut",
+        "founder": "Fondateur",
+        "createdAt": "Inscrit le"
+      },
+      "prev": "Précédent",
+      "next": "Suivant",
+      "pageInfo": "Page {page} / {totalPages}"
+    },
+    "UserDetail": {
+      "createdAt": "Inscrit le {date}",
+      "role": "Rôle : {role}",
+      "usageToday": "Aujourd'hui : {newPositions} nouvelles positions, {reviews} révisions",
+      "counts": "{cards} cartes, {reviewLogs} révisions au total",
+      "subscriptionTitle": "Abonnement",
+      "plan": "Offre",
+      "status": "Statut",
+      "founderDiscount": "Réduction fondateur",
+      "save": "Enregistrer"
+    },
+    "Positions": {
+      "title": "Positions",
+      "new": "Nouvelle position",
+      "allStatuses": "Tous les statuts",
+      "allThemes": "Tous les thèmes",
+      "filter": "Filtrer",
+      "columns": {
+        "title": "Titre",
+        "theme": "Thème",
+        "judgeType": "Juge",
+        "status": "Statut",
+        "free": "Gratuite"
+      },
+      "prev": "Précédent",
+      "next": "Suivant",
+      "pageInfo": "Page {page} / {totalPages}"
+    },
+    "PositionForm": {
+      "theme": "Thème",
+      "fen": "FEN",
+      "userSide": "Camp du joueur",
+      "expectedResult": "Résultat attendu",
+      "judgeType": "Type de juge",
+      "lineMoves": "Coups de la ligne (ignoré sauf type \"line\") — un par ligne : SAN | commentaire fr | commentaire en",
+      "title": "Titre",
+      "intro": "Introduction",
+      "goal": "Consigne",
+      "rating": "Cote",
+      "ratingDeviation": "Écart de cote",
+      "source": "Source",
+      "free": "Gratuite",
+      "saveDraft": "Enregistrer en brouillon",
+      "publish": "Publier",
+      "archive": "Archiver"
+    }
   }
 }

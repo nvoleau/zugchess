@@ -8,7 +8,7 @@ export interface PositionTexts {
 }
 
 /** Projette `Position.texts` (JSON `{ fr: {...}, en: {...} }`) sur la langue demandée, avec repli sur le français. */
-function textsFor(texts: unknown, locale: "fr" | "en"): PositionTexts {
+export function textsFor(texts: unknown, locale: "fr" | "en"): PositionTexts {
   const byLocale = texts as Record<string, PositionTexts | undefined>;
   return byLocale[locale] ?? byLocale.fr ?? { title: "", intro: "", goal: "" };
 }

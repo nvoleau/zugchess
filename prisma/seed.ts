@@ -385,6 +385,19 @@ async function main() {
     });
   }
 
+  const adminEmails = (process.env.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((email) => email.trim())
+    .filter((email) => email.length > 0);
+
+  if (adminEmails.length > 0) {
+    const { count } = await prisma.user.updateMany({
+      where: { email: { in: adminEmails } },
+      data: { role: "admin" },
+    });
+    console.log(`Admins promus : ${count}/${adminEmails.length} (les comptes manquants seront promus à leur prochaine connexion, en relançant le seed).`);
+  }
+
   console.log(`Seed terminé : ${THEMES.length} thèmes, ${POSITIONS.length} positions.`);
 }
 

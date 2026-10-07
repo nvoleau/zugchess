@@ -6,3 +6,5 @@ export * from "./judge/kpk.js";
 export * from "./judge/methodLine.js";
 export * from "./judge/syzygy.js";
 export * from "./judge/stockfish.js";
+export * from "./scheduler/fsrs.js";
+export * from "./scheduler/sessionQueue.js";

@@ -148,5 +148,72 @@
   "Locale": {
     "fr": "FR",
     "en": "EN"
+  },
+  "Admin": {
+    "nav": {
+      "users": "Users",
+      "positions": "Positions"
+    },
+    "Users": {
+      "title": "Users",
+      "searchPlaceholder": "Search by email",
+      "search": "Search",
+      "columns": {
+        "email": "Email",
+        "plan": "Plan",
+        "status": "Status",
+        "founder": "Founder",
+        "createdAt": "Joined"
+      },
+      "prev": "Previous",
+      "next": "Next",
+      "pageInfo": "Page {page} / {totalPages}"
+    },
+    "UserDetail": {
+      "createdAt": "Joined {date}",
+      "role": "Role: {role}",
+      "usageToday": "Today: {newPositions} new positions, {reviews} reviews",
+      "counts": "{cards} cards, {reviewLogs} total reviews",
+      "subscriptionTitle": "Subscription",
+      "plan": "Plan",
+      "status": "Status",
+      "founderDiscount": "Founder discount",
+      "save": "Save"
+    },
+    "Positions": {
+      "title": "Positions",
+      "new": "New position",
+      "allStatuses": "All statuses",
+      "allThemes": "All themes",
+      "filter": "Filter",
+      "columns": {
+        "title": "Title",
+        "theme": "Theme",
+        "judgeType": "Judge",
+        "status": "Status",
+        "free": "Free"
+      },
+      "prev": "Previous",
+      "next": "Next",
+      "pageInfo": "Page {page} / {totalPages}"
+    },
+    "PositionForm": {
+      "theme": "Theme",
+      "fen": "FEN",
+      "userSide": "Player's side",
+      "expectedResult": "Expected result",
+      "judgeType": "Judge type",
+      "lineMoves": "Line moves (ignored unless type is \"line\") — one per line: SAN | fr comment | en comment",
+      "title": "Title",
+      "intro": "Intro",
+      "goal": "Goal",
+      "rating": "Rating",
+      "ratingDeviation": "Rating deviation",
+      "source": "Source",
+      "free": "Free",
+      "saveDraft": "Save as draft",
+      "publish": "Publish",
+      "archive": "Archive"
+    }
   }
 }

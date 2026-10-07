@@ -38,6 +38,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async session({ session, user }) {
       session.user.id = user.id;
       session.user.lichessId = (user as { lichessId?: string | null }).lichessId ?? null;
+      session.user.role = (user as { role?: "player" | "admin" }).role ?? "player";
       return session;
     },
   },

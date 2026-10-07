@@ -5,6 +5,7 @@ declare module "next-auth" {
     user: {
       id: string;
       lichessId: string | null;
+      role: "player" | "admin";
     } & DefaultSession["user"];
   }
 }
