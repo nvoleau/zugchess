@@ -20,7 +20,7 @@ const bodySchema = z.object({
 
 /**
  * POST /api/reviews (SPEC.md) : fin de position — note FSRS calculée côté serveur, nouvelle
- * échéance de la carte, journalisation. Ne renvoie pas encore XP/trophées (lot 6).
+ * échéance de la carte, journalisation. Retourne xpGained, totalXp, level, streak, newAchievements.
  */
 export async function POST(request: Request) {
   const session = await auth();

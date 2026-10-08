@@ -28,6 +28,7 @@ export function SessionPlayer({ items, locale }: Props) {
   const [position, setPosition] = useState<PositionDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<SessionSummary | null>(null);
+  const [quotaReached, setQuotaReached] = useState(false);
   const accXpRef = useRef(0);
   const lastStreakRef = useRef(0);
 
@@ -75,6 +76,12 @@ export function SessionPlayer({ items, locale }: Props) {
       }),
     });
 
+    if (res.status === 429) {
+      setQuotaReached(true);
+      setSummary({ reviewed: index, xpGained: accXpRef.current, streak: lastStreakRef.current });
+      return;
+    }
+
     if (res.ok) {
       const data = await res.json();
       accXpRef.current += data.xpGained ?? 0;
@@ -101,7 +108,7 @@ export function SessionPlayer({ items, locale }: Props) {
     return (
       <div className="flex flex-col items-center gap-6 py-16 text-center">
         <span className="font-brandMono text-xs uppercase tracking-[0.14em] text-brand-gold">
-          {t("finished")}
+          {quotaReached ? t("quotaReached") : t("finished")}
         </span>
         <h2 className="font-brandSerif text-3xl">{t("finishedTitle")}</h2>
 

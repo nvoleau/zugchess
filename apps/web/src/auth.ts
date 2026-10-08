@@ -37,8 +37,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     async session({ session, user }) {
       session.user.id = user.id;
-      session.user.lichessId = (user as { lichessId?: string | null }).lichessId ?? null;
-      session.user.role = (user as { role?: "player" | "admin" }).role ?? "player";
+      const lichessId = (user as { lichessId?: string | null }).lichessId ?? null;
+      session.user.lichessId = lichessId;
+      let role = (user as { role?: "player" | "admin" }).role ?? "player";
+
+      // Promotion automatique via ADMIN_LICHESS_IDS (pour les comptes sans email comme Lichess).
+      if (role !== "admin" && lichessId) {
+        const adminIds = (process.env.ADMIN_LICHESS_IDS ?? "")
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean);
+        if (adminIds.includes(lichessId)) {
+          role = "admin";
+          await prisma.user.update({ where: { id: user.id }, data: { role: "admin" } });
+        }
+      }
+
+      session.user.role = role;
       return session;
     },
   },

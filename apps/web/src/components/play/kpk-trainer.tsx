@@ -10,6 +10,7 @@ import { attackerColorOf, frenchSan, legalDests, sanSequence, type Color } from 
 import type { TrainerStats } from "./trainer-types";
 
 const HELD_TO_DRAW = 8;
+const MAX_TOTAL_HALF_MOVES = 24; // filet de sécurité si aucune autre condition n'a déclenché la fin
 
 function colorToChessJs(color: Color): "w" | "b" {
   return color === "white" ? "w" : "b";
@@ -221,6 +222,14 @@ export function KpkTrainer({
     const [defFen, defMove] = defResult;
     setLastMove(defMove);
     setFen(defFen);
+
+    // Répétition triple, pat ou plafond de demi-coups → nulle acquise.
+    if (chess.isThreefoldRepetition() || chess.isDraw() || chess.history().length >= MAX_TOTAL_HALF_MOVES) {
+      pushFeed(t("feedDrawLimit"));
+      setWon(true);
+      onWin?.({ errors: blunderRef.current, tempoLost: false, moves: [...movesRef.current], moveDurationsMs: [...moveDurationsRef.current] });
+      return;
+    }
   }
 
   const boxes: TempoBoxState[] =
