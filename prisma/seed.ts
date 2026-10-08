@@ -51,6 +51,7 @@ interface ThemeSeed {
   family: string;
   order: number;
   title: { fr: string; en: string };
+  free?: boolean; // défaut true si absent (contenu existant) ; mettre false pour les familles premium
   defaultTexts?: { fr: ThemeDefaultTextsLocale; en: ThemeDefaultTextsLocale };
 }
 
@@ -223,6 +224,234 @@ const THEMES: ThemeSeed[] = [
         defendTitle: "Philidor – Hold the draw",
         attackGoal: "Overcome Philidor's defense and promote.",
         defendGoal: "Apply Philidor's defense and hold the draw.",
+      },
+    },
+  },
+
+  // --- Famille : Pièces mineures (order 10-12) --------------------------------
+  {
+    slug: "fou-couleurs-opposees", family: "piecesMineures", order: 10, free: false,
+    title: { fr: "Fous de couleurs opposées", en: "Opposite-color bishops" },
+    defaultTexts: {
+      fr: {
+        intro: "Les fous de couleurs opposées sont souvent nuls même avec un ou deux pions de plus : chaque fou est aveugle aux cases de l'autre couleur.",
+        attackTitle: "Fous opp. – Gagner",
+        defendTitle: "Fous opp. – Tenir la nulle",
+        attackGoal: "Exploite la supériorité matérielle malgré les fous opposés.",
+        defendGoal: "Utilise les fous opposés pour tenir la nulle.",
+      },
+      en: {
+        intro: "Opposite-color bishops are often drawn even with an extra pawn or two: each bishop is blind to the squares of the other color.",
+        attackTitle: "Opp. bishops – Win",
+        defendTitle: "Opp. bishops – Hold the draw",
+        attackGoal: "Exploit the material advantage despite opposite-color bishops.",
+        defendGoal: "Use the opposite-color bishops to hold the draw.",
+      },
+    },
+  },
+  {
+    slug: "mauvais-fou", family: "piecesMineures", order: 11, free: false,
+    title: { fr: "Mauvais fou", en: "Bad bishop" },
+    defaultTexts: {
+      fr: {
+        intro: "Un mauvais fou est bloqué derrière ses propres pions fixés sur sa couleur. Sa mobilité réduite en fait une pièce passive, souvent perdante.",
+        attackTitle: "Mauvais fou – Exploiter",
+        defendTitle: "Mauvais fou – Résister",
+        attackGoal: "Exploite le mauvais fou adverse pour gagner.",
+        defendGoal: "Compense le mauvais fou et tiens la nulle.",
+      },
+      en: {
+        intro: "A bad bishop is locked behind its own pawns fixed on its color. Its reduced mobility makes it a passive piece, often leading to a loss.",
+        attackTitle: "Bad bishop – Exploit it",
+        defendTitle: "Bad bishop – Resist",
+        attackGoal: "Exploit the opponent's bad bishop to win.",
+        defendGoal: "Compensate for the bad bishop and hold the draw.",
+      },
+    },
+  },
+  {
+    slug: "cavalier-vs-pions", family: "piecesMineures", order: 12, free: false,
+    title: { fr: "Cavalier et pions", en: "Knight and pawns" },
+    defaultTexts: {
+      fr: {
+        intro: "Le cavalier combat seul contre des pions ou avec le roi dans des finales aux règles spécifiques : le roi joue un rôle fondamental pour soutenir le cavalier.",
+        attackTitle: "Cavalier – Attaque",
+        defendTitle: "Cavalier – Défense",
+        attackGoal: "Utilise le roi et le cavalier pour gagner.",
+        defendGoal: "Résiste aux pions passés avec le cavalier.",
+      },
+      en: {
+        intro: "The knight fights alone against pawns or with the king in endgames with specific rules: the king plays a fundamental role in supporting the knight.",
+        attackTitle: "Knight – Attack",
+        defendTitle: "Knight – Defense",
+        attackGoal: "Use the king and knight to win.",
+        defendGoal: "Resist the passed pawns with the knight.",
+      },
+    },
+  },
+
+  // --- Famille : Finales de dame (order 20-21) --------------------------------
+  {
+    slug: "dame-contre-pion", family: "dame", order: 20, free: false,
+    title: { fr: "Dame contre pion", en: "Queen vs pawn" },
+    defaultTexts: {
+      fr: {
+        intro: "La dame bat presque tout pion seul — sauf les pions de tour et de fou en 7e rangée, où le défenseur peut viser le pat.",
+        attackTitle: "Dame vs pion – Gagner",
+        defendTitle: "Dame vs pion – Tenir le pat",
+        attackGoal: "Capte le pion ou force la promotion avantageuse.",
+        defendGoal: "Tiens le pat avec le pion de tour ou de fou en 7e.",
+      },
+      en: {
+        intro: "The queen beats almost any pawn alone — except rook and bishop pawns on the 7th rank, where the defender can aim for stalemate.",
+        attackTitle: "Queen vs pawn – Win",
+        defendTitle: "Queen vs pawn – Stalemate save",
+        attackGoal: "Capture the pawn or force a favourable promotion.",
+        defendGoal: "Hold the stalemate with a rook or bishop pawn on the 7th.",
+      },
+    },
+  },
+  {
+    slug: "dame-contre-tour", family: "dame", order: 21, free: false,
+    title: { fr: "Dame contre tour", en: "Queen vs rook" },
+    defaultTexts: {
+      fr: {
+        intro: "La dame bat généralement la tour, mais le défenseur peut tenir de longues positions de Philidor-dame. La technique exacte est exigeante.",
+        attackTitle: "Dame vs tour – Gagner",
+        defendTitle: "Dame vs tour – Philidor",
+        attackGoal: "Brise la défense de Philidor et gagne la tour.",
+        defendGoal: "Applique la défense de Philidor pour la dame et tiens la nulle.",
+      },
+      en: {
+        intro: "The queen generally beats the rook, but the defender can hold long queen-Philidor positions. The exact technique is demanding.",
+        attackTitle: "Queen vs rook – Win",
+        defendTitle: "Queen vs rook – Philidor",
+        attackGoal: "Break the Philidor defense and win the rook.",
+        defendGoal: "Apply the queen-Philidor defense and hold the draw.",
+      },
+    },
+  },
+
+  // --- Famille : Mats élémentaires (order 30-33) ------------------------------
+  {
+    slug: "mat-dame", family: "mats", order: 30, free: true,
+    title: { fr: "Mat à la dame", en: "Queen mate" },
+    defaultTexts: {
+      fr: {
+        intro: "La dame seule avec le roi suffit à mater : en quelques coups, le roi ennemi est repoussé vers le bord puis coincé dans le coin.",
+        attackTitle: "Mat à la dame",
+        defendTitle: "Résister au mat dame",
+        attackGoal: "Mate avec la dame en un minimum de coups.",
+        defendGoal: "Retarde le mat le plus longtemps possible.",
+      },
+      en: {
+        intro: "The queen alone with the king is enough to mate: in a few moves, the enemy king is pushed to the edge and trapped in the corner.",
+        attackTitle: "Queen mate",
+        defendTitle: "Resist the queen mate",
+        attackGoal: "Checkmate with the queen in as few moves as possible.",
+        defendGoal: "Delay the mate as long as possible.",
+      },
+    },
+  },
+  {
+    slug: "mat-tour", family: "mats", order: 31, free: true,
+    title: { fr: "Mat à la tour", en: "Rook mate" },
+    defaultTexts: {
+      fr: {
+        intro: "La tour seule avec le roi permet de mater : la technique de l'ascenseur repousse le roi ennemi rangée par rangée jusqu'à le bloquer en bordure.",
+        attackTitle: "Mat à la tour",
+        defendTitle: "Résister au mat tour",
+        attackGoal: "Mate avec la tour en appliquant la technique de l'ascenseur.",
+        defendGoal: "Retarde le mat en évitant les bords.",
+      },
+      en: {
+        intro: "The rook alone with the king can mate: the elevator technique pushes the enemy king rank by rank until it is blocked on the edge.",
+        attackTitle: "Rook mate",
+        defendTitle: "Resist the rook mate",
+        attackGoal: "Checkmate with the rook using the elevator technique.",
+        defendGoal: "Delay the mate by avoiding the edges.",
+      },
+    },
+  },
+  {
+    slug: "mat-deux-fous", family: "mats", order: 32, free: true,
+    title: { fr: "Mat aux deux fous", en: "Two bishops mate" },
+    defaultTexts: {
+      fr: {
+        intro: "Les deux fous matent ensemble : ils travaillent en équipe pour restreindre le roi ennemi, finalement coincé dans un coin.",
+        attackTitle: "Mat aux deux fous",
+        defendTitle: "Résister aux deux fous",
+        attackGoal: "Mate avec les deux fous en coordination avec le roi.",
+        defendGoal: "Retarde le mat en cherchant le centre.",
+      },
+      en: {
+        intro: "The two bishops mate together: they work as a team to restrict the enemy king, eventually cornered.",
+        attackTitle: "Two bishops mate",
+        defendTitle: "Resist the two bishops",
+        attackGoal: "Checkmate with both bishops in coordination with the king.",
+        defendGoal: "Delay the mate by seeking the centre.",
+      },
+    },
+  },
+  {
+    slug: "mat-fou-cavalier", family: "mats", order: 33, free: true,
+    title: { fr: "Mat fou et cavalier", en: "Bishop and knight mate" },
+    defaultTexts: {
+      fr: {
+        intro: "Le mat du fou et du cavalier est la technique la plus difficile des mats élémentaires : il faut conduire le roi adverse vers le coin de la couleur du fou.",
+        attackTitle: "Mat fou + cavalier",
+        defendTitle: "Résister au mat F+C",
+        attackGoal: "Mate avec le fou et le cavalier en suivant la méthode W.",
+        defendGoal: "Retarde le mat en fuyant vers le mauvais coin.",
+      },
+      en: {
+        intro: "The bishop and knight mate is the hardest elementary mate: you must drive the enemy king to the corner matching the bishop's color.",
+        attackTitle: "Bishop + knight mate",
+        defendTitle: "Resist the B+N mate",
+        attackGoal: "Checkmate with bishop and knight using the W-method.",
+        defendGoal: "Delay the mate by fleeing to the wrong corner.",
+      },
+    },
+  },
+
+  // --- Famille : Tour contre pièce mineure (order 40-41) ----------------------
+  {
+    slug: "tour-vs-fou", family: "tourVsMineure", order: 40, free: false,
+    title: { fr: "Tour contre fou", en: "Rook vs bishop" },
+    defaultTexts: {
+      fr: {
+        intro: "La tour bat généralement le fou, mais le défenseur peut souvent tenir la nulle en gardant son fou actif ou en cherchant le coin de la mauvaise couleur.",
+        attackTitle: "Tour vs fou – Gagner",
+        defendTitle: "Tour vs fou – Tenir la nulle",
+        attackGoal: "Gagne le fou ou force un pion passé décisif.",
+        defendGoal: "Maintiens le fou actif et tiens la nulle.",
+      },
+      en: {
+        intro: "The rook generally beats the bishop, but the defender can often hold the draw by keeping the bishop active or seeking the wrong-color corner.",
+        attackTitle: "Rook vs bishop – Win",
+        defendTitle: "Rook vs bishop – Hold the draw",
+        attackGoal: "Win the bishop or force a decisive passed pawn.",
+        defendGoal: "Keep the bishop active and hold the draw.",
+      },
+    },
+  },
+  {
+    slug: "tour-vs-cavalier", family: "tourVsMineure", order: 41, free: false,
+    title: { fr: "Tour contre cavalier", en: "Rook vs knight" },
+    defaultTexts: {
+      fr: {
+        intro: "La tour bat le cavalier avec l'aide du roi : le cavalier est moins flexible que le fou, mais certaines forteresses permettent la nulle.",
+        attackTitle: "Tour vs cavalier – Gagner",
+        defendTitle: "Tour vs cavalier – Forteresse",
+        attackGoal: "Brise la forteresse du cavalier et gagne.",
+        defendGoal: "Construis une forteresse et tiens la nulle.",
+      },
+      en: {
+        intro: "The rook beats the knight with the king's help: the knight is less flexible than the bishop, but some fortress positions allow a draw.",
+        attackTitle: "Rook vs knight – Win",
+        defendTitle: "Rook vs knight – Fortress",
+        attackGoal: "Break the knight fortress and win.",
+        defendGoal: "Build a fortress and hold the draw.",
       },
     },
   },
@@ -528,11 +757,11 @@ async function main() {
       where: { slug: theme.slug },
       create: {
         slug: theme.slug, family: theme.family, order: theme.order, title: theme.title,
-        free: true, defaultTexts: theme.defaultTexts as unknown as Prisma.InputJsonValue ?? undefined,
+        free: theme.free ?? true, defaultTexts: theme.defaultTexts as unknown as Prisma.InputJsonValue ?? undefined,
       },
       update: {
         family: theme.family, order: theme.order, title: theme.title,
-        defaultTexts: theme.defaultTexts as unknown as Prisma.InputJsonValue ?? undefined,
+        free: theme.free ?? true, defaultTexts: theme.defaultTexts as unknown as Prisma.InputJsonValue ?? undefined,
       },
     });
     themeIdBySlug.set(theme.slug, row.id);

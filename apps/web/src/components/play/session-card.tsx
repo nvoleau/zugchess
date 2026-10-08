@@ -10,10 +10,15 @@ import { attackerColorOf } from "./chess-move-dests";
 import { KpkTrainer } from "./kpk-trainer";
 import { MethodLineTrainer } from "./method-line-trainer";
 import { SyzygyTrainer } from "./syzygy-trainer";
+import type { TrainerStats } from "./trainer-types";
 
 export interface SessionCardResult {
   announceOk: boolean;
   durationMs: number;
+  errors: number;
+  tempoLost: boolean;
+  moves: string[];
+  moveDurationsMs: number[];
 }
 
 interface Props {
@@ -45,11 +50,13 @@ export function SessionCard({ position, onComplete, nextLabel }: Props) {
   const [phase, setPhase] = useState<"announce" | "play" | "done">("announce");
   const [announceOk, setAnnounceOk] = useState<boolean | null>(null);
   const startRef = useRef(Date.now());
+  const statsRef = useRef<TrainerStats>({ errors: 0, tempoLost: false, moves: [], moveDurationsMs: [] });
 
   useEffect(() => {
     setPhase("announce");
     setAnnounceOk(null);
     startRef.current = Date.now();
+    statsRef.current = { errors: 0, tempoLost: false, moves: [], moveDurationsMs: [] };
   }, [position.id]);
 
   const truth = truthOf(position);
@@ -59,12 +66,13 @@ export function SessionCard({ position, onComplete, nextLabel }: Props) {
     setPhase("play");
   }
 
-  function handleFinished() {
+  function handleFinished(stats: TrainerStats) {
+    statsRef.current = stats;
     setPhase("done");
   }
 
   function handleNext() {
-    onComplete({ announceOk: announceOk ?? false, durationMs: Date.now() - startRef.current });
+    onComplete({ announceOk: announceOk ?? false, durationMs: Date.now() - startRef.current, ...statsRef.current });
   }
 
   const btnLabel = nextLabel ?? t("nextCard");
@@ -119,7 +127,7 @@ export function SessionCard({ position, onComplete, nextLabel }: Props) {
           ) : position.judgeType === "stockfish" ? (
             <div className="mt-2 flex flex-col gap-2 text-sm text-brand-muted">
               <span>Juge Stockfish bientôt disponible.</span>
-              <button type="button" onClick={handleFinished} className="self-center text-brand-gold underline">
+              <button type="button" onClick={() => handleFinished({ errors: 0, tempoLost: false, moves: [], moveDurationsMs: [] })} className="self-center text-brand-gold underline">
                 Passer
               </button>
             </div>

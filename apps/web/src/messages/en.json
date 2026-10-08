@@ -202,7 +202,11 @@
       "explanations": "Explanations",
       "unlimited": "unlimited",
       "signOut": "Sign out",
-      "freePlayCta": "Free play"
+      "freePlayCta": "Free play",
+      "statsElo": "Endgame rating",
+      "statsLevel": "Level {level}",
+      "statsStreak": "day streak",
+      "statsStreakBest": "best streak"
     },
     "ComingSoon": {
       "lessonsTitle": "Lessons",
@@ -232,9 +236,13 @@
       "categoryPawns": "Pawn endgames",
       "categoryRooks": "Rook endgames",
       "backToLibrary": "Back to the list",
-      "finished": "Session complete!",
-      "finishedBody": "Well done. Come back tomorrow for your next reviews.",
+      "finished": "Session complete",
+      "finishedTitle": "Well done!",
+      "finishedBody": "Come back tomorrow for your next reviews.",
       "finishedCta": "Back to home",
+      "summaryReviewed": "positions",
+      "summaryXp": "XP earned",
+      "summaryStreak": "day streak",
       "empty": "All caught up.",
       "emptyBody": "No reviews due right now. Come back tomorrow or explore free play.",
       "emptyCta": "Free play",

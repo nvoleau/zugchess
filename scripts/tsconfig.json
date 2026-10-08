@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "paths": {
+      "@zugchess/core": ["../packages/core/src/index.ts"]
+    }
+  },
+  "include": ["."]
+}

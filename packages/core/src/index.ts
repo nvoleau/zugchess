@@ -8,3 +8,6 @@ export * from "./judge/syzygy.js";
 export * from "./judge/stockfish.js";
 export * from "./scheduler/fsrs.js";
 export * from "./scheduler/sessionQueue.js";
+export * from "./gamification/xp.js";
+export * from "./gamification/streak.js";
+export * from "./gamification/glicko.js";

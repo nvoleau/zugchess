@@ -76,13 +76,17 @@ model User {
   /// pour éviter qu'un admin ne puisse s'auto-élever ou élever quelqu'un d'autre par erreur.
   role          Role    @default(player)
 
-  accounts     Account[]
-  sessions     Session[]
-  settings     UserSettings?
-  subscription Subscription?
-  dailyUsages  DailyUsage[]
-  cards        Card[]
-  reviewLogs   ReviewLog[]
+  accounts          Account[]
+  sessions          Session[]
+  settings          UserSettings?
+  subscription      Subscription?
+  dailyUsages       DailyUsage[]
+  cards             Card[]
+  reviewLogs        ReviewLog[]
+  playerRating      PlayerRating?
+  xpEvents          XpEvent[]
+  streak            Streak?
+  userAchievements  UserAchievement[]
 }
 
 model UserSettings {
@@ -303,4 +307,69 @@ model ReviewLog {
 
   @@index([userId, reviewedAt])
   @@index([positionId])
+}
+
+/// Cote Glicko-2 du joueur (SPEC.md, table `player_ratings`). Mise à jour après chaque révision.
+model PlayerRating {
+  userId     String   @id
+  rating     Float    @default(1500)
+  deviation  Float    @default(350)
+  volatility Float    @default(0.06)
+  games      Int      @default(0)
+  updatedAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/// Source de vérité de l'XP (SPEC.md, table `xp_events`). L'XP total est la somme des montants.
+model XpEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  amount    Int
+  /// Raison lisible (ex. "review_good", "session_complete", "theme_mastered:opposition").
+  reason    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+/// Série quotidienne du joueur (SPEC.md, table `streaks`). Une seule ligne par joueur.
+model Streak {
+  userId   String   @id
+  current  Int      @default(0)
+  best     Int      @default(0)
+  /// Gels disponibles (max 2).
+  freezes  Int      @default(0)
+  /// Dernier jour de séance terminée (fuseau horaire UTC, date seulement — le service utilise le
+  /// fuseau du joueur pour le calcul).
+  lastDay  String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/// Catalogue des trophées (SPEC.md, table `achievements`). Alimenté par seed/migration.
+model Achievement {
+  code        String  @id
+  name        Json
+  description Json
+  /// Condition JSON évaluée par GamificationService (ex. {"type":"streak","value":7}).
+  condition   Json
+  icon        String
+
+  userAchievements UserAchievement[]
+}
+
+/// Trophées débloqués par un joueur (SPEC.md, table `user_achievements`).
+model UserAchievement {
+  userId      String
+  code        String
+  unlockedAt  DateTime @default(now())
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [code], references: [code], onDelete: Cascade)
+
+  @@id([userId, code])
+  @@index([userId])
 }

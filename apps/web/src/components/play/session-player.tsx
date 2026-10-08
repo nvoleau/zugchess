@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import type { PositionDetail } from "@/lib/positionService";
 import type { SessionQueueEntry } from "@/lib/schedulerService";
@@ -10,6 +10,12 @@ import { SessionCard, type SessionCardResult } from "./session-card";
 interface Props {
   items: SessionQueueEntry[];
   locale: "fr" | "en";
+}
+
+interface SessionSummary {
+  reviewed: number;
+  xpGained: number;
+  streak: number;
 }
 
 /**
@@ -21,7 +27,9 @@ export function SessionPlayer({ items, locale }: Props) {
   const [index, setIndex] = useState(0);
   const [position, setPosition] = useState<PositionDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [done, setDone] = useState(false);
+  const [summary, setSummary] = useState<SessionSummary | null>(null);
+  const accXpRef = useRef(0);
+  const lastStreakRef = useRef(0);
 
   const fetchPosition = useCallback(
     async (positionId: string) => {
@@ -44,7 +52,6 @@ export function SessionPlayer({ items, locale }: Props) {
       fetchPosition(item.positionId);
     } else {
       setLoading(false);
-      setDone(true);
     }
   }, [index, items, fetchPosition]);
 
@@ -52,26 +59,33 @@ export function SessionPlayer({ items, locale }: Props) {
     const item = items[index];
     if (!item) return;
 
-    await fetch("/api/reviews", {
+    const res = await fetch("/api/reviews", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         positionId: item.positionId,
         announceOk: result.announceOk,
         abandoned: false,
-        errors: 0,
-        tempoLost: false,
+        errors: result.errors,
+        tempoLost: result.tempoLost,
         hintRequested: false,
-        moveDurationsMs: [],
+        moveDurationsMs: result.moveDurationsMs,
         durationMs: result.durationMs,
-        moves: [],
+        moves: result.moves,
       }),
     });
 
-    if (index + 1 >= items.length) {
-      setDone(true);
+    if (res.ok) {
+      const data = await res.json();
+      accXpRef.current += data.xpGained ?? 0;
+      lastStreakRef.current = data.streak?.current ?? lastStreakRef.current;
+    }
+
+    const nextIndex = index + 1;
+    if (nextIndex >= items.length) {
+      setSummary({ reviewed: items.length, xpGained: accXpRef.current, streak: lastStreakRef.current });
     } else {
-      setIndex((i) => i + 1);
+      setIndex(nextIndex);
     }
   }
 
@@ -83,13 +97,33 @@ export function SessionPlayer({ items, locale }: Props) {
     );
   }
 
-  if (done) {
+  if (summary) {
     return (
-      <div className="flex flex-col items-center gap-4 py-16 text-center">
+      <div className="flex flex-col items-center gap-6 py-16 text-center">
         <span className="font-brandMono text-xs uppercase tracking-[0.14em] text-brand-gold">
-          {index} / {items.length}
+          {t("finished")}
         </span>
-        <h2 className="font-brandSerif text-3xl">{t("finished")}</h2>
+        <h2 className="font-brandSerif text-3xl">{t("finishedTitle")}</h2>
+
+        <div className="flex gap-8">
+          <div className="flex flex-col items-center gap-1">
+            <span className="font-brandMono text-2xl text-brand-cream">{summary.reviewed}</span>
+            <span className="text-xs text-brand-muted">{t("summaryReviewed")}</span>
+          </div>
+          {summary.xpGained > 0 && (
+            <div className="flex flex-col items-center gap-1">
+              <span className="font-brandMono text-2xl text-brand-gold">+{summary.xpGained}</span>
+              <span className="text-xs text-brand-muted">{t("summaryXp")}</span>
+            </div>
+          )}
+          {summary.streak > 0 && (
+            <div className="flex flex-col items-center gap-1">
+              <span className="font-brandMono text-2xl text-brand-cream">{summary.streak}</span>
+              <span className="text-xs text-brand-muted">{t("summaryStreak")}</span>
+            </div>
+          )}
+        </div>
+
         <p className="max-w-sm text-sm text-brand-muted">{t("finishedBody")}</p>
         <Link
           href="/app"

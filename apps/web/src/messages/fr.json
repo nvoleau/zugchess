@@ -202,7 +202,11 @@
       "explanations": "Explications",
       "unlimited": "illimité",
       "signOut": "Se déconnecter",
-      "freePlayCta": "Jeu libre"
+      "freePlayCta": "Jeu libre",
+      "statsElo": "Elo de finales",
+      "statsLevel": "Niveau {level}",
+      "statsStreak": "jours de série",
+      "statsStreakBest": "meilleure série"
     },
     "ComingSoon": {
       "lessonsTitle": "Leçons",
@@ -232,9 +236,13 @@
       "categoryPawns": "Finales de pions",
       "categoryRooks": "Finales de tours",
       "backToLibrary": "Retour à la liste",
-      "finished": "Séance terminée !",
-      "finishedBody": "Bien joué. Revenez demain pour vos prochaines révisions.",
+      "finished": "Séance terminée",
+      "finishedTitle": "Bien joué !",
+      "finishedBody": "Revenez demain pour vos prochaines révisions.",
       "finishedCta": "Retour à l'accueil",
+      "summaryReviewed": "positions",
+      "summaryXp": "XP gagnés",
+      "summaryStreak": "jours de suite",
       "empty": "Tout est à jour.",
       "emptyBody": "Aucune révision due pour l'instant. Revenez demain ou explorez le jeu libre.",
       "emptyCta": "Jeu libre",

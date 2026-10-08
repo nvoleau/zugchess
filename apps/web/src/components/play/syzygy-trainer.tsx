@@ -6,6 +6,7 @@ import { useEffect, useReducer, useRef, useState } from "react";
 import { ChessBoard } from "@/components/chess-board";
 import { TempoBar, type TempoBoxState } from "@/components/tempo-bar";
 import { frenchSan, legalDests, sanSequence } from "./chess-move-dests";
+import type { TrainerStats } from "./trainer-types";
 
 const HELD_TO_DRAW = 8;
 
@@ -55,7 +56,7 @@ export function SyzygyTrainer({
 }: {
   initialFen: string;
   userSide?: "white" | "black";
-  onFinished?: () => void;
+  onFinished?: (stats: TrainerStats) => void;
 }) {
   const t = useTranslations("Play.Syzygy");
   const chessRef = useRef(new Chess(initialFen));
@@ -71,6 +72,13 @@ export function SyzygyTrainer({
   const [pending, setPending] = useState(false);
   const [lastMove, setLastMove] = useState<[string, string] | undefined>();
   const [, forceSync] = useReducer((n: number) => n + 1, 0);
+
+  // Stats tracking
+  const lostTemposRef = useRef(0);
+  const blunderRef = useRef(0);
+  const movesRef = useRef<string[]>([]);
+  const moveDurationsRef = useRef<number[]>([]);
+  const moveStartRef = useRef(Date.now());
 
   const playerColor = initialFen.split(" ")[1] === "b" ? "b" : "w";
   const orientation: "white" | "black" = userSide ?? (playerColor === "w" ? "white" : "black");
@@ -138,6 +146,7 @@ export function SyzygyTrainer({
       const judgement = data.judgement;
 
       if (judgement.blundered) {
+        blunderRef.current++;
         const probe = chessRef.current;
         const attempted = applyUci(probe, uci);
         const attemptedSan = attempted ? frenchSan(attempted.san) : uci;
@@ -162,7 +171,13 @@ export function SyzygyTrainer({
         return;
       }
 
+      // Coup accepté — enregistrer durée et UCI
+      moveDurationsRef.current.push(Date.now() - moveStartRef.current);
+      movesRef.current.push(uci);
+      moveStartRef.current = Date.now();
+
       if (goal === "win") {
+        if (judgement.tempoLost) lostTemposRef.current++;
         setLostTempos((n) => n + (judgement.tempoLost ? 1 : 0));
         setRemainingHalfMoves(judgement.distanceAfter);
         pushFeed(t(judgement.tempoLost ? "feedTempoLost" : "feedGoodTempo", { san: frenchSan(played.san) }));
@@ -177,7 +192,7 @@ export function SyzygyTrainer({
         setFen(chess.fen());
         setStatus("finished");
         setOutcome(judgement.resultAfter);
-        onFinished?.();
+        onFinished?.({ errors: blunderRef.current, tempoLost: lostTemposRef.current > 0, moves: [...movesRef.current], moveDurationsMs: [...moveDurationsRef.current] });
         return;
       }
 
@@ -193,7 +208,7 @@ export function SyzygyTrainer({
       if (data.gameOverReason) {
         setStatus("finished");
         setOutcome(judgement.resultAfter);
-        onFinished?.();
+        onFinished?.({ errors: blunderRef.current, tempoLost: lostTemposRef.current > 0, moves: [...movesRef.current], moveDurationsMs: [...moveDurationsRef.current] });
       }
     } catch {
       pushFeed(t("serverError"));

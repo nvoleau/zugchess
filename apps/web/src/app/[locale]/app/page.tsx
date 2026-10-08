@@ -3,6 +3,7 @@ import { auth, signOut } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { getEntitlementsForUser } from "@/lib/entitlements";
 import { getTodaySession } from "@/lib/schedulerService";
+import { getPlayerStats } from "@/lib/statsService";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { StatItem } from "@/components/ui/stat-item";
@@ -25,9 +26,10 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
   const t = await getTranslations("App.Home");
   const localeTyped = (locale === "en" ? "en" : "fr") as "fr" | "en";
 
-  const [entitlements, todaySession] = await Promise.all([
+  const [entitlements, todaySession, stats] = await Promise.all([
     getEntitlementsForUser(user.id as string),
     getTodaySession(user.id as string, localeTyped),
+    getPlayerStats(user.id as string, localeTyped),
   ]);
 
   const dueCount = todaySession.items.filter((i) => i.kind === "due").length;
@@ -105,6 +107,28 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
           value={formatCount(entitlements.remaining.explanations, t("unlimited"))}
         />
       </Card>
+
+      {/* Stats joueur */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <Card className="flex flex-col gap-0.5">
+          <span className="font-brandMono text-xl text-brand-cream">{stats.rating}</span>
+          <span className="text-xs text-brand-muted">{t("statsElo")}</span>
+        </Card>
+        <Card className="flex flex-col gap-0.5">
+          <span className="font-brandMono text-xl text-brand-gold">
+            {stats.totalXp} <span className="text-sm">XP</span>
+          </span>
+          <span className="text-xs text-brand-muted">{t("statsLevel", { level: stats.level })}</span>
+        </Card>
+        <Card className="flex flex-col gap-0.5">
+          <span className="font-brandMono text-xl text-brand-cream">{stats.streak.current}</span>
+          <span className="text-xs text-brand-muted">{t("statsStreak")}</span>
+        </Card>
+        <Card className="flex flex-col gap-0.5">
+          <span className="font-brandMono text-xl text-brand-cream">{stats.streak.best}</span>
+          <span className="text-xs text-brand-muted">{t("statsStreakBest")}</span>
+        </Card>
+      </div>
 
       {/* Jeu libre */}
       <Link href="/app/free-play" className={btnClass("ghost", "sm", "w-fit pl-0")}>

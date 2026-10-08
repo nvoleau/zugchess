@@ -11,6 +11,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "./prisma";
 import { consumeUsage, getEntitlementsForUser } from "./entitlements";
 import { textsFor } from "./positionService";
+import { applyGamification } from "./gamificationService";
 
 /** `player_ratings` (SPEC.md) n'existe pas encore (lot Glicko à venir) : on compare à l'Elo de
  * finales par défaut pour trier les nouvelles positions par difficulté. */
@@ -98,6 +99,11 @@ export interface ReviewResult {
   rating: ReviewGrade;
   due: Date;
   isNewPosition: boolean;
+  xpGained: number;
+  totalXp: number;
+  level: number;
+  streak: { current: number; best: number; freezes: number };
+  newAchievements: string[];
 }
 
 /** POST /api/reviews (SPEC.md) : note la révision via `rateReview`, met à jour la carte FSRS du
@@ -155,5 +161,13 @@ export async function recordReview(userId: string, submission: ReviewSubmission)
     }),
   ]);
 
-  return { rating, due, isNewPosition };
+  const gamification = await applyGamification({
+    userId,
+    positionId: submission.positionId,
+    grade: rating,
+    isNewPosition,
+    announceOk: submission.announceOk,
+  });
+
+  return { rating, due, isNewPosition, ...gamification };
 }

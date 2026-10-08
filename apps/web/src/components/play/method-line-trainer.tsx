@@ -7,6 +7,7 @@ import { useReducer, useRef, useState } from "react";
 import { ChessBoard } from "@/components/chess-board";
 import { TempoBar, type TempoBoxState } from "@/components/tempo-bar";
 import { frenchSan, legalDests } from "./chess-move-dests";
+import type { TrainerStats } from "./trainer-types";
 
 /**
  * Entraîneur « ligne de méthode » : positions théoriques (Lucena, Philidor, etc.) où le coup
@@ -14,7 +15,7 @@ import { frenchSan, legalDests } from "./chess-move-dests";
  * la ligne ; un coup différent est refusé avec un indice, les coups du camp adverse s'enchaînent
  * automatiquement — chacun commenté dans le fil, comme ceux de l'élève.
  */
-export function MethodLineTrainer({ line, onComplete }: { line: MethodLine; onComplete?: () => void }) {
+export function MethodLineTrainer({ line, onComplete }: { line: MethodLine; onComplete?: (stats: TrainerStats) => void }) {
   const t = useTranslations("Play.Method");
   const chessRef = useRef<Chess | null>(null);
   const [stepIndex, setStepIndex] = useState(0);
@@ -22,6 +23,11 @@ export function MethodLineTrainer({ line, onComplete }: { line: MethodLine; onCo
   const [hint, setHint] = useState<string | null>(null);
   const [feed, setFeed] = useState<string[]>([]);
   const [, forceSync] = useReducer((n: number) => n + 1, 0);
+
+  const blunderRef = useRef(0);
+  const movesRef = useRef<string[]>([]);
+  const moveDurationsRef = useRef<number[]>([]);
+  const moveStartRef = useRef(Date.now());
 
   function pushFeed(text: string) {
     setFeed((lines) => [...lines, text]);
@@ -67,19 +73,25 @@ export function MethodLineTrainer({ line, onComplete }: { line: MethodLine; onCo
 
     const judgement = judgeMethodLineMove(line, stepIndex, { from, to, promotion });
     if (!judgement.correct) {
+      blunderRef.current++;
       setHint(judgement.hint?.fr ?? null);
       forceSync(); // le coup n'est pas appliqué : on force chessground à revenir à la position réelle.
       return;
     }
 
     setHint(null);
+    moveDurationsRef.current.push(Date.now() - moveStartRef.current);
+    moveStartRef.current = Date.now();
     const expected = line.steps[stepIndex]!.move;
+    movesRef.current.push(`${expected.from}${expected.to}${expected.promotion ?? ""}`);
     const played = chess.move({ from: expected.from, to: expected.to, promotion: expected.promotion });
     if (played) pushFeed(`${frenchSan(played.san)} — ${judgement.comment?.fr ?? ""}`.trim());
     const nextIndex = playAutoSteps(chess, stepIndex + 1);
     setStepIndex(nextIndex);
     setFen(chess.fen());
-    if (nextIndex >= line.steps.length) onComplete?.();
+    if (nextIndex >= line.steps.length) {
+      onComplete?.({ errors: blunderRef.current, tempoLost: false, moves: [...movesRef.current], moveDurationsMs: [...moveDurationsRef.current] });
+    }
   }
 
   return (

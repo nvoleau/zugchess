@@ -7,6 +7,7 @@ import { useEffect, useReducer, useRef, useState } from "react";
 import { ChessBoard } from "@/components/chess-board";
 import { TempoBar, type TempoBoxState } from "@/components/tempo-bar";
 import { attackerColorOf, frenchSan, legalDests, sanSequence, type Color } from "./chess-move-dests";
+import type { TrainerStats } from "./trainer-types";
 
 const HELD_TO_DRAW = 8;
 
@@ -44,7 +45,7 @@ export function KpkTrainer({
 }: {
   initialFen: string;
   userColor: Color;
-  onWin?: () => void;
+  onWin?: (stats: TrainerStats) => void;
 }) {
   const t = useTranslations("Play.Kpk");
   const chessRef = useRef(new Chess(initialFen));
@@ -64,6 +65,13 @@ export function KpkTrainer({
   const [resetCount, setResetCount] = useState(0);
   const openedRef = useRef(false);
 
+  // Stats tracking (refs pour éviter les problèmes de closure dans les callbacks)
+  const lostTemposRef = useRef(0);
+  const blunderRef = useRef(0);
+  const movesRef = useRef<string[]>([]);
+  const moveDurationsRef = useRef<number[]>([]);
+  const moveStartRef = useRef(Date.now());
+
   function reset() {
     chessRef.current = new Chess(initialFen);
     setFen(initialFen);
@@ -73,6 +81,11 @@ export function KpkTrainer({
     setFeed([]);
     setLastMove(undefined);
     openedRef.current = false;
+    lostTemposRef.current = 0;
+    blunderRef.current = 0;
+    movesRef.current = [];
+    moveDurationsRef.current = [];
+    moveStartRef.current = Date.now();
     setResetCount((n) => n + 1);
   }
 
@@ -127,19 +140,23 @@ export function KpkTrainer({
 
     // Check terminal cases before judgeKpkMove: post-promotion/capture FENs are not KPK positions.
     if (role === "attacker" && played.promotion) {
+      moveDurationsRef.current.push(Date.now() - moveStartRef.current);
+      movesRef.current.push(`${from}${to}${promotion ?? ""}`);
       pushFeed(t("feedPromotion", { san: frenchSan(played.san) }));
       setLastMove([from, to]);
       setFen(chess.fen());
       setWon(true);
-      onWin?.();
+      onWin?.({ errors: blunderRef.current, tempoLost: lostTemposRef.current > 0, moves: [...movesRef.current], moveDurationsMs: [...moveDurationsRef.current] });
       return;
     }
     if (role === "defender" && played.captured === "p") {
+      moveDurationsRef.current.push(Date.now() - moveStartRef.current);
+      movesRef.current.push(`${from}${to}${promotion ?? ""}`);
       pushFeed(t("feedCapture", { san: frenchSan(played.san) }));
       setLastMove([from, to]);
       setFen(chess.fen());
       setWon(true);
-      onWin?.();
+      onWin?.({ errors: blunderRef.current, tempoLost: lostTemposRef.current > 0, moves: [...movesRef.current], moveDurationsMs: [...moveDurationsRef.current] });
       return;
     }
 
@@ -148,6 +165,7 @@ export function KpkTrainer({
 
     if (!outcomeOk) {
       chess.undo();
+      blunderRef.current++;
       const safe = findSafeMoves(chess, playerColor, role);
       const hints = safe.map((m) => frenchSan(m.san)).join(", ");
       pushFeed(t(role === "attacker" ? "blunderAttacker" : "blunderDefender", { san: frenchSan(played.san), hints }));
@@ -157,8 +175,14 @@ export function KpkTrainer({
       return;
     }
 
+    // Coup accepté — enregistrer durée et UCI
+    moveDurationsRef.current.push(Date.now() - moveStartRef.current);
+    movesRef.current.push(`${from}${to}${promotion ?? ""}`);
+    moveStartRef.current = Date.now();
+
     if (role === "attacker") {
       if (judged.tempoLost) {
+        lostTemposRef.current++;
         setLostTempos((n) => n + 1);
         pushFeed(t("feedTempoLost", { san: frenchSan(played.san) }));
       } else {
@@ -185,7 +209,7 @@ export function KpkTrainer({
       setLastMove([from, to]);
       setFen(chess.fen());
       setWon(true);
-      onWin?.();
+      onWin?.({ errors: blunderRef.current, tempoLost: false, moves: [...movesRef.current], moveDurationsMs: [...moveDurationsRef.current] });
       return;
     }
     const defResult = engineReply(chess.fen());
