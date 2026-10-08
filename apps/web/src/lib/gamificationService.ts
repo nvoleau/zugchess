@@ -29,7 +29,7 @@ function todayInTz(timezone: string): string {
  * Vérifie si cette position a déjà été révisée aujourd'hui par ce joueur
  * (pour éviter le double XP sur révision anticipée).
  */
-async function isFirstReviewToday(userId: string, positionId: string, timezone: string): Promise<boolean> {
+async function isFirstReviewToday(userId: string, positionId: string, _timezone: string): Promise<boolean> {
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
   // On utilise UTC 00:00 comme approximation simple ; idéalement on convertirait le fuseau.

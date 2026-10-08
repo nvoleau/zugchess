@@ -791,6 +791,39 @@ async function main() {
     });
   }
 
+  // --- Trophées (Achievement) ---
+  const ACHIEVEMENTS = [
+    {
+      code: "streak_7",
+      name: { fr: "7 jours de suite", en: "7-day streak" },
+      description: { fr: "Compléter une séance 7 jours d'affilée.", en: "Complete a session 7 days in a row." },
+      condition: { type: "streak", value: 7 },
+      icon: "🔥",
+    },
+    {
+      code: "streak_30",
+      name: { fr: "30 jours de suite", en: "30-day streak" },
+      description: { fr: "Compléter une séance 30 jours d'affilée.", en: "Complete a session 30 days in a row." },
+      condition: { type: "streak", value: 30 },
+      icon: "⚡",
+    },
+    {
+      code: "streak_100",
+      name: { fr: "100 jours de suite", en: "100-day streak" },
+      description: { fr: "Compléter une séance 100 jours d'affilée.", en: "Complete a session 100 days in a row." },
+      condition: { type: "streak", value: 100 },
+      icon: "👑",
+    },
+  ];
+
+  for (const ach of ACHIEVEMENTS) {
+    await prisma.achievement.upsert({
+      where: { code: ach.code },
+      create: { ...ach, name: ach.name as unknown as Prisma.InputJsonValue, description: ach.description as unknown as Prisma.InputJsonValue, condition: ach.condition as unknown as Prisma.InputJsonValue },
+      update: { name: ach.name as unknown as Prisma.InputJsonValue, description: ach.description as unknown as Prisma.InputJsonValue, condition: ach.condition as unknown as Prisma.InputJsonValue, icon: ach.icon },
+    });
+  }
+
   const adminEmails = (process.env.ADMIN_EMAILS ?? "")
     .split(",")
     .map((email) => email.trim())
@@ -804,7 +837,7 @@ async function main() {
     console.log(`Admins promus : ${count}/${adminEmails.length} (les comptes manquants seront promus à leur prochaine connexion, en relançant le seed).`);
   }
 
-  console.log(`Seed terminé : ${THEMES.length} thèmes, ${POSITIONS.length} positions.`);
+  console.log(`Seed terminé : ${THEMES.length} thèmes, ${POSITIONS.length} positions, ${ACHIEVEMENTS.length} trophées.`);
 }
 
 main()

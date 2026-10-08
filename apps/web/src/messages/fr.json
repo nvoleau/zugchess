@@ -215,6 +215,16 @@
       "rankingBody": "Les classements arrivent avec la gamification (lot 6) : XP, Elo de finales, séries.",
       "backToApp": "Retour à l'accueil"
     },
+    "Ranking": {
+      "title": "Classement",
+      "backToApp": "Retour à l'accueil",
+      "tabRating": "Elo",
+      "tabXp": "XP",
+      "tabStreak": "Séries",
+      "streakUnit": "jours",
+      "empty": "Aucun joueur classé pour l'instant.",
+      "you": "vous"
+    },
     "Lessons": {
       "title": "Leçons",
       "intro": "Toutes les positions jouables, regroupées par thème. Rejoue n'importe laquelle librement — ta progression FSRS n'est pas modifiée.",
@@ -354,7 +364,19 @@
     "en": "EN"
   },
   "Admin": {
+    "Dashboard": {
+      "title": "Tableau de bord admin",
+      "users": "Utilisateurs",
+      "positions": "Positions",
+      "cards": "Cartes FSRS",
+      "reviews": "Révisions",
+      "positionsByStatus": "Positions par statut",
+      "see": "voir",
+      "manageUsers": "Gérer les utilisateurs",
+      "managePositions": "Gérer les positions"
+    },
     "nav": {
+      "dashboard": "Tableau de bord",
       "users": "Utilisateurs",
       "positions": "Positions"
     },
@@ -374,10 +396,16 @@
       "pageInfo": "Page {page} / {totalPages}"
     },
     "UserDetail": {
+      "back": "Retour",
+      "email": "E-mail : ",
       "createdAt": "Inscrit le {date}",
       "role": "Rôle : {role}",
       "usageToday": "Aujourd'hui : {newPositions} nouvelles positions, {reviews} révisions",
       "counts": "{cards} cartes, {reviewLogs} révisions au total",
+      "gamificationTitle": "Progression",
+      "elo": "Elo de finales",
+      "xp": "XP total",
+      "streak": "Série (jours)",
       "subscriptionTitle": "Abonnement",
       "plan": "Offre",
       "status": "Statut",
@@ -395,6 +423,7 @@
         "theme": "Thème",
         "judgeType": "Juge",
         "status": "Statut",
+        "generated": "Auto",
         "free": "Gratuite"
       },
       "prev": "Précédent",

@@ -62,6 +62,7 @@ export interface AdminPositionSummary {
   judgeType: JudgeType;
   status: PositionStatus;
   free: boolean;
+  generated: boolean;
 }
 
 export async function listPositionsForAdmin({
@@ -102,6 +103,7 @@ export async function listPositionsForAdmin({
       judgeType: row.judgeType,
       status: row.status,
       free: row.free,
+      generated: row.generated,
     })),
   };
 }

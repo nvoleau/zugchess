@@ -37,7 +37,7 @@ export default async function AdminPositionsPage({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">{t("title")}</h1>
+        <h1 className="text-xl font-semibold">{t("title")} <span className="text-sm font-normal text-neutral-500">({total})</span></h1>
         <Link href="/admin/positions/new" className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm dark:border-neutral-700">
           {t("new")}
         </Link>
@@ -71,6 +71,7 @@ export default async function AdminPositionsPage({
               <th className="py-2 pr-4">{t("columns.theme")}</th>
               <th className="py-2 pr-4">{t("columns.judgeType")}</th>
               <th className="py-2 pr-4">{t("columns.status")}</th>
+              <th className="py-2 pr-4">{t("columns.generated")}</th>
               <th className="py-2 pr-4">{t("columns.free")}</th>
             </tr>
           </thead>
@@ -84,7 +85,16 @@ export default async function AdminPositionsPage({
                 </td>
                 <td className="py-2 pr-4">{position.themeSlug}</td>
                 <td className="py-2 pr-4">{position.judgeType}</td>
-                <td className="py-2 pr-4">{position.status}</td>
+                <td className="py-2 pr-4">
+                  <span className={
+                    position.status === "published" ? "text-green-600 dark:text-green-400" :
+                    position.status === "draft" ? "text-amber-600 dark:text-amber-400" :
+                    "text-neutral-400"
+                  }>
+                    {position.status}
+                  </span>
+                </td>
+                <td className="py-2 pr-4 text-neutral-400">{position.generated ? "⚙" : ""}</td>
                 <td className="py-2 pr-4">{position.free ? "✓" : ""}</td>
               </tr>
             ))}

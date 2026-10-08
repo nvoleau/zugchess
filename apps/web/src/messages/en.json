@@ -215,6 +215,16 @@
       "rankingBody": "Leaderboards arrive with gamification (lot 6): XP, endgame Elo, streaks.",
       "backToApp": "Back to home"
     },
+    "Ranking": {
+      "title": "Leaderboard",
+      "backToApp": "Back to home",
+      "tabRating": "Elo",
+      "tabXp": "XP",
+      "tabStreak": "Streaks",
+      "streakUnit": "days",
+      "empty": "No ranked players yet.",
+      "you": "you"
+    },
     "Lessons": {
       "title": "Lessons",
       "intro": "All playable positions, grouped by theme. Replay any of them freely — your FSRS progress is not affected.",
@@ -354,7 +364,19 @@
     "en": "EN"
   },
   "Admin": {
+    "Dashboard": {
+      "title": "Admin dashboard",
+      "users": "Users",
+      "positions": "Positions",
+      "cards": "FSRS cards",
+      "reviews": "Reviews",
+      "positionsByStatus": "Positions by status",
+      "see": "view",
+      "manageUsers": "Manage users",
+      "managePositions": "Manage positions"
+    },
     "nav": {
+      "dashboard": "Dashboard",
       "users": "Users",
       "positions": "Positions"
     },
@@ -374,10 +396,16 @@
       "pageInfo": "Page {page} / {totalPages}"
     },
     "UserDetail": {
+      "back": "Back",
+      "email": "Email: ",
       "createdAt": "Joined {date}",
       "role": "Role: {role}",
       "usageToday": "Today: {newPositions} new positions, {reviews} reviews",
       "counts": "{cards} cards, {reviewLogs} total reviews",
+      "gamificationTitle": "Progress",
+      "elo": "Endgame Elo",
+      "xp": "Total XP",
+      "streak": "Streak (days)",
       "subscriptionTitle": "Subscription",
       "plan": "Plan",
       "status": "Status",
@@ -395,6 +423,7 @@
         "theme": "Theme",
         "judgeType": "Judge",
         "status": "Status",
+        "generated": "Auto",
         "free": "Free"
       },
       "prev": "Previous",
