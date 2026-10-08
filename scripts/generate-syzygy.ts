@@ -361,6 +361,8 @@ async function main() {
   const args = process.argv.slice(2);
   const countIdx = args.indexOf("--count");
   const countPerTheme = countIdx >= 0 ? parseInt(args[countIdx + 1] ?? "75", 10) : 75;
+  const themeIdx = args.indexOf("--theme");
+  const onlyTheme = themeIdx >= 0 ? args[themeIdx + 1] : null; // "lucena" | "philidor" | null = both
 
   const prisma = new PrismaClient();
 
@@ -379,7 +381,7 @@ async function main() {
   let totalAttempts = 0, totalApiCalls = 0;
 
   // --- LUCENA : génération aléatoire ---
-  {
+  if (!onlyTheme || onlyTheme === "lucena") {
     let attempts = 0;
     const target = countPerTheme;
     process.stdout.write(`\n--- LUCENA (cible: ${target} FEN) ---\n`);
@@ -417,11 +419,13 @@ async function main() {
   }
 
   // --- PHILIDOR : génération systématique (bien meilleur taux de réussite) ---
-  {
+  if (!onlyTheme || onlyTheme === "philidor") {
     const target = countPerTheme;
     process.stdout.write(`\n--- PHILIDOR systématique (cible: ${target} FEN) ---\n`);
-    process.stdout.write(`Pause 30s avant Philidor pour récupérer le quota Lichess…\n`);
-    await new Promise((r) => setTimeout(r, 30_000));
+    if (!onlyTheme) {
+      process.stdout.write(`Pause 30s avant Philidor pour récupérer le quota Lichess…\n`);
+      await new Promise((r) => setTimeout(r, 30_000));
+    }
 
     let attempts = 0;
     const generator = systematicPhilidorFens();
