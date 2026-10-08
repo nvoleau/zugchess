@@ -39,7 +39,7 @@ export function PricingSection() {
         </div>
 
         <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="flex flex-col gap-[22px] rounded-3xl border border-white/[0.08] bg-brand-panel p-8">
+          <div className="flex flex-col gap-[22px] rounded-3xl border border-white/[0.08] bg-brand-panel p-8 transition-all duration-300 hover:-translate-y-1 hover:border-white/[0.18]">
             <div className="flex flex-col gap-2">
               <span className="text-lg font-medium">{t("free.name")}</span>
               <div className="flex items-baseline gap-2">
@@ -60,7 +60,7 @@ export function PricingSection() {
             </Link>
           </div>
 
-          <div className="relative flex flex-col gap-[22px] rounded-3xl border border-brand-gold/45 bg-gradient-to-b from-[#221D12] to-brand-panel p-8">
+          <div className="relative flex flex-col gap-[22px] rounded-3xl border border-brand-gold/45 bg-gradient-to-b from-[#221D12] to-brand-panel p-8 transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/70">
             <div className="flex flex-col gap-2">
               <span className="text-lg font-medium text-brand-gold">{t("premium.name")}</span>
               <div className="flex flex-wrap items-baseline gap-2">

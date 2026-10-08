@@ -1,7 +1,12 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { auth, signOut } from "@/auth";
-import { Link, redirect } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 import { getEntitlementsForUser } from "@/lib/entitlements";
+import { getTodaySession } from "@/lib/schedulerService";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { StatItem } from "@/components/ui/stat-item";
+import { btnClass } from "@/components/ui/button";
 
 // Dépend de la session (cookies) et des quotas du jour : jamais mis en cache statique.
 export const dynamic = "force-dynamic";
@@ -15,15 +20,19 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
   setRequestLocale(locale);
 
   const session = await auth();
-  if (!session?.user) {
-    redirect({ href: "/login", locale });
-  }
-  const user = session!.user;
+  const user = session!.user; // garde centralisée dans app/layout.tsx
 
-  const t = await getTranslations("Dashboard");
-  const playT = await getTranslations("Play");
-  const freePlayT = await getTranslations("Play.FreePlay");
-  const entitlements = await getEntitlementsForUser(user.id);
+  const t = await getTranslations("App.Home");
+  const localeTyped = (locale === "en" ? "en" : "fr") as "fr" | "en";
+
+  const [entitlements, todaySession] = await Promise.all([
+    getEntitlementsForUser(user.id as string),
+    getTodaySession(user.id as string, localeTyped),
+  ]);
+
+  const dueCount = todaySession.items.filter((i) => i.kind === "due").length;
+  const newCount = todaySession.items.filter((i) => i.kind === "new").length;
+  const hasSession = todaySession.items.length > 0;
 
   async function handleSignOut() {
     "use server";
@@ -31,47 +40,76 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
   }
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">
-          {t("greeting", { name: user.name ?? user.email ?? "" })}
-        </h1>
+    <div className="flex flex-col gap-10">
+      {/* En-tête */}
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <Badge variant="kicker" className="mb-3 block">
+            {t("greeting", { name: user.name ?? user.email ?? "" })}
+          </Badge>
+          <h1 className="font-brandSerif text-4xl leading-tight tracking-tight sm:text-5xl">
+            {t("titleLine1")}{" "}
+            <em className="not-italic text-brand-gold">{t("titleEm")}</em>
+          </h1>
+        </div>
+
         <form action={handleSignOut}>
           <button
             type="submit"
-            className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm dark:border-neutral-700"
+            className="mt-1 text-sm text-brand-muted transition-colors hover:text-brand-cream"
           >
             {t("signOut")}
           </button>
         </form>
       </div>
 
-      <section className="rounded-lg border border-neutral-200 p-5 dark:border-neutral-800">
-        <h2 className="mb-3 text-lg font-semibold">{t("entitlementsTitle")}</h2>
-        <p className="mb-2 text-sm text-neutral-600 dark:text-neutral-400">
-          {t("plan", { plan: entitlements.plan })}
-        </p>
-        <ul className="flex flex-col gap-1 text-sm">
-          <li>{t("newPositions", { count: formatCount(entitlements.remaining.newPositions, t("unlimited")) })}</li>
-          <li>{t("reviews", { count: formatCount(entitlements.remaining.reviews, t("unlimited")) })}</li>
-          <li>{t("explanations", { count: formatCount(entitlements.remaining.explanations, t("unlimited")) })}</li>
-        </ul>
-      </section>
+      {/* CTA séance ou état vide */}
+      {hasSession ? (
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-wrap gap-2.5">
+            {dueCount > 0 && (
+              <Badge variant="pill">{t("dueCount", { count: dueCount })}</Badge>
+            )}
+            {newCount > 0 && (
+              <span className="rounded-full bg-white/[0.06] px-3 py-1 font-brandMono text-sm text-brand-mutedLight">
+                {t("newCount", { count: newCount })}
+              </span>
+            )}
+          </div>
+          <Link href="/app/play" className={btnClass("primary", "lg", "w-fit")}>
+            {t("cta")} →
+          </Link>
+        </div>
+      ) : (
+        <Card className="max-w-md">
+          <p className="font-brandSerif text-xl text-brand-cream">{t("allDoneTitle")}</p>
+          <p className="mt-2 text-sm text-brand-muted">{t("allDoneBody")}</p>
+        </Card>
+      )}
 
-      <div className="flex flex-wrap gap-2">
-        <Link
-          href="/app/play"
-          className="w-fit rounded-md border border-neutral-300 px-3 py-1.5 text-sm dark:border-neutral-700"
-        >
-          {playT("title")}
-        </Link>
-        <Link
-          href="/app/free-play"
-          className="w-fit rounded-md border border-neutral-300 px-3 py-1.5 text-sm dark:border-neutral-700"
-        >
-          {freePlayT("title")}
-        </Link>
-      </div>
+      {/* Quotas du jour */}
+      <Card className="max-w-sm">
+        <p className="mb-1 font-brandMono text-xs uppercase tracking-[0.14em] text-brand-muted">
+          {t("quotasTitle")}
+        </p>
+        <StatItem
+          label={t("newPositions")}
+          value={formatCount(entitlements.remaining.newPositions, t("unlimited"))}
+        />
+        <StatItem
+          label={t("reviews")}
+          value={formatCount(entitlements.remaining.reviews, t("unlimited"))}
+        />
+        <StatItem
+          label={t("explanations")}
+          value={formatCount(entitlements.remaining.explanations, t("unlimited"))}
+        />
+      </Card>
+
+      {/* Jeu libre */}
+      <Link href="/app/free-play" className={btnClass("ghost", "sm", "w-fit pl-0")}>
+        {t("freePlayCta")} →
+      </Link>
     </div>
   );
 }

@@ -6,7 +6,8 @@
       "progression": "Progression",
       "pricing": "Tarifs",
       "login": "Se connecter",
-      "signup": "Commencer gratuitement"
+      "signup": "Commencer gratuitement",
+      "about": "À propos"
     },
     "hero": {
       "kicker": "Finales d'échecs · 600 à 1800 Elo",
@@ -15,7 +16,7 @@
       "body": "Comprenez le plan grâce à des leçons courtes, annoncez le résultat, puis prouvez-le sur l'échiquier face à un juge exact. Cinq à dix minutes par jour suffisent.",
       "ctaPrimary": "Créer mon compte",
       "ctaSecondary": "Essayer sans compte",
-      "stat1Value": "300",
+      "stat1Value": "1 000+",
       "stat1Label": "positions validées",
       "stat2Value": "7",
       "stat2Label": "familles de finales",
@@ -25,7 +26,9 @@
     "heroDemo": {
       "label": "Démo gratuite",
       "badge": "Roi et pion contre roi",
-      "cta": "Créer mon compte"
+      "cta": "Créer mon compte",
+      "announceCorrect": "Bonne annonce !",
+      "announceWrong": "Mauvaise annonce — joue la position pour voir."
     },
     "quote": {
       "text": "Pour progresser, il faut d'abord étudier les finales.",
@@ -55,7 +58,7 @@
     },
     "programme": {
       "title": "Toutes les finales, de la plus fréquente à la plus rare.",
-      "body": "300 positions réparties en 7 familles. Le parcours « Fondamentaux » — 40 positions — est gratuit.",
+      "body": "1 000+ positions réparties en 7 familles. Le parcours « Fondamentaux » — 40 positions — est gratuit.",
       "positionsLabel": "positions",
       "families": [
         { "num": "01", "name": "Finales de pions", "themes": "Opposition, cases clés, règle du carré, triangulation, pion passé éloigné, percée.", "count": "90", "free": "20 gratuites", "glyph": "♟" },
@@ -104,7 +107,7 @@
         "priceMonthlySub": "par mois",
         "priceAnnual": "59 €",
         "priceAnnualSub": "par an · soit 4,92 € / mois",
-        "features": ["Les 300 positions et toutes les nouvelles", "Nouvelles positions et révisions illimitées", "Toutes les leçons", "Jeu libre depuis n'importe quelle FEN", "Explications d'erreur illimitées", "Maîtrise par thème, historique, points faibles"],
+        "features": ["Toutes les positions (1 000+) et toutes les nouvelles", "Nouvelles positions et révisions illimitées", "Toutes les leçons", "Jeu libre depuis n'importe quelle FEN", "Explications d'erreur illimitées", "Maîtrise par thème, historique, points faibles"],
         "cta": "Passer Premium"
       },
       "founder": {
@@ -124,9 +127,37 @@
     },
     "footer": {
       "copyright": "© 2026 ZugChess · Hébergé dans l'Union européenne",
+      "about": "À propos",
       "legal": "Mentions légales",
       "privacy": "Confidentialité",
       "contact": "Contact"
+    },
+    "about": {
+      "kicker": "Notre mission",
+      "title": "Des finales",
+      "titleEm": "pour tout le monde.",
+      "body": "ZugChess naît de la conviction que les finales d'échecs — souvent considérées comme austères — peuvent être apprises avec méthode, efficacité et même plaisir. Pas besoin d'être grand maître pour comprendre un roi et pion contre roi.",
+      "card1Title": "Juge exact",
+      "card1Body": "Chaque coup est évalué par une table de finales ou un moteur de force grand-maître. Pas d'approximation, pas de coup vaguement bon — la vérité exacte, toujours.",
+      "card2Title": "Répétition espacée",
+      "card2Body": "L'algorithme FSRS calcule le moment optimal pour revoir chaque position, juste avant que l'oubli s'installe. Cinq minutes par jour suffisent.",
+      "card3Title": "Méthode en trois étapes",
+      "card3Body": "Comprendre le plan, annoncer le résultat, le prouver sur l'échiquier. Trois étapes identiques pour chaque position — ce qui crée le réflexe.",
+      "closingTitle": "Construit avec soin.",
+      "closingBody": "ZugChess est développé par des passionnés d'échecs qui en ont assez des applications trop compliquées. Chaque décision de design part d'une question : est-ce que ça aide vraiment à progresser ?"
+    },
+    "contact": {
+      "kicker": "Contactez-nous",
+      "title": "Une question ?",
+      "titleEm": "Écrivons-nous.",
+      "body": "Suggestion, bug, partenariat ou juste envie d'échanger sur les finales — on lit tous les messages.",
+      "emailLabel": "Ou directement par e-mail",
+      "emailAddress": "contact@zugchess.app",
+      "formName": "Votre nom",
+      "formEmail": "Votre e-mail",
+      "formMessage": "Votre message",
+      "formCta": "Envoyer le message",
+      "formNote": "Réponse habituelle sous 48 heures."
     }
   },
   "Try": {
@@ -179,6 +210,18 @@
       "rankingTitle": "Classement",
       "rankingBody": "Les classements arrivent avec la gamification (lot 6) : XP, Elo de finales, séries.",
       "backToApp": "Retour à l'accueil"
+    },
+    "Lessons": {
+      "title": "Leçons",
+      "intro": "Toutes les positions jouables, regroupées par thème. Rejoue n'importe laquelle librement — ta progression FSRS n'est pas modifiée.",
+      "badgeNew": "Nouveau",
+      "badgeLearning": "En cours",
+      "badgeFamiliar": "Familier",
+      "badgeMastered": "Maîtrisé",
+      "replay": "Rejouer",
+      "replayBack": "← Leçons",
+      "replayDone": "Retour aux leçons",
+      "noPositions": "Aucune position dans ce thème pour l'instant."
     }
   },
   "Play": {
@@ -188,7 +231,14 @@
     "Session": {
       "categoryPawns": "Finales de pions",
       "categoryRooks": "Finales de tours",
-      "backToLibrary": "Retour à la liste"
+      "backToLibrary": "Retour à la liste",
+      "finished": "Séance terminée !",
+      "finishedBody": "Bien joué. Revenez demain pour vos prochaines révisions.",
+      "finishedCta": "Retour à l'accueil",
+      "empty": "Tout est à jour.",
+      "emptyBody": "Aucune révision due pour l'instant. Revenez demain ou explorez le jeu libre.",
+      "emptyCta": "Jeu libre",
+      "progress": "{current} / {total}"
     },
     "Announce": {
       "question": "Trait aux {side}. Quel est le résultat avec le meilleur jeu ?",

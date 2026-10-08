@@ -13,9 +13,11 @@
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
     "prisma:generate": "prisma generate --schema prisma/schema.prisma",
-    "prisma:migrate": "prisma migrate dev --schema prisma/schema.prisma",
-    "prisma:deploy": "prisma migrate deploy --schema prisma/schema.prisma",
-    "prisma:seed": "tsx prisma/seed.ts"
+    "prisma:migrate": "dotenv -e .env.local -- prisma migrate dev --schema prisma/schema.prisma",
+    "prisma:deploy": "dotenv -e .env.local -- prisma migrate deploy --schema prisma/schema.prisma",
+    "prisma:seed": "dotenv -e .env.local -- tsx prisma/seed.ts",
+    "generate:kpk": "dotenv -e .env.local -- npx tsx scripts/generate-kpk.ts",
+    "generate:syzygy": "dotenv -e .env.local -- npx tsx scripts/generate-syzygy.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -24,6 +26,7 @@
     "@prisma/client": "^6.1.0",
     "@types/node": "^22.10.2",
     "chess.js": "^1.1.0",
+    "dotenv-cli": "^11.0.0",
     "prisma": "^6.1.0",
     "tsx": "^4.23.15",
     "typescript": "^5.7.2"

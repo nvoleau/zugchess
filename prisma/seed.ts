@@ -38,23 +38,194 @@ function buildLineSteps(fen: string, sanMoves: Array<[string, { fr: string; en: 
   });
 }
 
+interface ThemeDefaultTextsLocale {
+  intro: string;
+  attackTitle: string;
+  defendTitle: string;
+  attackGoal: string;
+  defendGoal: string;
+}
+
 interface ThemeSeed {
   slug: string;
   family: string;
   order: number;
   title: { fr: string; en: string };
+  defaultTexts?: { fr: ThemeDefaultTextsLocale; en: ThemeDefaultTextsLocale };
 }
 
 const THEMES: ThemeSeed[] = [
-  { slug: "opposition", family: "pions", order: 0, title: { fr: "Opposition", en: "Opposition" } },
-  { slug: "tempo", family: "pions", order: 1, title: { fr: "Tempo et triangulation", en: "Tempo and triangulation" } },
-  { slug: "pat", family: "pions", order: 2, title: { fr: "Éviter le pat", en: "Avoiding stalemate" } },
-  { slug: "carre", family: "pions", order: 3, title: { fr: "Règle du carré", en: "Rule of the square" } },
-  { slug: "pion-de-tour", family: "pions", order: 4, title: { fr: "Pion de tour", en: "Rook pawn" } },
-  { slug: "percee", family: "pions", order: 5, title: { fr: "Percée", en: "Breakthrough" } },
-  { slug: "etudes", family: "etudes", order: 0, title: { fr: "Études célèbres", en: "Famous studies" } },
-  { slug: "lucena", family: "tours", order: 0, title: { fr: "Lucena", en: "Lucena" } },
-  { slug: "philidor", family: "tours", order: 1, title: { fr: "Philidor", en: "Philidor" } },
+  {
+    slug: "opposition", family: "pions", order: 0, title: { fr: "Opposition", en: "Opposition" },
+    defaultTexts: {
+      fr: {
+        intro: "L'opposition directe place les deux rois face à face, séparés d'un nombre impair de cases. Posséder l'opposition force le roi adverse à reculer.",
+        attackTitle: "KPK – Prendre l'opposition",
+        defendTitle: "KPK – Résister à l'opposition",
+        attackGoal: "Prends l'opposition et mène le pion à dame.",
+        defendGoal: "Reprends l'opposition à chaque coup et tiens la nulle.",
+      },
+      en: {
+        intro: "Direct opposition places the two kings face to face, separated by an odd number of squares. Gaining the opposition forces the opposing king to give way.",
+        attackTitle: "KPK – Gain the opposition",
+        defendTitle: "KPK – Resist the opposition",
+        attackGoal: "Gain the opposition and promote the pawn.",
+        defendGoal: "Retake the opposition every move and hold the draw.",
+      },
+    },
+  },
+  {
+    slug: "tempo", family: "pions", order: 1, title: { fr: "Tempo et triangulation", en: "Tempo and triangulation" },
+    defaultTexts: {
+      fr: {
+        intro: "La triangulation est une manœuvre de roi qui perd un tempo pour rendre le trait à l'adversaire. Utile quand la position est gagnée avec son propre trait mais nulle avec le trait adverse.",
+        attackTitle: "KPK – Triangulation",
+        defendTitle: "KPK – Éviter la triangulation",
+        attackGoal: "Utilise le tempo de réserve ou triangule pour obtenir l'opposition favorable.",
+        defendGoal: "Surveille le tempo adverse et tiens la nulle.",
+      },
+      en: {
+        intro: "Triangulation is a king manoeuvre that loses a tempo to hand the move to the opponent. Useful when the position is winning with your own move but drawn when the opponent moves.",
+        attackTitle: "KPK – Triangulation",
+        defendTitle: "KPK – Avoid triangulation",
+        attackGoal: "Use the spare tempo or triangulate to gain the favourable opposition.",
+        defendGoal: "Watch for the tempo transfer and hold the draw.",
+      },
+    },
+  },
+  {
+    slug: "pat", family: "pions", order: 2, title: { fr: "Éviter le pat", en: "Avoiding stalemate" },
+    defaultTexts: {
+      fr: {
+        intro: "Le pat est la ressource ultime du défenseur : si le roi n'a aucun coup légal et n'est pas en échec, la partie est nulle. L'attaquant doit toujours laisser une case de fuite au roi adverse.",
+        attackTitle: "KPK – Éviter le pat",
+        defendTitle: "KPK – Viser le pat",
+        attackGoal: "Gagne sans enfermer le roi adverse.",
+        defendGoal: "Force le pat et sauve la nulle.",
+      },
+      en: {
+        intro: "Stalemate is the defender's ultimate resource: if the king has no legal move and is not in check, the game is drawn. The attacker must always leave the defending king a flight square.",
+        attackTitle: "KPK – Avoid stalemate",
+        defendTitle: "KPK – Aim for stalemate",
+        attackGoal: "Win without stalemating the defending king.",
+        defendGoal: "Force stalemate and save the draw.",
+      },
+    },
+  },
+  {
+    slug: "carre", family: "pions", order: 3, title: { fr: "Règle du carré", en: "Rule of the square" },
+    defaultTexts: {
+      fr: {
+        intro: "La règle du carré : trace un carré depuis la case du pion jusqu'à la 8e rangée. Si le roi défenseur peut y entrer en un coup, il rattrape le pion.",
+        attackTitle: "KPK – Hors du carré",
+        defendTitle: "KPK – Entrer dans le carré",
+        attackGoal: "Pousse le pion hors du carré du roi adverse.",
+        defendGoal: "Entre dans le carré et rattrape le pion.",
+      },
+      en: {
+        intro: "The rule of the square: draw a square from the pawn to the 8th rank. If the defending king can step into that square, it catches the pawn.",
+        attackTitle: "KPK – Outside the square",
+        defendTitle: "KPK – Step into the square",
+        attackGoal: "Push the pawn out of the defending king's square.",
+        defendGoal: "Step into the square and catch the pawn.",
+      },
+    },
+  },
+  {
+    slug: "pion-de-tour", family: "pions", order: 4, title: { fr: "Pion de tour", en: "Rook pawn" },
+    defaultTexts: {
+      fr: {
+        intro: "Les pions de colonnes a et h sont une exception majeure : même avec un pion en 7e et le roi en h8, le coin sauve le défenseur si son roi s'y réfugie.",
+        attackTitle: "KPK – Pion de tour, attaque",
+        defendTitle: "KPK – Pion de tour, défense",
+        attackGoal: "Empêche le roi adverse de gagner le coin et fais dame.",
+        defendGoal: "Rejoins le coin et tiens la nulle.",
+      },
+      en: {
+        intro: "Rook pawns (a and h files) are a major exception: even with a pawn on the 7th, the corner saves the defender if their king reaches it.",
+        attackTitle: "KPK – Rook pawn, attack",
+        defendTitle: "KPK – Rook pawn, defense",
+        attackGoal: "Cut the defending king off from the corner and promote.",
+        defendGoal: "Reach the corner and hold the draw.",
+      },
+    },
+  },
+  {
+    slug: "percee", family: "pions", order: 5, title: { fr: "Percée", en: "Breakthrough" },
+    defaultTexts: {
+      fr: {
+        intro: "La percée est un sacrifice de pion qui crée un pion passé irréversible quand les rois sont loin de l'action.",
+        attackTitle: "Percée de pions",
+        defendTitle: "Contrer la percée",
+        attackGoal: "Crée un pion passé par la percée et fais dame.",
+        defendGoal: "Bloque la percée et tiens la nulle.",
+      },
+      en: {
+        intro: "The breakthrough is a pawn sacrifice that creates an unstoppable passed pawn when the kings are far away.",
+        attackTitle: "Pawn breakthrough",
+        defendTitle: "Counter the breakthrough",
+        attackGoal: "Create a passed pawn with the breakthrough and promote.",
+        defendGoal: "Stop the breakthrough and hold the draw.",
+      },
+    },
+  },
+  {
+    slug: "etudes", family: "etudes", order: 0, title: { fr: "Études célèbres", en: "Famous studies" },
+    defaultTexts: {
+      fr: {
+        intro: "Les études classiques illustrent des thèmes contre-intuitifs, utilisés depuis des siècles pour enseigner les subtilités des finales.",
+        attackTitle: "Étude – Attaque",
+        defendTitle: "Étude – Défense",
+        attackGoal: "Trouve la combinaison gagnante.",
+        defendGoal: "Tiens la nulle par une défense précise.",
+      },
+      en: {
+        intro: "Classical studies illustrate counter-intuitive themes, used for centuries to teach the subtleties of endgames.",
+        attackTitle: "Study – Attack",
+        defendTitle: "Study – Defense",
+        attackGoal: "Find the winning combination.",
+        defendGoal: "Hold the draw with precise defense.",
+      },
+    },
+  },
+  {
+    slug: "lucena", family: "tours", order: 0, title: { fr: "Lucena", en: "Lucena" },
+    defaultTexts: {
+      fr: {
+        intro: "La position de Lucena est la position gagnante de référence en finale de tour : le pion est en 7e rangée et le roi fort est sorti de devant son pion. La technique du pont est la clé.",
+        attackTitle: "Lucena – Construire le pont",
+        defendTitle: "Lucena – Résister au pont",
+        attackGoal: "Construis le pont et fais dame.",
+        defendGoal: "Donne le maximum d'échecs et tente de bloquer la technique.",
+      },
+      en: {
+        intro: "The Lucena position is the reference winning position in rook endings: the pawn is on the 7th rank and the stronger side's king has stepped out. The bridge technique is the key.",
+        attackTitle: "Lucena – Build the bridge",
+        defendTitle: "Lucena – Resist the bridge",
+        attackGoal: "Build the bridge and promote.",
+        defendGoal: "Give maximum checks and try to disrupt the technique.",
+      },
+    },
+  },
+  {
+    slug: "philidor", family: "tours", order: 1, title: { fr: "Philidor", en: "Philidor" },
+    defaultTexts: {
+      fr: {
+        intro: "La défense de Philidor est la technique nulle de référence en finale de tour avec pion : la tour en 6e rangée bloque le roi adverse, puis passe derrière pour des échecs perpétuels.",
+        attackTitle: "Philidor – Forcer la dame",
+        defendTitle: "Philidor – Tenir la nulle",
+        attackGoal: "Contourne la défense de Philidor et fais dame.",
+        defendGoal: "Applique la défense de Philidor et tiens la nulle.",
+      },
+      en: {
+        intro: "Philidor's defense is the reference drawing technique in rook-and-pawn endings: the rook on the 6th rank holds back the opposing king, then drops behind for perpetual checks.",
+        attackTitle: "Philidor – Force promotion",
+        defendTitle: "Philidor – Hold the draw",
+        attackGoal: "Overcome Philidor's defense and promote.",
+        defendGoal: "Apply Philidor's defense and hold the draw.",
+      },
+    },
+  },
 ];
 
 interface KpkPositionSeed {
@@ -355,8 +526,14 @@ async function main() {
   for (const theme of THEMES) {
     const row = await prisma.theme.upsert({
       where: { slug: theme.slug },
-      create: { slug: theme.slug, family: theme.family, order: theme.order, title: theme.title, free: true },
-      update: { family: theme.family, order: theme.order, title: theme.title },
+      create: {
+        slug: theme.slug, family: theme.family, order: theme.order, title: theme.title,
+        free: true, defaultTexts: theme.defaultTexts as unknown as Prisma.InputJsonValue ?? undefined,
+      },
+      update: {
+        family: theme.family, order: theme.order, title: theme.title,
+        defaultTexts: theme.defaultTexts as unknown as Prisma.InputJsonValue ?? undefined,
+      },
     });
     themeIdBySlug.set(theme.slug, row.id);
   }

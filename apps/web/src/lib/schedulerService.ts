@@ -39,6 +39,7 @@ export async function getTodaySession(userId: string, locale: "fr" | "en"): Prom
       where: { status: "published", cards: { none: { userId } } },
       include: { theme: true },
       orderBy: [{ theme: { order: "asc" } }, { createdAt: "asc" }],
+      take: 200,
     }),
   ]);
 

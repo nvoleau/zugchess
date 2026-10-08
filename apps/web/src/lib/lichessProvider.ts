@@ -23,6 +23,8 @@ export function Lichess(config: OAuthUserConfig<LichessProfile>): OAuthConfig<Li
     },
     token: "https://lichess.org/api/token",
     userinfo: "https://lichess.org/api/account",
+    // Lichess attend client_id + client_secret dans le corps du POST (pas en Basic auth).
+    client: { token_endpoint_auth_method: "client_secret_post" },
     profile(profile) {
       return {
         id: profile.id,

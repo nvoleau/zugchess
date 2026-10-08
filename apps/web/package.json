@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "dotenv -e ../../.env.local -- next dev",
     "build": "next build",
     "vercel-build": "prisma migrate deploy --schema ../../prisma/schema.prisma && next build",
     "start": "next start",

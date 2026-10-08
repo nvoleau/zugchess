@@ -191,6 +191,8 @@ model Theme {
   /// `{ fr: "...", en: "..." }`
   title  Json
   free   Boolean @default(false)
+  /// Textes par défaut pour les positions générées : `{ fr: { intro, attackTitle, defendTitle, attackGoal, defendGoal }, en: {...} }`
+  defaultTexts Json?
 
   lessons   Lesson[]
   positions Position[]
@@ -229,6 +231,8 @@ model Position {
   ratingDeviation Float          @default(350)
   free            Boolean        @default(false)
   status          PositionStatus @default(draft)
+  /// true = généré par script (generate-kpk, generate-syzygy), false = curé manuellement
+  generated       Boolean        @default(false)
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
 

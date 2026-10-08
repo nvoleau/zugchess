@@ -70,6 +70,76 @@ export interface PositionDetail {
   methodLine: MethodLine | null;
 }
 
+// ---------------------------------------------------------------------------
+// Page Leçons : toutes les positions publiées + niveau de maîtrise FSRS
+// ---------------------------------------------------------------------------
+
+export interface PositionMasteryItem {
+  id: string;
+  title: string;
+  mastery: "new" | "learning" | "familiar" | "mastered";
+}
+
+export interface ThemeLessons {
+  id: string;
+  slug: string;
+  title: string;
+  order: number;
+  positions: PositionMasteryItem[];
+}
+
+function masteryFromStability(stability: number | undefined): "new" | "learning" | "familiar" | "mastered" {
+  if (!stability) return "learning";
+  if (stability < 7) return "learning";
+  if (stability < 30) return "familiar";
+  return "mastered";
+}
+
+/**
+ * Retourne tous les thèmes ayant au moins une position publiée, avec pour chaque position
+ * son niveau de maîtrise FSRS (stability) pour l'utilisateur donné.
+ */
+export async function listThemesWithPositions(userId: string, locale: "fr" | "en"): Promise<ThemeLessons[]> {
+  const rows = await prisma.position.findMany({
+    where: { status: "published" },
+    include: {
+      theme: true,
+      cards: { where: { userId }, select: { fsrsState: true } },
+    },
+    orderBy: [{ theme: { order: "asc" } }, { createdAt: "asc" }],
+  });
+
+  const themeMap = new Map<string, ThemeLessons>();
+
+  for (const row of rows) {
+    if (!themeMap.has(row.themeId)) {
+      const titleJson = row.theme.title as Record<string, string>;
+      themeMap.set(row.themeId, {
+        id: row.theme.id,
+        slug: row.theme.slug,
+        title: titleJson[locale] ?? titleJson.fr ?? row.theme.slug,
+        order: row.theme.order,
+        positions: [],
+      });
+    }
+
+    const card = row.cards[0];
+    const mastery = card
+      ? masteryFromStability((card.fsrsState as { stability?: number } | null)?.stability)
+      : "new";
+
+    themeMap.get(row.themeId)!.positions.push({
+      id: row.id,
+      title: textsFor(row.texts, locale).title,
+      mastery,
+    });
+  }
+
+  return Array.from(themeMap.values()).sort((a, b) => a.order - b.order);
+}
+
+// ---------------------------------------------------------------------------
+
 export async function getPosition(id: string, locale: "fr" | "en"): Promise<PositionDetail | null> {
   const row = await prisma.position.findUnique({ where: { id }, include: { theme: true } });
   if (!row || row.status !== "published") return null;

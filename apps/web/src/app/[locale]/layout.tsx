@@ -5,6 +5,7 @@ import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Cursor } from "@/components/ui/cursor";
 import { routing, type AppLocale } from "@/i18n/routing";
 import "../globals.css";
 
@@ -45,6 +46,7 @@ export default async function LocaleLayout({
       <body
         className={`min-h-screen bg-white text-neutral-900 antialiased dark:bg-neutral-950 dark:text-neutral-100 ${brandSans.variable} ${brandMono.variable} ${brandSerif.variable}`}
       >
+        <Cursor />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
         </ThemeProvider>

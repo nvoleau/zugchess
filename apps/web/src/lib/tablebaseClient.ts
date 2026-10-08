@@ -1,9 +1,17 @@
 import { normalizeFenForTablebase, type SyzygyPosition } from "@zugchess/core";
 import { prisma } from "./prisma";
 
-const TABLEBASE_URL = "https://tablebase.lichess.ovh/standard";
-const MIN_REQUEST_INTERVAL_MS = 1000; // 1 requête/s, limite imposée par Lichess.
-const CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 jours : un résultat Syzygy ne change jamais, large marge pour un rafraîchissement.
+// Avec un jeton personnel Lichess, on passe par lichess.org/api (meilleure tolérance de débit).
+// Sans jeton, on utilise l'URL publique tablebase.lichess.ovh (1 req/s recommandée par Lichess).
+const API_KEY = process.env.LICHESS_API_KEY ?? "";
+const TABLEBASE_URL = API_KEY
+  ? "https://lichess.org/api/tablebase/standard"
+  : "https://tablebase.lichess.ovh/standard";
+
+// 300 ms avec auth (≈ 3 req/s, largement sous le quota Lichess) ; 1 s sans auth.
+const MIN_REQUEST_INTERVAL_MS = API_KEY ? 300 : 1000;
+
+const CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 jours : un résultat Syzygy est immuable.
 
 let lastRequestAt = 0;
 
@@ -15,9 +23,9 @@ async function throttle(): Promise<void> {
 
 /**
  * Récupère le jugement Syzygy d'une position (SPEC.md, service `TablebaseClient`) : cache Neon
- * d'abord (`TablebaseCache`), sinon appel à `tablebase.lichess.ovh`, limité à 1 requête/s comme
- * demandé par Lichess. Lève une erreur si l'API répond une erreur ou une position hors tables (plus
- * de 7 pièces : c'est alors Stockfish qui doit être utilisé, pas ce client).
+ * d'abord (`TablebaseCache`), sinon appel à l'API Lichess (authentifié si `LICHESS_API_KEY` est
+ * défini), limité par le throttle ci-dessus. Lève une erreur si l'API est indisponible ou si la
+ * position dépasse 7 pièces (utiliser Stockfish dans ce cas).
  */
 export async function getTablebasePosition(fen: string): Promise<SyzygyPosition> {
   const fenNormalized = normalizeFenForTablebase(fen);
@@ -28,9 +36,13 @@ export async function getTablebasePosition(fen: string): Promise<SyzygyPosition>
   }
 
   await throttle();
-  const response = await fetch(`${TABLEBASE_URL}?fen=${encodeURIComponent(fen)}`, {
-    headers: { "User-Agent": "ZugChess (https://github.com/zugchess)" },
-  });
+
+  const headers: Record<string, string> = {
+    "User-Agent": "ZugChess (https://github.com/zugchess)",
+  };
+  if (API_KEY) headers["Authorization"] = `Bearer ${API_KEY}`;
+
+  const response = await fetch(`${TABLEBASE_URL}?fen=${encodeURIComponent(fen)}`, { headers });
   if (!response.ok) {
     throw new Error(`Tablebase Lichess indisponible (${response.status}) pour ${fen}`);
   }

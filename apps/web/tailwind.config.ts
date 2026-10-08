@@ -28,6 +28,16 @@ const config: Config = {
         brandMono: ["var(--font-brand-mono)"],
         brandSerif: ["var(--font-brand-serif)"],
       },
+      keyframes: {
+        "pop-in": {
+          "0%": { transform: "scale(0.85)", opacity: "0" },
+          "60%": { transform: "scale(1.04)" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
+      },
+      animation: {
+        "pop-in": "pop-in 0.25s ease-out both",
+      },
     },
   },
   plugins: [],

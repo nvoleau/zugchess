@@ -1,8 +1,9 @@
 "use client";
 
-import { randomWinningKpkFen, type GameResult } from "@zugchess/core";
+import { kpkResult, randomWinningKpkFen, type GameResult } from "@zugchess/core";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { ChessBoard } from "@/components/chess-board";
 import { AnnounceStep } from "@/components/play/announce-step";
 import { attackerColorOf } from "@/components/play/chess-move-dests";
 import { KpkTrainer } from "@/components/play/kpk-trainer";
@@ -22,10 +23,13 @@ export function HeroTrial() {
   const t = useTranslations("Marketing.heroDemo");
   const [fen] = useState(() => randomWinningKpkFen());
   const [phase, setPhase] = useState<"announce" | "play" | "done">("announce");
+  const [announceOk, setAnnounceOk] = useState<boolean | null>(null);
   const attacker = attackerColorOf(fen);
+  // randomWinningKpkFen() always generates a winning position for the attacker
+  const truth: GameResult = kpkResult(fen) === "win" ? attacker : "draw";
 
   function handleAnnounce(choice: GameResult) {
-    void choice; // la démo n'affiche pas si l'annonce était juste, seulement le jeu réel qui suit
+    setAnnounceOk(choice === truth);
     setPhase("play");
   }
 
@@ -39,11 +43,21 @@ export function HeroTrial() {
       </div>
 
       {phase === "announce" && (
-        <AnnounceStep sideToMove={sideToMoveOf(fen)} onAnswer={handleAnnounce} />
+        <>
+          <ChessBoard fen={fen} orientation={attacker} />
+          <AnnounceStep sideToMove={sideToMoveOf(fen)} onAnswer={handleAnnounce} />
+        </>
       )}
 
       {phase !== "announce" && (
-        <KpkTrainer key={fen} initialFen={fen} userColor={attacker} onWin={() => setPhase("done")} />
+        <>
+          {announceOk !== null && (
+            <p className={`text-center text-sm font-medium ${announceOk ? "text-emerald-400" : "text-rose-400"}`}>
+              {announceOk ? t("announceCorrect") : t("announceWrong")}
+            </p>
+          )}
+          <KpkTrainer key={fen} initialFen={fen} userColor={attacker} onWin={() => setPhase("done")} />
+        </>
       )}
 
       {phase === "done" && (

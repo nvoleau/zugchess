@@ -6,7 +6,8 @@
       "progression": "Progression",
       "pricing": "Pricing",
       "login": "Log in",
-      "signup": "Start for free"
+      "signup": "Start for free",
+      "about": "About"
     },
     "hero": {
       "kicker": "Chess endgames · 600 to 1800 Elo",
@@ -15,7 +16,7 @@
       "body": "Understand the plan through short lessons, announce the result, then prove it on the board against an exact judge. Five to ten minutes a day is enough.",
       "ctaPrimary": "Create my account",
       "ctaSecondary": "Try without an account",
-      "stat1Value": "300",
+      "stat1Value": "1,000+",
       "stat1Label": "validated positions",
       "stat2Value": "7",
       "stat2Label": "endgame families",
@@ -25,7 +26,9 @@
     "heroDemo": {
       "label": "Free demo",
       "badge": "King and pawn vs king",
-      "cta": "Create my account"
+      "cta": "Create my account",
+      "announceCorrect": "Correct call!",
+      "announceWrong": "Wrong call — play the position to see why."
     },
     "quote": {
       "text": "In order to improve your game, you must first study the endgame.",
@@ -55,7 +58,7 @@
     },
     "programme": {
       "title": "Every endgame, from the most common to the rarest.",
-      "body": "300 positions across 7 families. The « Fundamentals » path — 40 positions — is free.",
+      "body": "1,000+ positions across 7 families. The « Fundamentals » path — 40 positions — is free.",
       "positionsLabel": "positions",
       "families": [
         { "num": "01", "name": "Pawn endgames", "themes": "Opposition, key squares, rule of the square, triangulation, distant passed pawn, breakthrough.", "count": "90", "free": "20 free", "glyph": "♟" },
@@ -104,7 +107,7 @@
         "priceMonthlySub": "per month",
         "priceAnnual": "€59",
         "priceAnnualSub": "per year · €4.92/month",
-        "features": ["All 300 positions and every new one", "Unlimited new positions and reviews", "Every lesson", "Free play from any FEN", "Unlimited error explanations", "Mastery by theme, history, weak spots"],
+        "features": ["All positions (1,000+) and every new one", "Unlimited new positions and reviews", "Every lesson", "Free play from any FEN", "Unlimited error explanations", "Mastery by theme, history, weak spots"],
         "cta": "Go Premium"
       },
       "founder": {
@@ -124,9 +127,37 @@
     },
     "footer": {
       "copyright": "© 2026 ZugChess · Hosted in the European Union",
+      "about": "About",
       "legal": "Legal notice",
       "privacy": "Privacy",
       "contact": "Contact"
+    },
+    "about": {
+      "kicker": "Our mission",
+      "title": "Endgames",
+      "titleEm": "for everyone.",
+      "body": "ZugChess was born from the belief that chess endgames — often seen as dry and technical — can be learned with method, efficiency, and even enjoyment. You don't have to be a grandmaster to understand king and pawn versus king.",
+      "card1Title": "Exact judge",
+      "card1Body": "Every move is evaluated by a tablebase or a grandmaster-strength engine. No approximation, no vaguely good moves — the exact truth, always.",
+      "card2Title": "Spaced repetition",
+      "card2Body": "The FSRS algorithm calculates the optimal moment to review each position, just before forgetting sets in. Five minutes a day is enough.",
+      "card3Title": "Three-step method",
+      "card3Body": "Understand the plan, announce the result, prove it on the board. Three identical steps for every position — that's what builds the reflex.",
+      "closingTitle": "Built with care.",
+      "closingBody": "ZugChess is developed by chess enthusiasts who are tired of overcomplicated apps. Every design decision starts from one question: does this actually help you improve?"
+    },
+    "contact": {
+      "kicker": "Get in touch",
+      "title": "A question?",
+      "titleEm": "Let's talk.",
+      "body": "Suggestions, bugs, partnerships, or just a chat about endgames — we read every message.",
+      "emailLabel": "Or reach us directly",
+      "emailAddress": "contact@zugchess.app",
+      "formName": "Your name",
+      "formEmail": "Your email",
+      "formMessage": "Your message",
+      "formCta": "Send message",
+      "formNote": "We usually reply within 48 hours."
     }
   },
   "Try": {
@@ -179,6 +210,18 @@
       "rankingTitle": "Leaderboard",
       "rankingBody": "Leaderboards arrive with gamification (lot 6): XP, endgame Elo, streaks.",
       "backToApp": "Back to home"
+    },
+    "Lessons": {
+      "title": "Lessons",
+      "intro": "All playable positions, grouped by theme. Replay any of them freely — your FSRS progress is not affected.",
+      "badgeNew": "New",
+      "badgeLearning": "Learning",
+      "badgeFamiliar": "Familiar",
+      "badgeMastered": "Mastered",
+      "replay": "Replay",
+      "replayBack": "← Lessons",
+      "replayDone": "Back to lessons",
+      "noPositions": "No positions in this theme yet."
     }
   },
   "Play": {
@@ -188,7 +231,14 @@
     "Session": {
       "categoryPawns": "Pawn endgames",
       "categoryRooks": "Rook endgames",
-      "backToLibrary": "Back to the list"
+      "backToLibrary": "Back to the list",
+      "finished": "Session complete!",
+      "finishedBody": "Well done. Come back tomorrow for your next reviews.",
+      "finishedCta": "Back to home",
+      "empty": "All caught up.",
+      "emptyBody": "No reviews due right now. Come back tomorrow or explore free play.",
+      "emptyCta": "Free play",
+      "progress": "{current} / {total}"
     },
     "Announce": {
       "question": "{side} to move. What's the result with best play?",

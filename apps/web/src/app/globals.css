@@ -1,3 +1,65 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Défilement fluide pour les ancres de la page marketing */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Curseur de marque */
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e2b65a;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0;
+  will-change: transform;
+  transition:
+    width 0.22s ease,
+    height 0.22s ease,
+    background 0.22s ease,
+    border 0.22s ease,
+    border-width 0.22s ease,
+    opacity 0.3s ease;
+}
+
+.cursor-dot.cursor--hover {
+  width: 26px;
+  height: 26px;
+  background: transparent;
+  border: 1.5px solid #e2b65a;
+  opacity: 1 !important;
+}
+
+/* Masquer sur écrans tactiles */
+@media (pointer: coarse) {
+  .cursor-dot {
+    display: none;
+  }
+}
+
+@layer utilities {
+  /* Lien de navigation : trait or qui s'étend au survol */
+  .nav-link {
+    @apply relative transition-colors duration-200;
+  }
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    height: 1px;
+    width: 0;
+    background-color: theme("colors.brand.gold");
+    transition: width 0.25s ease;
+  }
+  .nav-link:hover::after {
+    width: 100%;
+  }
+}

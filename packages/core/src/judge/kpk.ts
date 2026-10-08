@@ -576,3 +576,13 @@ export function kpkPrincipalVariation(fen: string, plies = 5, random: () => numb
 }
 
 export { algebraicToSquare };
+
+/**
+ * Nombre de demi-coups jusqu'à la conversion (promotion ou capture du pion) pour l'attaquant,
+ * depuis la position donnée avec le meilleur jeu des deux côtés.
+ * Retourne 0 si la position est nulle.
+ * Utilisé par les scripts de génération pour filtrer les positions par complexité.
+ */
+export function kpkDepth(fen: string): number {
+  return judgeKpkMove(fen, fen).depthBefore;
+}

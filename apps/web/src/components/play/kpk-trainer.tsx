@@ -60,6 +60,7 @@ export function KpkTrainer({
   const remainingHalfMoves = won ? 0 : judgeKpkMove(fen, fen).depthBefore;
   const remainingMoves = Math.ceil(remainingHalfMoves / 2);
 
+  const [lastMove, setLastMove] = useState<[string, string] | undefined>();
   const [resetCount, setResetCount] = useState(0);
   const openedRef = useRef(false);
 
@@ -70,6 +71,7 @@ export function KpkTrainer({
     setLostTempos(0);
     setHeld(0);
     setFeed([]);
+    setLastMove(undefined);
     openedRef.current = false;
     setResetCount((n) => n + 1);
   }
@@ -78,14 +80,24 @@ export function KpkTrainer({
     setFeed((lines) => [...lines, line]);
   }
 
-  function engineReply(afterFen: string): string {
+  // Returns [newFen, [from, to]] on success, null if the engine has no valid reply.
+  function engineReply(afterFen: string): [string, [string, string]] | null {
     const chess = chessRef.current;
     const reply = bestKpkReply(afterFen);
-    const replied = chess.move({ from: reply.from, to: reply.to, promotion: reply.promotion });
-    if (!replied) return afterFen;
+    let replied = chess.move({ from: reply.from, to: reply.to, promotion: reply.promotion });
+    if (!replied) {
+      // Fallback: pick any legal move for the engine
+      const engineColor = chess.turn();
+      for (const m of chess.moves({ verbose: true })) {
+        if (m.color !== engineColor) continue;
+        replied = chess.move({ from: m.from, to: m.to, promotion: m.promotion as "q" | "r" | "b" | "n" | undefined });
+        if (replied) break;
+      }
+    }
+    if (!replied) return null;
     const side = replied.color === "w" ? t("sideWhite") : t("sideBlack");
     pushFeed(t("feedEngine", { side, san: frenchSan(replied.san) }));
-    return chess.fen();
+    return [chess.fen(), [replied.from, replied.to]];
   }
 
   // La FEN de départ peut placer l'autre camp au trait (ex. entraînement en défense) : le juge
@@ -94,7 +106,12 @@ export function KpkTrainer({
     if (openedRef.current) return;
     openedRef.current = true;
     if (chessRef.current.turn() !== playerColor) {
-      setFen(engineReply(chessRef.current.fen()));
+      const result = engineReply(chessRef.current.fen());
+      if (result) {
+        const [newFen, move] = result;
+        setLastMove(move);
+        setFen(newFen);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetCount]);
@@ -107,6 +124,24 @@ export function KpkTrainer({
     const fenBefore = chess.fen();
     const played = chess.move({ from, to, promotion });
     if (!played) return;
+
+    // Check terminal cases before judgeKpkMove: post-promotion/capture FENs are not KPK positions.
+    if (role === "attacker" && played.promotion) {
+      pushFeed(t("feedPromotion", { san: frenchSan(played.san) }));
+      setLastMove([from, to]);
+      setFen(chess.fen());
+      setWon(true);
+      onWin?.();
+      return;
+    }
+    if (role === "defender" && played.captured === "p") {
+      pushFeed(t("feedCapture", { san: frenchSan(played.san) }));
+      setLastMove([from, to]);
+      setFen(chess.fen());
+      setWon(true);
+      onWin?.();
+      return;
+    }
 
     const judged = judgeKpkMove(fenBefore, chess.fen());
     const outcomeOk = role === "attacker" ? judged.resultAfter === "win" : judged.resultAfter === "draw";
@@ -123,41 +158,45 @@ export function KpkTrainer({
     }
 
     if (role === "attacker") {
-      if (played.promotion) {
-        pushFeed(t("feedPromotion", { san: frenchSan(played.san) }));
-        setFen(chess.fen());
-        setWon(true);
-        onWin?.();
-        return;
-      }
       if (judged.tempoLost) {
         setLostTempos((n) => n + 1);
         pushFeed(t("feedTempoLost", { san: frenchSan(played.san) }));
       } else {
         pushFeed(t("feedGoodTempo", { san: frenchSan(played.san) }));
       }
-      setFen(engineReply(chess.fen()));
+      const result = engineReply(chess.fen());
+      if (!result) {
+        // Engine has no reply — revert the player's move to keep the game playable
+        chess.undo();
+        forceSync();
+        return;
+      }
+      const [newFen, engineMove] = result;
+      setLastMove(engineMove);
+      setFen(newFen);
       return;
     }
 
-    // Défenseur : capture du pion = nulle immédiate ; sinon ça tient, et ça continue.
-    if (played.captured === "p") {
-      pushFeed(t("feedCapture", { san: frenchSan(played.san) }));
-      setFen(chess.fen());
-      setWon(true);
-      onWin?.();
-      return;
-    }
+    // Défenseur : coup normal — ça tient, et ça continue.
     const nextHeld = held + 1;
     setHeld(nextHeld);
     pushFeed(t("feedHeld", { san: frenchSan(played.san) }));
     if (nextHeld >= HELD_TO_DRAW) {
+      setLastMove([from, to]);
       setFen(chess.fen());
       setWon(true);
       onWin?.();
       return;
     }
-    setFen(engineReply(chess.fen()));
+    const defResult = engineReply(chess.fen());
+    if (!defResult) {
+      chess.undo();
+      forceSync();
+      return;
+    }
+    const [defFen, defMove] = defResult;
+    setLastMove(defMove);
+    setFen(defFen);
   }
 
   const boxes: TempoBoxState[] =
@@ -179,10 +218,11 @@ export function KpkTrainer({
         movableColor={won ? undefined : userColor}
         dests={won ? undefined : legalDests(chessRef.current, playerColor)}
         onMove={handleMove}
+        lastMove={lastMove}
       />
       <TempoBar label={label} boxes={boxes} />
       {won ? (
-        <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">{role === "attacker" ? t("won") : t("heldDraw")}</p>
+        <p className="animate-pop-in text-sm font-medium text-brand-good">{role === "attacker" ? t("won") : t("heldDraw")}</p>
       ) : (
         <button type="button" onClick={reset} className="text-xs text-neutral-500 underline dark:text-neutral-400">
           {t("reset")}
