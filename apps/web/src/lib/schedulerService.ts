@@ -167,6 +167,7 @@ export async function recordReview(userId: string, submission: ReviewSubmission)
     grade: rating,
     isNewPosition,
     announceOk: submission.announceOk,
+    errors: submission.errors,
   });
 
   return { rating, due, isNewPosition, ...gamification };

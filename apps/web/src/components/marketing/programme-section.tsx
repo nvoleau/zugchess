@@ -14,7 +14,20 @@ export async function ProgrammeSection() {
   const families = t.raw("families") as Family[];
 
   return (
-    <section id="programme" className="bg-brand-paper text-brand-paperInk">
+    <section
+      id="programme"
+      className="bg-brand-paper text-brand-paperInk relative"
+      style={{
+        backgroundImage: `
+          linear-gradient(45deg, rgba(0,0,0,0.025) 25%, transparent 25%),
+          linear-gradient(-45deg, rgba(0,0,0,0.025) 25%, transparent 25%),
+          linear-gradient(45deg, transparent 75%, rgba(0,0,0,0.025) 75%),
+          linear-gradient(-45deg, transparent 75%, rgba(0,0,0,0.025) 75%)
+        `,
+        backgroundSize: '48px 48px',
+        backgroundPosition: '0 0, 0 24px, 24px -24px, -24px 0px',
+      }}
+    >
       <div className="mx-auto flex max-w-6xl flex-col gap-12 px-5 py-16 sm:px-10 sm:py-28">
         <div className="flex flex-wrap items-end justify-between gap-8">
           <h2 className="max-w-[700px] text-balance font-brandSerif text-[clamp(40px,5.5vw,68px)] font-normal leading-none tracking-tight">
@@ -36,7 +49,7 @@ export async function ProgrammeSection() {
                   >
                     {family.num}
                   </span>
-                  <span className="text-3xl leading-none">{family.glyph}</span>
+                  <span className="text-5xl leading-none">{family.glyph}</span>
                 </div>
                 <h3 className="text-[21px] font-medium">{family.name}</h3>
                 <p className="flex-1 text-sm leading-relaxed opacity-[0.78]">{family.themes}</p>

@@ -563,25 +563,36 @@ export function randomWinningKpkFen(random: () => number = Math.random): string 
 
 /**
  * Suite principale (SPEC.md, « explication d'erreur » : coup juste + suite de quelques coups) :
- * rejoue `bestKpkReply` des deux côtés en alternance, pour montrer au joueur comment la position se
- * joue optimalement après une erreur. S'arrête plus tôt si la ligne atteint une promotion (la
- * position sort alors du domaine K+P vs K) ou l'absence de coup légal (mat/pat).
+ * rejoue `bestKpkReply` des deux côtés en alternance, puis continue 2 demi-coups après la
+ * promotion pour montrer que le Roi noir ne peut pas capturer la dame.
+ * S'arrête à la fin légale de la partie (mat/pat).
  */
 export function kpkPrincipalVariation(fen: string, plies = 5, random: () => number = Math.random): SquareMove[] {
   const line: SquareMove[] = [];
   const chess = new Chess(fen);
 
+  // Phase KPK : jusqu'à `plies` demi-coups avec bestKpkReply
   for (let i = 0; i < plies; i++) {
+    if (chess.isGameOver()) return line;
     let move: SquareMove;
     try {
       move = bestKpkReply(chess.fen(), random);
     } catch {
-      break;
+      return line;
     }
     const played = chess.move({ from: move.from, to: move.to, promotion: move.promotion });
-    if (!played) break;
+    if (!played) return line;
     line.push(move);
-    if (played.promotion || chess.isGameOver()) break;
+    if (played.promotion) {
+      // Phase post-promotion : 1 coup du Roi noir pour montrer qu'il ne peut pas prendre la dame
+      if (!chess.isGameOver()) {
+        const legalMoves = chess.moves({ verbose: true });
+        const kingMoves = legalMoves.filter((m) => m.piece === "k" && m.captured !== "q");
+        const extra = kingMoves[0] ?? legalMoves[0];
+        if (extra) line.push({ from: extra.from, to: extra.to });
+      }
+      return line;
+    }
   }
 
   return line;

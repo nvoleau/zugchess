@@ -7,6 +7,7 @@
       "pricing": "Tarifs",
       "login": "Se connecter",
       "signup": "Commencer gratuitement",
+      "goToApp": "Mon espace",
       "about": "À propos"
     },
     "hero": {
@@ -43,7 +44,10 @@
       "step2Title": "Annoncer le résultat",
       "step2Body": "Gain, nulle ou perte ? Avant de toucher une pièce, vous évaluez la position. Une annonce juste rapporte des points, une annonce fausse se révise plus tôt.",
       "step3Title": "Prouver sur l'échiquier",
-      "step3Body": "Le juge défend avec le meilleur coup. Un coup perdant est annulé et les coups justes s'affichent. Vous continuez jusqu'à la promotion, au mat ou à la nulle tenue."
+      "step3Body": "Le juge défend avec le meilleur coup. Un coup perdant est annulé et les coups justes s'affichent. Vous continuez jusqu'à la promotion, au mat ou à la nulle tenue.",
+      "boardTitle": "Position en jeu",
+      "boardHeading": "Identifiez le coup juste au premier coup d'œil",
+      "boardBody": "Chaque exercice part d'une position réelle issue des tablebases. Le Roi blanc doit escorter le pion : Rd7 coupe la route au Roi noir."
     },
     "tempo": {
       "kicker": "La barre de tempo",
@@ -185,7 +189,10 @@
       "lessons": "Leçons",
       "ranking": "Classement",
       "planFree": "Gratuit",
-      "planPremium": "Premium"
+      "planPremium": "Premium",
+      "adminPanel": "Administration",
+      "signOut": "Se déconnecter",
+      "myAccount": "Mon compte"
     },
     "Home": {
       "greeting": "Bonjour {name}",
@@ -205,8 +212,18 @@
       "freePlayCta": "Jeu libre",
       "statsElo": "Elo de finales",
       "statsLevel": "Niveau {level}",
-      "statsStreak": "jours de série",
-      "statsStreakBest": "meilleure série"
+      "statsStreak": "jours de suite",
+      "statsStreakBest": "record",
+      "statsXpToNext": "{xp} XP vers le niveau {next}",
+      "statsXpProgress": "{current} / {range} XP",
+      "xpGuideTitle": "Comment gagner de l'XP",
+      "xpGuideAnnounce": "Annonce correcte",
+      "xpGuideHard": "Coup difficile (Hard)",
+      "xpGuideGood": "Coup réussi (Good)",
+      "xpGuideNew": "Nouvelle position réussie",
+      "xpGuideSession": "Séance complète",
+      "xpGuideWrongAnnounce": "Annonce incorrecte",
+      "xpGuideErrors": "Erreur de jeu"
     },
     "ComingSoon": {
       "lessonsTitle": "Leçons",
@@ -227,7 +244,7 @@
     },
     "Lessons": {
       "title": "Leçons",
-      "intro": "Toutes les positions jouables, regroupées par thème. Rejoue n'importe laquelle librement — ta progression FSRS n'est pas modifiée.",
+      "intro": "Explore les thèmes, suis ta progression, rejoue n'importe quelle position librement.",
       "badgeNew": "Nouveau",
       "badgeLearning": "En cours",
       "badgeFamiliar": "Familier",
@@ -235,7 +252,13 @@
       "replay": "Rejouer",
       "replayBack": "← Leçons",
       "replayDone": "Retour aux leçons",
-      "noPositions": "Aucune position dans ce thème pour l'instant."
+      "noPositions": "Aucune position dans ce thème pour l'instant.",
+      "positions": "{count} positions",
+      "explore": "Explorer →",
+      "themeBack": "← Leçons",
+      "page": "Page {page} / {total}",
+      "prevPage": "← Précédent",
+      "nextPage": "Suivant →"
     }
   },
   "Play": {
@@ -252,8 +275,9 @@
       "finishedBody": "Revenez demain pour vos prochaines révisions.",
       "finishedCta": "Retour à l'accueil",
       "summaryReviewed": "positions",
-      "summaryXp": "XP gagnés",
+      "summaryXp": "XP gagnés cette séance",
       "summaryStreak": "jours de suite",
+      "summaryLevelUp": "Niveau {level} atteint !",
       "empty": "Tout est à jour.",
       "emptyBody": "Aucune révision due pour l'instant. Revenez demain ou explorez le jeu libre.",
       "emptyCta": "Jeu libre",
@@ -281,6 +305,7 @@
       "sideWhite": "Blancs",
       "sideBlack": "Noirs",
       "feedEngine": "Les {side} jouent {san}.",
+      "feedEngineDefender": "Les {side} jouent {san} (résistance optimale).",
       "feedGoodTempo": "{san} : bon tempo.",
       "feedTempoLost": "{san} gagne encore, mais coûte du temps.",
       "feedHeld": "{san} : ça tient.",
@@ -289,7 +314,8 @@
       "feedPromotion": "{san} : la dame va apparaître.",
       "blunderAttacker": "{san} laisse filer le gain. Ce qui gagne : {hints}.",
       "blunderDefender": "{san} perd : le roi passe. Ce qui tient : {hints}.",
-      "principalVariation": "Suite principale : {line}"
+      "principalVariation": "Suite principale : {line}",
+      "hintButton": "Meilleur coup"
     },
     "Method": {
       "tempoLabel": "Méthode : {done} / {total}",
@@ -318,7 +344,8 @@
       "feedMove": "{san}.",
       "blunderAttacker": "{san} laisse filer le gain. Ce qui gagne : {hints}.",
       "blunderDefender": "{san} perd. Ce qui tient : {hints}.",
-      "principalVariation": "Suite principale : {line}"
+      "principalVariation": "Suite principale : {line}",
+      "hintButton": "Meilleur coup"
     },
     "Stockfish": {
       "evaluating": "Analyse de la position…",

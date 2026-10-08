@@ -95,6 +95,92 @@ function masteryFromStability(stability: number | undefined): "new" | "learning"
   return "mastered";
 }
 
+// ---------------------------------------------------------------------------
+// Vue par thème : stats agrégées (sans charger toutes les positions)
+// ---------------------------------------------------------------------------
+
+export interface ThemeStat {
+  id: string;
+  slug: string;
+  title: string;
+  family: string;
+  total: number;
+  masteredCount: number;
+  familiarCount: number;
+  learningCount: number;
+  newCount: number;
+}
+
+export async function listThemeStats(userId: string, locale: "fr" | "en"): Promise<ThemeStat[]> {
+  const themes = await prisma.theme.findMany({
+    where: { positions: { some: { status: "published" } } },
+    include: {
+      positions: {
+        where: { status: "published" },
+        select: { id: true, cards: { where: { userId }, select: { fsrsState: true } } },
+      },
+    },
+    orderBy: { order: "asc" },
+  });
+
+  return themes.map((theme) => {
+    const titleJson = theme.title as Record<string, string>;
+    let mastered = 0, familiar = 0, learning = 0, newCount = 0;
+    for (const pos of theme.positions) {
+      const card = pos.cards[0];
+      const mastery = card
+        ? masteryFromStability((card.fsrsState as { stability?: number } | null)?.stability)
+        : "new";
+      if (mastery === "mastered") mastered++;
+      else if (mastery === "familiar") familiar++;
+      else if (mastery === "learning") learning++;
+      else newCount++;
+    }
+    return {
+      id: theme.id,
+      slug: theme.slug,
+      title: titleJson[locale] ?? titleJson.fr ?? theme.slug,
+      family: (theme.family as string) ?? "",
+      total: theme.positions.length,
+      masteredCount: mastered,
+      familiarCount: familiar,
+      learningCount: learning,
+      newCount,
+    };
+  });
+}
+
+export async function listPositionsForTheme(
+  themeSlug: string,
+  userId: string,
+  locale: "fr" | "en",
+  skip = 0,
+  take = 24,
+): Promise<{ positions: PositionMasteryItem[]; total: number }> {
+  const where = { status: "published" as const, theme: { slug: themeSlug } };
+  const [rows, total] = await Promise.all([
+    prisma.position.findMany({
+      where,
+      include: { cards: { where: { userId }, select: { fsrsState: true } } },
+      orderBy: { createdAt: "asc" },
+      skip,
+      take,
+    }),
+    prisma.position.count({ where }),
+  ]);
+
+  return {
+    total,
+    positions: rows.map((row) => {
+      const card = row.cards[0];
+      const mastery = card
+        ? masteryFromStability((card.fsrsState as { stability?: number } | null)?.stability)
+        : "new";
+      return { id: row.id, title: textsFor(row.texts, locale).title, mastery };
+    }),
+  };
+}
+
 /**
  * Retourne tous les thèmes ayant au moins une position publiée, avec pour chaque position
  * son niveau de maîtrise FSRS (stability) pour l'utilisateur donné.

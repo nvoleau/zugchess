@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { ReactNode } from "react";
 import { auth } from "@/auth";
 import { AppNav } from "@/components/app-shell/app-nav";
+import { UserMenu } from "@/components/app-shell/user-menu";
 import { Link, redirect } from "@/i18n/navigation";
 import { getEntitlementsForUser } from "@/lib/entitlements";
 
@@ -51,14 +52,13 @@ export default async function AppShellLayout({
 
           <AppNav labels={{ home: t("home"), session: t("session"), lessons: t("lessons"), ranking: t("ranking") }} />
 
-          <div className="flex items-center gap-3.5">
-            <span className="rounded-full border border-brand-gold/40 px-2.5 py-1 font-brandMono text-xs text-brand-gold">
-              {entitlements.plan === "premium" ? t("planPremium") : t("planFree")}
-            </span>
-            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-brand-gold/50 bg-[#2A251B] text-xs font-semibold">
-              {initialsOf(user.name, user.email)}
-            </span>
-          </div>
+          <UserMenu
+            initials={initialsOf(user.name, user.email)}
+            name={user.name ?? null}
+            plan={entitlements.plan === "premium" ? t("planPremium") : t("planFree")}
+            isAdmin={user.role === "admin"}
+            labels={{ myAccount: t("myAccount"), adminPanel: t("adminPanel"), signOut: t("signOut") }}
+          />
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-8 sm:py-10">{children}</main>

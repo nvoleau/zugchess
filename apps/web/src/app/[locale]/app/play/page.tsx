@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { btnClass } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { getTodaySession } from "@/lib/schedulerService";
+import { getPlayerStats } from "@/lib/statsService";
 import { SessionPlayer } from "@/components/play/session-player";
 
 // Garde d'authentification centralisée dans app/layout.tsx.
@@ -22,7 +23,10 @@ export default async function PlayPage({ params }: { params: Promise<{ locale: s
   ]);
 
   const localeTyped = (locale === "en" ? "en" : "fr") as "fr" | "en";
-  const todaySession = await getTodaySession(user.id as string, localeTyped);
+  const [todaySession, stats] = await Promise.all([
+    getTodaySession(user.id as string, localeTyped),
+    getPlayerStats(user.id as string, localeTyped),
+  ]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -46,7 +50,7 @@ export default async function PlayPage({ params }: { params: Promise<{ locale: s
           </Link>
         </Card>
       ) : (
-        <SessionPlayer items={todaySession.items} locale={localeTyped} />
+        <SessionPlayer items={todaySession.items} locale={localeTyped} initialTotalXp={stats.totalXp} />
       )}
     </div>
   );

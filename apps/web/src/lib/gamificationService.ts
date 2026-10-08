@@ -62,14 +62,16 @@ export async function applyGamification(params: {
   grade: number;
   isNewPosition: boolean;
   announceOk: boolean;
+  errors: number;
 }): Promise<GamificationResult> {
-  const { userId, positionId, grade, isNewPosition, announceOk } = params;
+  const { userId, positionId, grade, isNewPosition, announceOk, errors } = params;
 
-  const [user, position, existingRating, existingStreak] = await Promise.all([
+  const [user, position, existingRating, existingStreak, currentXp] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId }, select: { timezone: true } }),
     prisma.position.findUnique({ where: { id: positionId }, select: { rating: true, ratingDeviation: true } }),
     prisma.playerRating.findUnique({ where: { userId } }),
     prisma.streak.findUnique({ where: { userId } }),
+    getTotalXp(userId),
   ]);
 
   const timezone = user?.timezone ?? "Europe/Paris";
@@ -77,12 +79,26 @@ export async function applyGamification(params: {
   const isFirstToday = await isFirstReviewToday(userId, positionId, timezone);
 
   // --- 1. XP ---
-  const grants = computeReviewXp({ grade, isNewPosition, announceOk, isFirstToday });
+  const rawGrants = computeReviewXp({ grade, isNewPosition, announceOk, isFirstToday, errors });
+
+  // Clamp : le total XP ne descend jamais sous 0
+  const positiveSum = rawGrants.filter((g) => g.amount > 0).reduce((s, g) => s + g.amount, 0);
+  const negativeSum = rawGrants.filter((g) => g.amount < 0).reduce((s, g) => s + g.amount, 0);
+  const floor = -(currentXp + positiveSum); // max perte autorisée
+  const clampedNegative = Math.max(negativeSum, floor);
+
+  const grants = rawGrants.map((g) =>
+    g.amount < 0 && negativeSum !== 0
+      ? { ...g, amount: Math.round(g.amount * (clampedNegative / negativeSum)) }
+      : g,
+  );
+
   let xpGained = grants.reduce((s, g) => s + g.amount, 0);
 
-  if (grants.length > 0) {
+  const nonZeroGrants = grants.filter((g) => g.amount !== 0);
+  if (nonZeroGrants.length > 0) {
     await prisma.xpEvent.createMany({
-      data: grants.map((g) => ({ userId, amount: g.amount, reason: g.reason })),
+      data: nonZeroGrants.map((g) => ({ userId, amount: g.amount, reason: g.reason })),
     });
   }
 

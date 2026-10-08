@@ -95,19 +95,24 @@ export function MethodLineTrainer({ line, onComplete }: { line: MethodLine; onCo
   }
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <ChessBoard
-        fen={fen}
-        orientation={line.playerSide}
-        movableColor={complete ? undefined : line.playerSide}
-        dests={complete || !chessRef.current ? undefined : legalDests(chessRef.current, playerColor)}
-        onMove={handleMove}
-      />
-      <TempoBar label={t("tempoLabel", { done: donePlayerSteps, total: playerStepIndices.length })} boxes={boxes} />
-      {complete && <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">{t("complete")}</p>}
-      {hint && !complete && <p className="text-sm text-amber-600 dark:text-amber-400">{hint}</p>}
+    <div className="flex flex-col items-center gap-4 md:flex-row md:items-start">
+      {/* Colonne échiquier */}
+      <div className="flex flex-col items-center gap-3">
+        <ChessBoard
+          fen={fen}
+          orientation={line.playerSide}
+          movableColor={complete ? undefined : line.playerSide}
+          dests={complete || !chessRef.current ? undefined : legalDests(chessRef.current, playerColor)}
+          onMove={handleMove}
+        />
+        <TempoBar label={t("tempoLabel", { done: donePlayerSteps, total: playerStepIndices.length })} boxes={boxes} />
+        {complete && <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">{t("complete")}</p>}
+        {hint && !complete && <p className="text-sm text-amber-600 dark:text-amber-400">{hint}</p>}
+      </div>
+
+      {/* Panneau latéral — commentaires */}
       {feed.length > 0 && (
-        <ul className="flex w-full max-w-[360px] flex-col gap-1.5 text-sm">
+        <ul className="flex w-full flex-col gap-1.5 text-sm md:max-h-[360px] md:w-64 md:overflow-y-auto">
           {feed.map((lineText, i) => (
             <li key={i} className="rounded-md bg-neutral-100 px-3 py-1.5 dark:bg-neutral-800">
               {lineText}

@@ -3,10 +3,11 @@
 import { bestKpkReply, judgeKpkMove, kpkPrincipalVariation } from "@zugchess/core";
 import { Chess, type Move } from "chess.js";
 import { useTranslations } from "next-intl";
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { ChessBoard } from "@/components/chess-board";
 import { TempoBar, type TempoBoxState } from "@/components/tempo-bar";
 import { attackerColorOf, frenchSan, legalDests, sanSequence, type Color } from "./chess-move-dests";
+import { MoveList, type HalfMove } from "./move-list";
 import type { TrainerStats } from "./trainer-types";
 
 const HELD_TO_DRAW = 8;
@@ -43,10 +44,12 @@ export function KpkTrainer({
   initialFen,
   userColor,
   onWin,
+  texts,
 }: {
   initialFen: string;
   userColor: Color;
   onWin?: (stats: TrainerStats) => void;
+  texts?: { title: string; intro: string; goal: string };
 }) {
   const t = useTranslations("Play.Kpk");
   const chessRef = useRef(new Chess(initialFen));
@@ -64,7 +67,14 @@ export function KpkTrainer({
 
   const [lastMove, setLastMove] = useState<[string, string] | undefined>();
   const [resetCount, setResetCount] = useState(0);
+  const [moveHistory, setMoveHistory] = useState<HalfMove[]>([]);
+  const [hintShape, setHintShape] = useState<{ orig: string; dest: string } | null>(null);
   const openedRef = useRef(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const pushMove = useCallback((san: string, color: "w" | "b") => {
+    setMoveHistory((h) => [...h, { san, color }]);
+  }, []);
 
   // Stats tracking (refs pour éviter les problèmes de closure dans les callbacks)
   const lostTemposRef = useRef(0);
@@ -81,6 +91,8 @@ export function KpkTrainer({
     setHeld(0);
     setFeed([]);
     setLastMove(undefined);
+    setMoveHistory([]);
+    setHintShape(null);
     openedRef.current = false;
     lostTemposRef.current = 0;
     blunderRef.current = 0;
@@ -100,7 +112,6 @@ export function KpkTrainer({
     const reply = bestKpkReply(afterFen);
     let replied = chess.move({ from: reply.from, to: reply.to, promotion: reply.promotion });
     if (!replied) {
-      // Fallback: pick any legal move for the engine
       const engineColor = chess.turn();
       for (const m of chess.moves({ verbose: true })) {
         if (m.color !== engineColor) continue;
@@ -110,9 +121,18 @@ export function KpkTrainer({
     }
     if (!replied) return null;
     const side = replied.color === "w" ? t("sideWhite") : t("sideBlack");
-    pushFeed(t("feedEngine", { side, san: frenchSan(replied.san) }));
+    // When user is attacker, engine plays as defender → show "most resistant defense" context
+    const feedKey = role === "attacker" ? "feedEngineDefender" : "feedEngine";
+    pushFeed(t(feedKey, { side, san: frenchSan(replied.san) }));
+    pushMove(frenchSan(replied.san), replied.color);
     return [chess.fen(), [replied.from, replied.to]];
   }
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [moveHistory]);
 
   // La FEN de départ peut placer l'autre camp au trait (ex. entraînement en défense) : le juge
   // joue alors son premier coup avant que l'élève puisse interagir.
@@ -143,6 +163,8 @@ export function KpkTrainer({
     if (role === "attacker" && played.promotion) {
       moveDurationsRef.current.push(Date.now() - moveStartRef.current);
       movesRef.current.push(`${from}${to}${promotion ?? ""}`);
+      pushMove(frenchSan(played.san), played.color);
+      setHintShape(null);
       pushFeed(t("feedPromotion", { san: frenchSan(played.san) }));
       setLastMove([from, to]);
       setFen(chess.fen());
@@ -153,6 +175,8 @@ export function KpkTrainer({
     if (role === "defender" && played.captured === "p") {
       moveDurationsRef.current.push(Date.now() - moveStartRef.current);
       movesRef.current.push(`${from}${to}${promotion ?? ""}`);
+      pushMove(frenchSan(played.san), played.color);
+      setHintShape(null);
       pushFeed(t("feedCapture", { san: frenchSan(played.san) }));
       setLastMove([from, to]);
       setFen(chess.fen());
@@ -180,6 +204,8 @@ export function KpkTrainer({
     moveDurationsRef.current.push(Date.now() - moveStartRef.current);
     movesRef.current.push(`${from}${to}${promotion ?? ""}`);
     moveStartRef.current = Date.now();
+    pushMove(frenchSan(played.san), played.color);
+    setHintShape(null);
 
     if (role === "attacker") {
       if (judged.tempoLost) {
@@ -243,33 +269,73 @@ export function KpkTrainer({
   const label =
     role === "attacker" ? t("tempoLabel", { count: remainingMoves }) : t("defenderTempoLabel", { held, total: HELD_TO_DRAW });
 
+  function showHint() {
+    if (won || chessRef.current.turn() !== playerColor) return;
+    try {
+      const move = bestKpkReply(fen);
+      setHintShape({ orig: move.from, dest: move.to });
+    } catch { /* aucun coup disponible */ }
+  }
+
   return (
-    <div className="flex flex-col items-center gap-4">
-      <ChessBoard
-        fen={fen}
-        orientation={userColor}
-        movableColor={won ? undefined : userColor}
-        dests={won ? undefined : legalDests(chessRef.current, playerColor)}
-        onMove={handleMove}
-        lastMove={lastMove}
-      />
-      <TempoBar label={label} boxes={boxes} />
-      {won ? (
-        <p className="animate-pop-in text-sm font-medium text-brand-good">{role === "attacker" ? t("won") : t("heldDraw")}</p>
-      ) : (
-        <button type="button" onClick={reset} className="text-xs text-neutral-500 underline dark:text-neutral-400">
-          {t("reset")}
-        </button>
-      )}
-      {feed.length > 0 && (
-        <ul className="flex w-full max-w-[360px] flex-col gap-1.5 text-sm">
-          {feed.map((line, i) => (
-            <li key={i} className="rounded-md bg-neutral-100 px-3 py-1.5 dark:bg-neutral-800">
-              {line}
-            </li>
-          ))}
-        </ul>
-      )}
+    <div className="flex flex-col items-center gap-4 md:flex-row md:items-start">
+      {/* Colonne échiquier */}
+      <div className="flex flex-col items-center gap-3">
+        <ChessBoard
+          fen={fen}
+          orientation={userColor}
+          movableColor={won ? undefined : userColor}
+          dests={won ? undefined : legalDests(chessRef.current, playerColor)}
+          onMove={handleMove}
+          lastMove={lastMove}
+          shapes={hintShape ? [{ orig: hintShape.orig, dest: hintShape.dest, brush: "paleBlue" }] : undefined}
+          size={480}
+        />
+        <TempoBar label={label} boxes={boxes} />
+        {won && (
+          <p className="animate-pop-in text-sm font-medium text-brand-good">{role === "attacker" ? t("won") : t("heldDraw")}</p>
+        )}
+      </div>
+
+      {/* Panneau latéral style étude Lichess */}
+      <div className="flex w-full flex-col md:h-[480px] md:w-72">
+        {texts && (
+          <div className="shrink-0 border-b border-white/[0.08] pb-3 mb-3">
+            <p className="font-brandMono text-[10px] uppercase tracking-[0.14em] text-brand-muted">{texts.title}</p>
+            <p className="mt-1 text-sm text-brand-cream">{texts.goal}</p>
+          </div>
+        )}
+
+        <div ref={scrollRef} className="flex-1 overflow-y-auto pr-1">
+          <MoveList moves={moveHistory} />
+          {feed.length > 0 && (
+            <ul className="mt-3 flex flex-col gap-1">
+              {feed.map((line, i) => (
+                <li key={i} className="text-xs text-brand-muted leading-5">{line}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="shrink-0 border-t border-white/[0.08] pt-3 mt-3 flex items-center justify-between gap-2">
+          {!won && (
+            <button
+              type="button"
+              onClick={showHint}
+              className="rounded-full border border-brand-gold/40 px-3 py-1 font-brandMono text-xs text-brand-gold hover:bg-brand-gold/10"
+            >
+              {t("hintButton")}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={reset}
+            className="ml-auto text-xs text-brand-muted hover:text-brand-cream underline underline-offset-2"
+          >
+            {t("reset")}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

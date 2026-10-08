@@ -7,6 +7,7 @@
       "pricing": "Pricing",
       "login": "Log in",
       "signup": "Start for free",
+      "goToApp": "My space",
       "about": "About"
     },
     "hero": {
@@ -43,7 +44,10 @@
       "step2Title": "Announce the result",
       "step2Body": "Win, draw, or loss? Before touching a piece, you evaluate the position. A correct announcement earns points; a wrong one comes back sooner.",
       "step3Title": "Prove it on the board",
-      "step3Body": "The judge defends with the best move. A losing move is undone and the correct moves are shown. You continue until promotion, mate, or a held draw."
+      "step3Body": "The judge defends with the best move. A losing move is undone and the correct moves are shown. You continue until promotion, mate, or a held draw.",
+      "boardTitle": "Live position",
+      "boardHeading": "Spot the right move at a glance",
+      "boardBody": "Every exercise starts from a real tablebase position. The White King must escort the pawn: Kd7 cuts off the Black King."
     },
     "tempo": {
       "kicker": "The tempo bar",
@@ -185,7 +189,10 @@
       "lessons": "Lessons",
       "ranking": "Leaderboard",
       "planFree": "Free",
-      "planPremium": "Premium"
+      "planPremium": "Premium",
+      "adminPanel": "Administration",
+      "signOut": "Sign out",
+      "myAccount": "My account"
     },
     "Home": {
       "greeting": "Hello {name}",
@@ -206,7 +213,17 @@
       "statsElo": "Endgame rating",
       "statsLevel": "Level {level}",
       "statsStreak": "day streak",
-      "statsStreakBest": "best streak"
+      "statsStreakBest": "best",
+      "statsXpToNext": "{xp} XP to level {next}",
+      "statsXpProgress": "{current} / {range} XP",
+      "xpGuideTitle": "How to earn XP",
+      "xpGuideAnnounce": "Correct announce",
+      "xpGuideHard": "Hard move",
+      "xpGuideGood": "Good move",
+      "xpGuideNew": "New position cleared",
+      "xpGuideSession": "Full session",
+      "xpGuideWrongAnnounce": "Wrong announce",
+      "xpGuideErrors": "Move error"
     },
     "ComingSoon": {
       "lessonsTitle": "Lessons",
@@ -227,7 +244,7 @@
     },
     "Lessons": {
       "title": "Lessons",
-      "intro": "All playable positions, grouped by theme. Replay any of them freely — your FSRS progress is not affected.",
+      "intro": "Explore themes, track your progress, and replay any position freely.",
       "badgeNew": "New",
       "badgeLearning": "Learning",
       "badgeFamiliar": "Familiar",
@@ -235,7 +252,13 @@
       "replay": "Replay",
       "replayBack": "← Lessons",
       "replayDone": "Back to lessons",
-      "noPositions": "No positions in this theme yet."
+      "noPositions": "No positions in this theme yet.",
+      "positions": "{count} positions",
+      "explore": "Explore →",
+      "themeBack": "← Lessons",
+      "page": "Page {page} / {total}",
+      "prevPage": "← Previous",
+      "nextPage": "Next →"
     }
   },
   "Play": {
@@ -252,8 +275,9 @@
       "finishedBody": "Come back tomorrow for your next reviews.",
       "finishedCta": "Back to home",
       "summaryReviewed": "positions",
-      "summaryXp": "XP earned",
+      "summaryXp": "XP earned this session",
       "summaryStreak": "day streak",
+      "summaryLevelUp": "Level {level} reached!",
       "empty": "All caught up.",
       "emptyBody": "No reviews due right now. Come back tomorrow or explore free play.",
       "emptyCta": "Free play",
@@ -281,6 +305,7 @@
       "sideWhite": "White",
       "sideBlack": "Black",
       "feedEngine": "{side} play {san}.",
+      "feedEngineDefender": "{side} play {san} (most resistant defense).",
       "feedGoodTempo": "{san}: good tempo.",
       "feedTempoLost": "{san} still wins, but costs tempo.",
       "feedHeld": "{san}: it holds.",
@@ -289,7 +314,8 @@
       "feedPromotion": "{san}: the queen is coming.",
       "blunderAttacker": "{san} lets the win slip. What wins: {hints}.",
       "blunderDefender": "{san} loses: the king gets through. What holds: {hints}.",
-      "principalVariation": "Main line: {line}"
+      "principalVariation": "Main line: {line}",
+      "hintButton": "Best move"
     },
     "Method": {
       "tempoLabel": "Method: {done} / {total}",
@@ -318,7 +344,8 @@
       "feedMove": "{san}.",
       "blunderAttacker": "{san} lets the win slip. What wins: {hints}.",
       "blunderDefender": "{san} loses. What holds: {hints}.",
-      "principalVariation": "Main line: {line}"
+      "principalVariation": "Main line: {line}",
+      "hintButton": "Best move"
     },
     "Stockfish": {
       "evaluating": "Evaluating the position…",

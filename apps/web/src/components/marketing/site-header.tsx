@@ -42,7 +42,7 @@ export async function SiteHeader({ isAuthenticated }: { isAuthenticated: boolean
             href={isAuthenticated ? "/app" : "/try"}
             className="rounded-full bg-brand-gold px-5 py-2.5 text-sm font-semibold text-brand-ink transition-all hover:bg-brand-goldHover hover:scale-[1.03] active:scale-[0.97]"
           >
-            {t("signup")}
+            {isAuthenticated ? t("goToApp") : t("signup")}
           </Link>
         </div>
       </div>

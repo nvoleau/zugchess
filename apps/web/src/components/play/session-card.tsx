@@ -88,18 +88,11 @@ export function SessionCard({ position, onComplete, nextLabel }: Props) {
 
       {phase !== "announce" && (
         <>
-          {/* Titre et intro révélés seulement après l'annonce — ils orienteraient l'analyse sinon. */}
-          <div className="animate-pop-in">
-            <h2 className="text-xl font-bold">{position.texts.title}</h2>
-            <p className="mt-1 text-sm text-brand-muted">{position.texts.intro}</p>
-          </div>
-
           {announceOk !== null && (
             <p className={`animate-pop-in text-sm ${announceOk ? "text-brand-good" : "text-brand-bad"}`}>
               {announceOk ? t("announceCorrect") : t("announceWrong")}
             </p>
           )}
-          <p className="font-medium">{position.texts.goal}</p>
 
           {/* Bouton visible directement au-dessus de l'échiquier quand la position est finie */}
           {phase === "done" && (
@@ -117,12 +110,14 @@ export function SessionCard({ position, onComplete, nextLabel }: Props) {
               initialFen={position.fen}
               userColor={position.userSide}
               onWin={handleFinished}
+              texts={position.texts}
             />
           ) : position.judgeType === "syzygy" ? (
             <SyzygyTrainer
               initialFen={position.fen}
               userSide={position.userSide}
               onFinished={handleFinished}
+              texts={position.texts}
             />
           ) : position.judgeType === "stockfish" ? (
             <div className="mt-2 flex flex-col gap-2 text-sm text-brand-muted">

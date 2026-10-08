@@ -65,12 +65,15 @@ export async function GET(request: Request) {
 
   try {
     const position = await getTablebasePosition(fen);
+    let bestMove: string | null = null;
+    try { bestMove = bestSyzygyMove(position)?.uci ?? null; } catch { /* position sans coup */ }
     return NextResponse.json({
       category: position.category,
       dtz: position.dtz,
       dtm: position.dtm ?? null,
       checkmate: position.checkmate,
       stalemate: position.stalemate,
+      bestMove,
     });
   } catch {
     return NextResponse.json({ error: "tablebase_unavailable" }, { status: 502 });

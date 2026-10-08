@@ -8,6 +8,8 @@ export type XpReason =
   | "review_hard"          // Carte due, note Hard
   | "new_position"         // Nouvelle position réussie (note >= Good)
   | "announce_correct"     // Annonce juste (+3 bonus)
+  | "announce_wrong"       // Annonce incorrecte (−5 malus)
+  | "errors_penalty"       // Erreurs de jeu (−5 malus, si l'annonce était juste)
   | "session_complete"     // Séance quotidienne terminée
   | "theme_mastered";      // Thème entièrement maîtrisé
 
@@ -17,6 +19,8 @@ export const XP_AMOUNTS: Record<XpReason, number> = {
   review_hard: 5,
   new_position: 15,
   announce_correct: 3,
+  announce_wrong: -5,
+  errors_penalty: -5,
   session_complete: 20,
   theme_mastered: 100,
 };
@@ -44,20 +48,34 @@ export interface XpGrant {
  * Calcule les grants XP à attribuer pour une révision.
  * Note : seule la première révision du jour sur une position devrait donner de l'XP pour
  * la note review_* — le filtre est fait par GamificationService côté serveur.
+ *
+ * Règles pénalités :
+ * - Annonce incorrecte → −5 XP (announce_wrong)
+ * - Erreurs de jeu ET annonce correcte → −5 XP (errors_penalty)
+ * - Au plus une pénalité par problème (jamais les deux)
+ * - Le clampage "jamais sous 0" est fait côté serveur après lecture du total courant.
  */
 export function computeReviewXp(params: {
   grade: number;          // 1=Again, 2=Hard, 3=Good, 4=Easy
   isNewPosition: boolean;
   announceOk: boolean;
   isFirstToday: boolean;  // première révision du jour pour cette position
+  errors: number;         // coups perdants joués (0 = aucun)
 }): XpGrant[] {
-  const { grade, isNewPosition, announceOk, isFirstToday } = params;
+  const { grade, isNewPosition, announceOk, isFirstToday, errors } = params;
   const grants: XpGrant[] = [];
 
   if (!isFirstToday) return grants; // révision anticipée = pas d'XP
 
+  // Pénalité : une seule par problème (announce_wrong prime sur errors_penalty)
+  if (!announceOk) {
+    grants.push({ reason: "announce_wrong", amount: XP_AMOUNTS.announce_wrong });
+  } else if (errors > 0) {
+    grants.push({ reason: "errors_penalty", amount: XP_AMOUNTS.errors_penalty });
+  }
+
   if (grade === 1) {
-    // Again : pas d'XP (ni note, ni nouvelle position)
+    // Again : pas d'XP positif
     return grants;
   }
 

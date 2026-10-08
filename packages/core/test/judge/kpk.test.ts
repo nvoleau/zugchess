@@ -189,9 +189,12 @@ describe("kpkPrincipalVariation", () => {
       const played = chess.move({ from: move.from, to: move.to, promotion: move.promotion });
       expect(played).not.toBeNull();
     }
-    // la ligne se termine à la promotion (plus de pion à partir de là) ou au nombre de demi-coups demandé
+    // la ligne se termine après la promotion (+ 1 coup de roi démonstratif) ou au nombre demandé
     const last = line[line.length - 1]!;
-    expect(last.promotion === "q" || line.length === 9).toBe(true);
+    const penultimate = line[line.length - 2];
+    const endsAtPromo = last.promotion === "q";
+    const endsAfterPromo = !last.promotion && penultimate?.promotion === "q";
+    expect(endsAtPromo || endsAfterPromo || line.length === 9).toBe(true);
   });
 
   it("s'arrête net si on lui demande 0 coup", () => {

@@ -2,10 +2,11 @@
 
 import { Chess } from "chess.js";
 import { useTranslations } from "next-intl";
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { ChessBoard } from "@/components/chess-board";
 import { TempoBar, type TempoBoxState } from "@/components/tempo-bar";
 import { frenchSan, legalDests, sanSequence } from "./chess-move-dests";
+import { MoveList, type HalfMove } from "./move-list";
 import type { TrainerStats } from "./trainer-types";
 
 const HELD_TO_DRAW = 8;
@@ -53,10 +54,12 @@ export function SyzygyTrainer({
   initialFen,
   userSide,
   onFinished,
+  texts,
 }: {
   initialFen: string;
   userSide?: "white" | "black";
   onFinished?: (stats: TrainerStats) => void;
+  texts?: { title: string; intro: string; goal: string };
 }) {
   const t = useTranslations("Play.Syzygy");
   const chessRef = useRef(new Chess(initialFen));
@@ -71,7 +74,21 @@ export function SyzygyTrainer({
   const [hint, setHint] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [lastMove, setLastMove] = useState<[string, string] | undefined>();
+  const [moveHistory, setMoveHistory] = useState<HalfMove[]>([]);
+  const [hintShape, setHintShape] = useState<{ orig: string; dest: string } | null>(null);
+  const [hintLoading, setHintLoading] = useState(false);
   const [, forceSync] = useReducer((n: number) => n + 1, 0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const pushMove = useCallback((san: string, color: "w" | "b") => {
+    setMoveHistory((h) => [...h, { san, color }]);
+  }, []);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [moveHistory]);
 
   // Stats tracking
   const lostTemposRef = useRef(0);
@@ -128,53 +145,57 @@ export function SyzygyTrainer({
     if (chess.turn() !== playerColor) return;
 
     const uci = `${from}${to}${promotion ?? ""}`;
+    const fenBefore = chess.fen();
+
+    // Appliquer le coup immédiatement (optimiste) pour éviter le snap-back visuel pendant l'appel serveur.
+    const played = chess.move({ from, to, promotion });
+    if (!played) return;
+    setFen(chess.fen());
+    setLastMove([from, to]);
 
     setPending(true);
     try {
       const res = await fetch("/api/judge/syzygy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fen: chess.fen(), uci }),
+        body: JSON.stringify({ fen: fenBefore, uci }),
       });
       const data: MoveResponse = await res.json();
 
       if (!res.ok || !data.judgement) {
         pushFeed(t("serverError"));
-        forceSync();
+        chess.undo();
+        setFen(chess.fen());
+        setLastMove(undefined);
         return;
       }
       const judgement = data.judgement;
 
       if (judgement.blundered) {
         blunderRef.current++;
-        const probe = chessRef.current;
-        const attempted = applyUci(probe, uci);
-        const attemptedSan = attempted ? frenchSan(attempted.san) : uci;
-        if (attempted) probe.undo();
-        setHint(t(goal === "draw" ? "blunderDefender" : "blunderAttacker", { san: attemptedSan, hints: hintSanList(data.hints ?? []) }));
+        // Annuler le coup optimiste avant de sonder les coups valides (qui attendent fenBefore).
+        chess.undo();
+        setFen(chess.fen());
+        setLastMove(undefined);
+        setHint(t(goal === "draw" ? "blunderDefender" : "blunderAttacker", { san: frenchSan(played.san), hints: hintSanList(data.hints ?? []) }));
         if (data.principalVariation && data.principalVariation.length > 0) {
           const pvMoves = data.principalVariation.map((pvUci) => ({
             from: pvUci.slice(0, 2),
             to: pvUci.slice(2, 4),
             promotion: (pvUci.slice(4) || undefined) as "q" | "r" | "b" | "n" | undefined,
           }));
-          pushFeed(t("principalVariation", { line: sanSequence(chessRef.current.fen(), pvMoves).join(" ") }));
+          pushFeed(t("principalVariation", { line: sanSequence(fenBefore, pvMoves).join(" ") }));
         }
-        forceSync();
         return;
       }
       setHint(null);
-
-      const played = chess.move({ from, to, promotion });
-      if (!played) {
-        forceSync();
-        return;
-      }
 
       // Coup accepté — enregistrer durée et UCI
       moveDurationsRef.current.push(Date.now() - moveStartRef.current);
       movesRef.current.push(uci);
       moveStartRef.current = Date.now();
+      pushMove(frenchSan(played.san), played.color);
+      setHintShape(null);
 
       if (goal === "win") {
         if (judgement.tempoLost) lostTemposRef.current++;
@@ -189,7 +210,6 @@ export function SyzygyTrainer({
       }
 
       if (!data.reply) {
-        setFen(chess.fen());
         setStatus("finished");
         setOutcome(judgement.resultAfter);
         onFinished?.({ errors: blunderRef.current, tempoLost: lostTemposRef.current > 0, moves: [...movesRef.current], moveDurationsMs: [...moveDurationsRef.current] });
@@ -201,6 +221,7 @@ export function SyzygyTrainer({
       if (reply) {
         const side = reply.color === "w" ? t("sideWhite") : t("sideBlack");
         pushFeed(t("feedEngine", { side, san: frenchSan(reply.san) }));
+        pushMove(frenchSan(reply.san), reply.color);
         setLastMove([replyUci.slice(0, 2), replyUci.slice(2, 4)]);
       }
       setFen(chess.fen());
@@ -212,14 +233,16 @@ export function SyzygyTrainer({
       }
     } catch {
       pushFeed(t("serverError"));
-      forceSync();
+      chess.undo();
+      setFen(chess.fen());
+      setLastMove(undefined);
     } finally {
       setPending(false);
     }
   }
 
   if (status === "loading") {
-    return <div className="flex h-[360px] w-[360px] items-center justify-center text-sm text-neutral-500">{t("evaluating")}</div>;
+    return <div className="flex h-[480px] w-[480px] items-center justify-center text-sm text-neutral-500">{t("evaluating")}</div>;
   }
   if (status === "error") {
     return <p className="text-sm text-amber-600 dark:text-amber-400">{t("evalError")}</p>;
@@ -245,33 +268,78 @@ export function SyzygyTrainer({
         ? t("defenderTempoLabel", { held, total: HELD_TO_DRAW })
         : t("goalLoss");
 
+  async function showHint() {
+    if (status !== "playing" || pending || hintLoading) return;
+    setHintLoading(true);
+    try {
+      const res = await fetch(`/api/judge/syzygy?fen=${encodeURIComponent(fen)}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.bestMove && typeof data.bestMove === "string" && data.bestMove.length >= 4) {
+        setHintShape({ orig: data.bestMove.slice(0, 2), dest: data.bestMove.slice(2, 4) });
+      }
+    } catch { /* silencieux */ } finally {
+      setHintLoading(false);
+    }
+  }
+
   return (
-    <div className="flex flex-col items-center gap-4">
-      <ChessBoard
-        fen={fen}
-        orientation={orientation}
-        movableColor={status === "playing" && !pending ? (playerColor === "w" ? "white" : "black") : undefined}
-        dests={status === "playing" && !pending ? legalDests(chessRef.current, playerColor) : undefined}
-        onMove={handleMove}
-        lastMove={lastMove}
-      />
-      {boxes.length > 0 && <TempoBar label={label} boxes={boxes} />}
-      {goal !== "win" && goal !== "draw" && <p className="text-sm text-neutral-600 dark:text-neutral-400">{label}</p>}
-      {status === "finished" && outcome && (
-        <p className="animate-pop-in text-sm font-medium text-brand-good">
-          {outcome === "win" ? t("won") : outcome === "draw" ? t("drawn") : t("lost")}
-        </p>
-      )}
-      {hint && <p className="text-sm text-amber-600 dark:text-amber-400">{hint}</p>}
-      {feed.length > 0 && (
-        <ul className="flex w-full max-w-[360px] flex-col gap-1.5 text-sm">
-          {feed.map((line, i) => (
-            <li key={i} className="rounded-md bg-neutral-100 px-3 py-1.5 dark:bg-neutral-800">
-              {line}
-            </li>
-          ))}
-        </ul>
-      )}
+    <div className="flex flex-col items-center gap-4 md:flex-row md:items-start">
+      {/* Colonne échiquier */}
+      <div className="flex flex-col items-center gap-3">
+        <ChessBoard
+          fen={fen}
+          orientation={orientation}
+          movableColor={status === "playing" && !pending ? (playerColor === "w" ? "white" : "black") : undefined}
+          dests={status === "playing" && !pending ? legalDests(chessRef.current, playerColor) : undefined}
+          onMove={handleMove}
+          lastMove={lastMove}
+          shapes={hintShape ? [{ orig: hintShape.orig, dest: hintShape.dest, brush: "paleBlue" }] : undefined}
+          size={480}
+        />
+        {boxes.length > 0 && <TempoBar label={label} boxes={boxes} />}
+        {goal !== "win" && goal !== "draw" && <p className="text-sm text-neutral-600 dark:text-neutral-400">{label}</p>}
+        {status === "finished" && outcome && (
+          <p className="animate-pop-in text-sm font-medium text-brand-good">
+            {outcome === "win" ? t("won") : outcome === "draw" ? t("drawn") : t("lost")}
+          </p>
+        )}
+        {hint && <p className="text-sm text-amber-600 dark:text-amber-400">{hint}</p>}
+      </div>
+
+      {/* Panneau latéral style étude Lichess */}
+      <div className="flex w-full flex-col md:h-[480px] md:w-72">
+        {texts && (
+          <div className="shrink-0 border-b border-white/[0.08] pb-3 mb-3">
+            <p className="font-brandMono text-[10px] uppercase tracking-[0.14em] text-brand-muted">{texts.title}</p>
+            <p className="mt-1 text-sm text-brand-cream">{texts.goal}</p>
+          </div>
+        )}
+
+        <div ref={scrollRef} className="flex-1 overflow-y-auto pr-1">
+          <MoveList moves={moveHistory} />
+          {feed.length > 0 && (
+            <ul className="mt-3 flex flex-col gap-1">
+              {feed.map((line, i) => (
+                <li key={i} className="text-xs text-brand-muted leading-5">{line}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="shrink-0 border-t border-white/[0.08] pt-3 mt-3 flex items-center justify-between gap-2">
+          {status === "playing" && (
+            <button
+              type="button"
+              onClick={showHint}
+              disabled={hintLoading}
+              className="rounded-full border border-brand-gold/40 px-3 py-1 font-brandMono text-xs text-brand-gold hover:bg-brand-gold/10 disabled:opacity-40"
+            >
+              {hintLoading ? "…" : t("hintButton")}
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

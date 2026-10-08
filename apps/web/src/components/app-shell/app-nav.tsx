@@ -14,9 +14,10 @@ export function AppNav({ labels }: { labels: Record<string, string> }) {
   const pathname = usePathname();
 
   return (
-    <nav className="flex flex-wrap gap-1 rounded-full border border-white/10 bg-brand-panel p-1">
+    <nav className="flex gap-1 rounded-full border border-white/10 bg-brand-panel p-1">
       {TABS.map((tab) => {
-        const active = pathname === tab.href;
+        // /app exact, les autres sur startsWith pour couvrir les sous-pages
+        const active = tab.href === "/app" ? pathname === tab.href : pathname.startsWith(tab.href);
         return (
           <Link
             key={tab.href}

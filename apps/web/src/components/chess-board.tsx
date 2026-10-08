@@ -22,6 +22,10 @@ export interface ChessBoardProps {
   lastMove?: [string, string];
   check?: boolean;
   onMove?: (from: string, to: string, promotion?: PromotionPiece) => void;
+  /** Flèches ou surlignages automatiques (ex. indice meilleur coup). */
+  shapes?: Array<{ orig: string; dest?: string; brush?: string }>;
+  /** Taille de l'échiquier en pixels (défaut 360). */
+  size?: number;
 }
 
 const PROMOTION_CHOICES: Array<{ piece: PromotionPiece; label: string }> = [
@@ -32,7 +36,7 @@ const PROMOTION_CHOICES: Array<{ piece: PromotionPiece; label: string }> = [
 ];
 
 /** Enveloppe React fine autour de chessground (lib de l'échiquier de Lichess) : pas de logique de jeu ici. */
-export function ChessBoard({ fen, orientation, movableColor, dests, lastMove, check, onMove }: ChessBoardProps) {
+export function ChessBoard({ fen, orientation, movableColor, dests, lastMove, check, onMove, shapes, size = 360 }: ChessBoardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const apiRef = useRef<Api | null>(null);
   const onMoveRef = useRef(onMove);
@@ -42,6 +46,7 @@ export function ChessBoard({ fen, orientation, movableColor, dests, lastMove, ch
   useEffect(() => {
     if (!containerRef.current) return;
     const api = Chessground(containerRef.current, {
+      coordinates: true,
       movable: {
         events: {
           after: (orig, dest) => {
@@ -74,9 +79,16 @@ export function ChessBoard({ fen, orientation, movableColor, dests, lastMove, ch
         dests: dests as cg.Dests | undefined,
         showDests: true,
       },
+      drawable: {
+        autoShapes: (shapes ?? []).map((s) => ({
+          orig: s.orig as cg.Key,
+          dest: s.dest as cg.Key | undefined,
+          brush: s.brush ?? "paleBlue",
+        })),
+      },
     };
     apiRef.current?.set(config);
-  }, [fen, orientation, movableColor, dests, lastMove, check]);
+  }, [fen, orientation, movableColor, dests, lastMove, check, shapes]);
 
   function choosePromotion(piece: PromotionPiece) {
     if (!pendingPromotion) return;
@@ -86,8 +98,8 @@ export function ChessBoard({ fen, orientation, movableColor, dests, lastMove, ch
   }
 
   return (
-    <div style={{ position: "relative", width: 360, height: 360 }}>
-      <div ref={containerRef} style={{ width: 360, height: 360 }} />
+    <div style={{ position: "relative", width: size, height: size }}>
+      <div ref={containerRef} style={{ width: size, height: size }} />
       {pendingPromotion && (
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/40">
           <div className="flex gap-2 rounded-md bg-white p-3 shadow-lg dark:bg-neutral-800">
