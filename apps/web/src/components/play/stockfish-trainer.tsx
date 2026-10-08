@@ -137,7 +137,7 @@ export function StockfishTrainer({ initialFen, toleranceCp = 100 }: { initialFen
   }
 
   if (status === "loading") {
-    return <div className="flex h-[360px] w-[360px] items-center justify-center text-sm text-neutral-500">{t("evaluating")}</div>;
+    return <div className="flex h-64 w-full max-w-[480px] items-center justify-center text-sm text-neutral-500">{t("evaluating")}</div>;
   }
   if (status === "error") {
     return <p className="text-sm text-amber-600 dark:text-amber-400">{t("evalError")}</p>;
@@ -161,7 +161,7 @@ export function StockfishTrainer({ initialFen, toleranceCp = 100 }: { initialFen
       )}
       {hint && <p className="text-sm text-amber-600 dark:text-amber-400">{hint}</p>}
       {feed.length > 0 && (
-        <ul className="flex w-full max-w-[360px] flex-col gap-1.5 text-sm">
+        <ul className="flex w-full max-w-[480px] flex-col gap-1.5 text-sm">
           {feed.map((line, i) => (
             <li key={i} className="rounded-md bg-neutral-100 px-3 py-1.5 dark:bg-neutral-800">
               {line}

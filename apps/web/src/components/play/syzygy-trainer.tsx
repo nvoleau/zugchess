@@ -77,7 +77,7 @@ export function SyzygyTrainer({
   const [moveHistory, setMoveHistory] = useState<HalfMove[]>([]);
   const [hintShape, setHintShape] = useState<{ orig: string; dest: string } | null>(null);
   const [hintLoading, setHintLoading] = useState(false);
-  const [, forceSync] = useReducer((n: number) => n + 1, 0);
+  const [,] = useReducer((n: number) => n + 1, 0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const pushMove = useCallback((san: string, color: "w" | "b") => {
@@ -333,7 +333,7 @@ export function SyzygyTrainer({
               type="button"
               onClick={showHint}
               disabled={hintLoading}
-              className="rounded-full border border-brand-gold/40 px-3 py-1 font-brandMono text-xs text-brand-gold hover:bg-brand-gold/10 disabled:opacity-40"
+              className="min-h-[44px] rounded-full border border-brand-gold/40 px-4 py-2 font-brandMono text-xs text-brand-gold hover:bg-brand-gold/10 disabled:opacity-40"
             >
               {hintLoading ? "…" : t("hintButton")}
             </button>

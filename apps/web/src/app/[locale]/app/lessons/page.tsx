@@ -69,7 +69,7 @@ export default async function LessonsPage({ params }: { params: Promise<{ locale
 
               <div className="flex items-center justify-between text-xs text-brand-muted">
                 <span>{done} / {theme.total} {localeTyped === "fr" ? "maîtrisées" : "mastered"}</span>
-                <span className="font-brandMono text-brand-gold opacity-0 transition-opacity group-hover:opacity-100">
+                <span className="font-brandMono text-brand-gold opacity-60 transition-opacity group-hover:opacity-100">
                   {t("explore")}
                 </span>
               </div>

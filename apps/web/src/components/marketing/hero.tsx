@@ -102,8 +102,8 @@ export async function Hero({ isAuthenticated }: { isAuthenticated: boolean }) {
 
   return (
     <section className="relative overflow-hidden">
-      {/* ── Background chess board (perspective-tilted) ── */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+      {/* ── Background chess board (perspective-tilted) — hidden on small screens ── */}
+      <div className="pointer-events-none absolute inset-0 hidden overflow-hidden sm:block" aria-hidden="true">
         {/* Board: rotated + partially off-screen right */}
         <div
           className="absolute right-[-8%] top-[-12%] opacity-[0.15]"

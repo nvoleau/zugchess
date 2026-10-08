@@ -322,7 +322,7 @@ export function KpkTrainer({
             <button
               type="button"
               onClick={showHint}
-              className="rounded-full border border-brand-gold/40 px-3 py-1 font-brandMono text-xs text-brand-gold hover:bg-brand-gold/10"
+              className="min-h-[44px] rounded-full border border-brand-gold/40 px-4 py-2 font-brandMono text-xs text-brand-gold hover:bg-brand-gold/10"
             >
               {t("hintButton")}
             </button>
@@ -330,7 +330,7 @@ export function KpkTrainer({
           <button
             type="button"
             onClick={reset}
-            className="ml-auto text-xs text-brand-muted hover:text-brand-cream underline underline-offset-2"
+            className="ml-auto min-h-[44px] px-2 text-xs text-brand-muted hover:text-brand-cream underline underline-offset-2"
           >
             {t("reset")}
           </button>

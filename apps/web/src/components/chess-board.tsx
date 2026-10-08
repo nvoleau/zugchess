@@ -9,6 +9,7 @@ import type { Api } from "@lichess-org/chessground/api";
 import type { Config } from "@lichess-org/chessground/config";
 import type * as cg from "@lichess-org/chessground/types";
 import { useEffect, useRef, useState } from "react";
+import { useResizeBoardSize } from "@/hooks/use-resize-board-size";
 
 export type PromotionPiece = "q" | "r" | "b" | "n";
 
@@ -36,7 +37,8 @@ const PROMOTION_CHOICES: Array<{ piece: PromotionPiece; label: string }> = [
 ];
 
 /** Enveloppe React fine autour de chessground (lib de l'échiquier de Lichess) : pas de logique de jeu ici. */
-export function ChessBoard({ fen, orientation, movableColor, dests, lastMove, check, onMove, shapes, size = 360 }: ChessBoardProps) {
+export function ChessBoard({ fen, orientation, movableColor, dests, lastMove, check, onMove, shapes, size = 480 }: ChessBoardProps) {
+  const { wrapperRef, effectiveSize } = useResizeBoardSize(size);
   const containerRef = useRef<HTMLDivElement>(null);
   const apiRef = useRef<Api | null>(null);
   const onMoveRef = useRef(onMove);
@@ -90,6 +92,10 @@ export function ChessBoard({ fen, orientation, movableColor, dests, lastMove, ch
     apiRef.current?.set(config);
   }, [fen, orientation, movableColor, dests, lastMove, check, shapes]);
 
+  useEffect(() => {
+    apiRef.current?.redrawAll();
+  }, [effectiveSize]);
+
   function choosePromotion(piece: PromotionPiece) {
     if (!pendingPromotion) return;
     const { from, to } = pendingPromotion;
@@ -98,24 +104,26 @@ export function ChessBoard({ fen, orientation, movableColor, dests, lastMove, ch
   }
 
   return (
-    <div style={{ position: "relative", width: size, height: size }}>
-      <div ref={containerRef} style={{ width: size, height: size }} />
-      {pendingPromotion && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/40">
-          <div className="flex gap-2 rounded-md bg-white p-3 shadow-lg dark:bg-neutral-800">
-            {PROMOTION_CHOICES.map(({ piece, label }) => (
-              <button
-                key={piece}
-                type="button"
-                onClick={() => choosePromotion(piece)}
-                className="flex h-12 w-12 items-center justify-center rounded-md border-2 border-neutral-900 text-xl font-bold dark:border-white"
-              >
-                {label}
-              </button>
-            ))}
+    <div ref={wrapperRef} style={{ width: "100%", maxWidth: size }}>
+      <div style={{ position: "relative", width: effectiveSize, height: effectiveSize }}>
+        <div ref={containerRef} style={{ width: effectiveSize, height: effectiveSize }} />
+        {pendingPromotion && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/40">
+            <div className="flex gap-2 rounded-md bg-white p-3 shadow-lg dark:bg-neutral-800">
+              {PROMOTION_CHOICES.map(({ piece, label }) => (
+                <button
+                  key={piece}
+                  type="button"
+                  onClick={() => choosePromotion(piece)}
+                  className="flex h-12 w-12 items-center justify-center rounded-md border-2 border-neutral-900 text-xl font-bold dark:border-white"
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

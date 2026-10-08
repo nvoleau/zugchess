@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { ReactNode } from "react";
 import { auth } from "@/auth";
-import { AppNav } from "@/components/app-shell/app-nav";
+import { AppBottomNav, AppNav } from "@/components/app-shell/app-nav";
 import { UserMenu } from "@/components/app-shell/user-menu";
 import { Link, redirect } from "@/i18n/navigation";
 import { getEntitlementsForUser } from "@/lib/entitlements";
@@ -61,7 +61,8 @@ export default async function AppShellLayout({
           />
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-8 sm:py-10">{children}</main>
+      <main className="mx-auto max-w-6xl px-4 py-8 pb-24 sm:px-8 sm:py-10 md:pb-10">{children}</main>
+      <AppBottomNav labels={{ home: t("home"), session: t("session"), lessons: t("lessons"), ranking: t("ranking") }} />
     </div>
   );
 }

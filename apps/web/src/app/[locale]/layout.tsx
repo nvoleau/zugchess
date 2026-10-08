@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
@@ -12,6 +12,18 @@ import "../globals.css";
 export const metadata: Metadata = {
   title: "ZugChess",
   description: "Apprends, comprends et joue toutes les finales d'échecs.",
+  appleWebApp: {
+    capable: true,
+    title: "ZugChess",
+    statusBarStyle: "black-translucent",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0d0d0d",
+  viewportFit: "cover",
+  width: "device-width",
+  initialScale: 1,
 };
 
 // Polices de l'identité de marque (accueil + app) — chargées une fois ici en variables CSS ;

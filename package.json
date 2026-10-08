@@ -17,7 +17,8 @@
     "prisma:deploy": "dotenv -e .env.local -- prisma migrate deploy --schema prisma/schema.prisma",
     "prisma:seed": "dotenv -e .env.local -- tsx prisma/seed.ts",
     "generate:kpk": "dotenv -e .env.local -- npx tsx scripts/generate-kpk.ts",
-    "generate:syzygy": "dotenv -e .env.local -- npx tsx scripts/generate-syzygy.ts"
+    "generate:syzygy": "dotenv -e .env.local -- npx tsx scripts/generate-syzygy.ts",
+    "generate:percee": "dotenv -e .env.local -- npx tsx scripts/generate-percee.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

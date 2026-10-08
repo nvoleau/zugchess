@@ -48,10 +48,51 @@ function pawnFile(fen: string): number {
   return 0;
 }
 
+/**
+ * Détecte les positions "règle du carré" : le roi attaquant est loin du pion
+ * (Chebyshev ≥ 5) et le pion est à 2-4 coups de la promotion.
+ * Dans ces positions, l'issue dépend exclusivement de la géométrie du carré.
+ */
+function isCarreCandidate(normalizedFen: string): boolean {
+  const parts = normalizedFen.split(" ");
+  const placement = parts[0]!;
+  const turn = parts[1]! as "w" | "b";
+  const attackerIsWhite = turn === "w";
+
+  let pFile = -1, pRank = -1;
+  let akFile = -1, akRank = -1;
+  let file = 0, rank = 7;
+
+  for (const ch of placement) {
+    if (ch === "/") { rank--; file = 0; continue; }
+    if (ch >= "1" && ch <= "8") { file += parseInt(ch, 10); continue; }
+    if ((attackerIsWhite && ch === "P") || (!attackerIsWhite && ch === "p")) {
+      pFile = file; pRank = rank;
+    }
+    if ((attackerIsWhite && ch === "K") || (!attackerIsWhite && ch === "k")) {
+      akFile = file; akRank = rank;
+    }
+    file++;
+  }
+
+  if (pFile < 0 || akFile < 0) return false;
+  if (pFile === 0 || pFile === 7) return false; // pion de tour : thème séparé
+
+  // Moves to promote (rank 0-indexed, 7 = back rank for white)
+  const movesToPromo = attackerIsWhite ? (7 - pRank) : pRank;
+  if (movesToPromo < 2 || movesToPromo > 4) return false; // rangs 4-6 en algébrique
+
+  // Chebyshev : roi attaquant à ≥ 4 cases du pion → la promotion dépend principalement
+  // de la géométrie du carré, pas du soutien actif du roi
+  const chebyshev = Math.max(Math.abs(akFile - pFile), Math.abs(akRank - pRank));
+  return chebyshev >= 4;
+}
+
 /** Slug du thème cible d'après la colonne du pion et un hash de la FEN. */
 function themeSlugFor(normalizedFen: string): string {
   const col = pawnFile(normalizedFen);
   if (col === 0 || col === 7) return "pion-de-tour";
+  if (isCarreCandidate(normalizedFen)) return "carre";
   // 70 % opposition, 30 % tempo — déterministe par FEN
   const h = parseInt(createHash("sha256").update(normalizedFen).digest("hex").slice(0, 4), 16);
   return h % 10 < 3 ? "tempo" : "opposition";
@@ -65,9 +106,9 @@ async function main() {
   const prisma = new PrismaClient();
 
   const themes = await prisma.theme.findMany({
-    where: { slug: { in: ["opposition", "tempo", "pion-de-tour"] } },
+    where: { slug: { in: ["opposition", "tempo", "pion-de-tour", "carre"] } },
   });
-  if (themes.length !== 3) {
+  if (themes.length !== 4) {
     throw new Error(`Thèmes manquants en DB (${themes.map((t) => t.slug).join(", ")}). Relancer le seed d'abord.`);
   }
   const themeBySlug = new Map(themes.map((t) => [t.slug, t]));

@@ -149,19 +149,16 @@ function randomFenForTheme(
   let turn: "w" | "b";
 
   if (theme === "lucena") {
-    // Pion avancé : rangs 4-6 algébriques (0-idx 3-5 pour blanc, 2-4 pour noir)
     pawnRank0 = attackerIsWhite ? 3 + Math.floor(rng() * 3) : 2 + Math.floor(rng() * 3);
-    turn = atkColor; // Attaquant au trait
+    turn = atkColor;
   } else {
-    // Pion peu avancé : rangs 2-4 algébriques (0-idx 1-3 pour blanc, 4-6 pour noir)
     pawnRank0 = attackerIsWhite ? 1 + Math.floor(rng() * 3) : 4 + Math.floor(rng() * 3);
-    turn = defColor; // Défenseur au trait
+    turn = defColor;
   }
 
   const occupied = new Set<number>();
   occupied.add(sq(pawnFile, pawnRank0));
 
-  // Roi attaquant : 1-2 cases du pion (position de soutien)
   const atkKingCandidates: Array<{ file: number; rank: number }> = [];
   for (let df = -2; df <= 2; df++) {
     for (let dr = -1; dr <= 2; dr++) {
@@ -175,12 +172,8 @@ function randomFenForTheme(
   if (!atkKing) return null;
   occupied.add(sq(atkKing.file, atkKing.rank));
 
-  // Roi défenseur :
-  //   - Lucena : au moins 3 cases du roi attaquant (libre)
-  //   - Philidor : près de la case de promotion du pion (devant le pion)
   let defKingCandidates: Array<{ file: number; rank: number }>;
   if (theme === "philidor") {
-    // Défenseur idéalement devant le pion : ±1 fichier, rangée de promotion ou adjacente
     const promotionRank0 = attackerIsWhite ? 7 : 0;
     defKingCandidates = allSquares().filter(({ file: f, rank: r }) => {
       if (occupied.has(sq(f, r))) return false;
@@ -188,7 +181,6 @@ function randomFenForTheme(
       const farFromAtk = Math.max(Math.abs(f - atkKing.file), Math.abs(r - atkKing.rank)) >= 2;
       return nearProm && farFromAtk;
     });
-    // Repli si contrainte trop stricte
     if (defKingCandidates.length === 0) {
       defKingCandidates = allSquares().filter(({ file: f, rank: r }) => {
         if (occupied.has(sq(f, r))) return false;
@@ -205,20 +197,15 @@ function randomFenForTheme(
   if (!defKing) return null;
   occupied.add(sq(defKing.file, defKing.rank));
 
-  // Tour attaquante : aléatoire
   const atkRook = pickEmpty(allSquares(), occupied, rng);
   if (!atkRook) return null;
   occupied.add(sq(atkRook.file, atkRook.rank));
 
-  // Tour défenseure :
-  //   - Philidor : rangée 6 algébrique (0-idx 5 pour blanc, 2 pour noir) — position classique Philidor
-  //   - Lucena   : aléatoire
   let defRook: { file: number; rank: number } | null;
   if (theme === "philidor") {
-    const philidorRookRank0 = attackerIsWhite ? 5 : 2; // rangée 6 algébrique = 0-idx 5
+    const philidorRookRank0 = attackerIsWhite ? 5 : 2;
     const philidorCandidates = allSquares().filter(({ file: f, rank: r }) => {
       if (r !== philidorRookRank0 || occupied.has(sq(f, r))) return false;
-      // Évite que la tour donne échec au roi attaquant (non au trait) sur la même colonne.
       if (f === atkKing.file) return false;
       return true;
     });
@@ -245,6 +232,75 @@ function randomFenForTheme(
 
   const fen = buildFen(attackerIsWhite ? piecesWhiteAtk : piecesBlackAtk, turn);
   return { fen, attackerColor: atkColor };
+}
+
+/**
+ * Génère des FEN Philidor systématiques à partir de gabarits.
+ * Taux de réussite tablebase beaucoup plus élevé que la génération aléatoire.
+ * Retourne un itérateur de { fen, attackerColor }.
+ */
+function* systematicPhilidorFens(): Generator<{ fen: string; attackerColor: "w" | "b" }> {
+  // Pion blanc sur fichiers b-g, rangées 3-5 algébriques (0-idx 2-4)
+  for (const pFile of [1, 2, 3, 4, 5, 6]) {
+    for (const pRank0 of [2, 3, 4]) { // rangs algébriques 3-5
+      const pRomRank0 = 7; // promotion rangée 0-idx pour blanc
+
+      // Roi attaquant : derrière et à côté du pion
+      const atkKingOptions = (
+        [
+          [pFile - 1, pRank0 - 1] as [number, number],
+          [pFile + 1, pRank0 - 1] as [number, number],
+          [pFile - 1, pRank0]     as [number, number],
+          [pFile + 1, pRank0]     as [number, number],
+          [pFile,     pRank0 - 1] as [number, number],
+        ] satisfies Array<[number, number]>
+      ).filter(([f, r]) => f >= 0 && f <= 7 && r >= 0 && r <= 7);
+
+      for (const [akf, akr] of atkKingOptions) {
+        const occupied = new Set<number>([sq(pFile, pRank0), sq(akf, akr)]);
+
+        // Roi défenseur : directement devant le pion (rangée 7 ou 8 algébrique = 0-idx 6 ou 7)
+        for (const dkr0 of [6, 7]) {
+          for (const dkdf of [-1, 0, 1]) {
+            const dkf = pFile + dkdf;
+            if (dkf < 0 || dkf > 7) continue;
+            if (occupied.has(sq(dkf, dkr0))) continue;
+            // Rois non adjacents
+            if (Math.max(Math.abs(dkf - akf), Math.abs(dkr0 - akr)) < 2) continue;
+            occupied.add(sq(dkf, dkr0));
+
+            // Tour défenseure : rangée 6 algébrique (0-idx 5) — position Philidor classique
+            for (const drf of [0, 1, 2, 3, 4, 5, 6, 7]) {
+              if (occupied.has(sq(drf, 5))) continue;
+              if (drf === akf) continue; // évite échec au roi attaquant
+              occupied.add(sq(drf, 5));
+
+              // Tour attaquante : rangée 1 ou 8 (0-idx 0 ou 7), toute colonne
+              for (const arf of [0, 1, 2, 3, 4, 5, 6, 7]) {
+                for (const arr0 of [0, 7]) {
+                  if (occupied.has(sq(arf, arr0))) continue;
+
+                  const pieces: Array<{ piece: PieceCode; file: number; rank: number }> = [
+                    { piece: "K", file: akf,  rank: akr  },
+                    { piece: "R", file: arf,  rank: arr0 },
+                    { piece: "P", file: pFile, rank: pRank0 },
+                    { piece: "k", file: dkf,  rank: dkr0 },
+                    { piece: "r", file: drf,  rank: 5    },
+                  ];
+                  const fen = buildFen(pieces, "b"); // défenseur (noir) au trait
+                  yield { fen, attackerColor: "w" };
+                }
+              }
+
+              occupied.delete(sq(drf, 5));
+            }
+
+            occupied.delete(sq(dkf, dkr0));
+          }
+        }
+      }
+    }
+  }
 }
 
 /** Valide la FEN avec chess.js + vérifie que le roi du camp NON au trait n'est pas en échec (position impossible). */
@@ -322,20 +378,17 @@ async function main() {
   const rng = Math.random.bind(Math);
   let totalAttempts = 0, totalApiCalls = 0;
 
-  // Génère séparément les deux thèmes — generateur biaisé par thème améliore le hit rate.
-  for (const [theme, bucket] of [
-    ["lucena", lucenaBucket],
-    ["philidor", philidorBucket],
-  ] as Array<[string, string[]]>) {
+  // --- LUCENA : génération aléatoire ---
+  {
     let attempts = 0;
     const target = countPerTheme;
-    process.stdout.write(`\n--- ${theme.toUpperCase()} (cible: ${target} FEN) ---\n`);
+    process.stdout.write(`\n--- LUCENA (cible: ${target} FEN) ---\n`);
 
-    while (bucket.length < target && attempts < MAX_ATTEMPTS) {
+    while (lucenaBucket.length < target && attempts < MAX_ATTEMPTS) {
       attempts++;
       totalAttempts++;
 
-      const generated = randomFenForTheme(theme as "lucena" | "philidor", rng);
+      const generated = randomFenForTheme("lucena", rng);
       if (!generated) continue;
       const { fen, attackerColor } = generated;
 
@@ -354,23 +407,53 @@ async function main() {
       const turnField = fen.split(" ")[1] as "w" | "b";
       const attackerToMove = turnField === attackerColor;
 
-      const matches =
-        theme === "lucena"
-          ? attackerToMove && category === "win"
-          : !attackerToMove && (category === "draw" || category === "blessed-loss");
-
-      if (matches) {
+      if (attackerToMove && category === "win") {
         seenFens.add(normFen);
-        bucket.push(fen);
-        process.stdout.write(`[${theme} ${bucket.length}/${target}] dtz=${dtz} ${fen}\n`);
+        lucenaBucket.push(fen);
+        process.stdout.write(`[lucena ${lucenaBucket.length}/${target}] dtz=${dtz} ${fen}\n`);
       }
     }
-    process.stdout.write(`${theme}: ${bucket.length}/${target} en ${attempts} tentatives.\n`);
-    // Pause inter-phase pour laisser le quota Lichess se reconstituer.
-    if (theme === "lucena" && philidorBucket.length < countPerTheme) {
-      process.stdout.write(`\nPause 60s avant Philidor pour récupérer le quota Lichess…\n`);
-      await new Promise((r) => setTimeout(r, 60_000));
+    process.stdout.write(`lucena: ${lucenaBucket.length}/${target} en ${attempts} tentatives.\n`);
+  }
+
+  // --- PHILIDOR : génération systématique (bien meilleur taux de réussite) ---
+  {
+    const target = countPerTheme;
+    process.stdout.write(`\n--- PHILIDOR systématique (cible: ${target} FEN) ---\n`);
+    process.stdout.write(`Pause 30s avant Philidor pour récupérer le quota Lichess…\n`);
+    await new Promise((r) => setTimeout(r, 30_000));
+
+    let attempts = 0;
+    const generator = systematicPhilidorFens();
+
+    for (const { fen, attackerColor } of generator) {
+      if (philidorBucket.length >= target) break;
+      if (attempts >= MAX_ATTEMPTS * 3) break; // espace de recherche grand, on s'arrête quand même
+      attempts++;
+      totalAttempts++;
+
+      if (!isPlayableFen(fen)) continue;
+
+      const normFen = normalizeFenForTablebase(fen);
+      if (seenFens.has(normFen)) continue;
+
+      const tablebase = await fetchTablebase(fen, prisma);
+      totalApiCalls++;
+      if (!tablebase) continue;
+
+      const { category, dtz } = tablebase;
+      if (dtz === null || Math.abs(dtz) < MIN_DTZ || Math.abs(dtz) > MAX_DTZ) continue;
+
+      const turnField = fen.split(" ")[1] as "w" | "b";
+      const attackerToMove = turnField === attackerColor;
+
+      if (!attackerToMove && (category === "draw" || category === "blessed-loss")) {
+        seenFens.add(normFen);
+        philidorBucket.push(fen);
+        process.stdout.write(`[philidor ${philidorBucket.length}/${target}] dtz=${dtz} ${fen}\n`);
+      }
     }
+    process.stdout.write(`philidor: ${philidorBucket.length}/${target} en ${attempts} tentatives.\n`);
   }
 
   console.log(

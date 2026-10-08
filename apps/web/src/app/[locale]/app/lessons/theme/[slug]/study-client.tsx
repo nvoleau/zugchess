@@ -2,6 +2,7 @@
 
 import { useLocale } from "next-intl";
 import { useEffect, useState } from "react";
+import { Link } from "@/i18n/navigation";
 import { SessionCard, type SessionCardResult } from "@/components/play/session-card";
 import type { PositionDetail, PositionMasteryItem } from "@/lib/positionService";
 
@@ -51,7 +52,8 @@ export function ThemeStudyClient({
 
   const selectedIndex = positions.findIndex((p) => p.id === selectedId);
 
-  function handleFinished(_result?: SessionCardResult) {
+  function handleFinished(result?: SessionCardResult) {
+    void result;
     const next = positions[selectedIndex + 1];
     if (next) setSelectedId(next.id);
     // En mode consultation, on n'enregistre pas de révision FSRS
@@ -88,12 +90,12 @@ export function ThemeStudyClient({
               <p className="font-brandMono text-[10px] uppercase tracking-[0.14em] text-brand-muted">
                 + {lockedCount} positions
               </p>
-              <a
+              <Link
                 href="/app/upgrade"
                 className="mt-2 block rounded-lg border border-brand-gold/30 bg-brand-gold/[0.06] px-3 py-2 text-center font-brandMono text-xs text-brand-gold transition-colors hover:bg-brand-gold/10"
               >
                 Passer Premium →
-              </a>
+              </Link>
             </div>
           )}
         </div>

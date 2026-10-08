@@ -112,7 +112,7 @@ export function MethodLineTrainer({ line, onComplete }: { line: MethodLine; onCo
 
       {/* Panneau latéral — commentaires */}
       {feed.length > 0 && (
-        <ul className="flex w-full flex-col gap-1.5 text-sm md:max-h-[360px] md:w-64 md:overflow-y-auto">
+        <ul className="flex w-full flex-col gap-1.5 text-sm max-h-40 overflow-y-auto md:max-h-[480px] md:w-64">
           {feed.map((lineText, i) => (
             <li key={i} className="rounded-md bg-neutral-100 px-3 py-1.5 dark:bg-neutral-800">
               {lineText}
