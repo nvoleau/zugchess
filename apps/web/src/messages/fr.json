@@ -165,13 +165,17 @@
     }
   },
   "Try": {
-    "title": "Essaie sans créer de compte",
-    "intro": "3 positions roi + pion contre roi tirées au hasard. Pas d'e-mail, pas d'inscription — ta progression reste sur cet appareil.",
+    "title": "5 positions pour comprendre ce qu'OpenChess ne t'a jamais montré",
+    "intro": "Pas d'e-mail, pas d'inscription — ta progression reste sur cet appareil."
+  },
+  "Onboarding": {
     "progress": "Position {current} / {total}",
     "nextPosition": "Position suivante",
     "seeResult": "Voir le bilan",
-    "done": "Les 3 positions sont gagnées ! Crée un compte pour garder ta progression et débloquer toutes les finales.",
-    "signUpCta": "Créer un compte gratuit"
+    "doneBadge": "Terminé",
+    "done": "Les 5 positions sont gagnées !",
+    "doneIntro": "Connecte-toi avec Lichess pour garder ta progression et débloquer les 300 autres finales du programme.",
+    "loginCta": "Se connecter avec Lichess"
   },
   "Login": {
     "title": "Se connecter",

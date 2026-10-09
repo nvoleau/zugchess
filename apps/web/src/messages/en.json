@@ -165,13 +165,17 @@
     }
   },
   "Try": {
-    "title": "Try it without creating an account",
-    "intro": "3 random king + pawn vs king positions. No email, no sign-up — your progress stays on this device.",
+    "title": "5 positions that show you what you've been missing",
+    "intro": "No email, no sign-up — your progress stays on this device."
+  },
+  "Onboarding": {
     "progress": "Position {current} / {total}",
     "nextPosition": "Next position",
     "seeResult": "See results",
-    "done": "All 3 positions solved! Create an account to keep your progress and unlock every endgame.",
-    "signUpCta": "Create a free account"
+    "doneBadge": "Done",
+    "done": "All 5 positions solved!",
+    "doneIntro": "Sign in with Lichess to keep your progress and unlock the other 300 endgames in the program.",
+    "loginCta": "Sign in with Lichess"
   },
   "Login": {
     "title": "Sign in",
