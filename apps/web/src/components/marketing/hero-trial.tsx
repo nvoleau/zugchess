@@ -3,7 +3,7 @@
 import { kpkResult, randomWinningKpkFen, type GameResult } from "@zugchess/core";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { ChessBoard } from "@/components/chess-board";
+import { ZugBoard } from "@/components/zug-board";
 import { AnnounceStep } from "@/components/play/announce-step";
 import { attackerColorOf } from "@/components/play/chess-move-dests";
 import { KpkTrainer } from "@/components/play/kpk-trainer";
@@ -44,7 +44,7 @@ export function HeroTrial() {
 
       {phase === "announce" && (
         <>
-          <ChessBoard fen={fen} orientation={attacker} />
+          <ZugBoard fen={fen} orientation={attacker} />
           <AnnounceStep sideToMove={sideToMoveOf(fen)} onAnswer={handleAnnounce} />
         </>
       )}

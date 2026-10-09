@@ -1,7 +1,7 @@
 import type { SquareMove } from "@zugchess/core";
 import { Chess } from "chess.js";
 
-/** Construit la map `case de départ -> cases d'arrivée légales` attendue par chessground. */
+/** Construit la map `case de départ -> cases d'arrivée légales` attendue par ZugBoard. */
 export function legalDests(chess: Chess, color: "w" | "b"): Map<string, string[]> {
   const dests = new Map<string, string[]>();
   for (const move of chess.moves({ verbose: true })) {

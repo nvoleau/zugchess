@@ -4,11 +4,9 @@ import { invertScore, judgeStockfishMove, type EngineScore } from "@zugchess/cor
 import { Chess } from "chess.js";
 import { useTranslations } from "next-intl";
 import { useEffect, useReducer, useRef, useState } from "react";
-import { ChessBoard } from "@/components/chess-board";
-import { StockfishEngine } from "@/lib/stockfishEngine";
+import { ZugBoard } from "@/components/zug-board";
+import { evaluatePosition } from "@/lib/cloudEvalClient";
 import { frenchSan, legalDests, sanSequence } from "./chess-move-dests";
-
-const SEARCH_DEPTH = 12;
 
 function formatScore(score: EngineScore, t: ReturnType<typeof useTranslations>): string {
   if (score.type === "mate") return t(score.value > 0 ? "mateFor" : "mateAgainst", { n: Math.abs(score.value) });
@@ -17,13 +15,12 @@ function formatScore(score: EngineScore, t: ReturnType<typeof useTranslations>):
 }
 
 /**
- * Entraîneur « jeu libre » pour les positions de plus de 7 pièces (SPEC.md) : jugées par Stockfish
- * WASM dans le navigateur (`StockfishEngine`), selon un seuil de tolérance en centipions — aucun
- * appel réseau, le moteur tourne localement dans un worker.
+ * Entraîneur « jeu libre » pour les positions de plus de 7 pièces (SPEC.md) : jugées via
+ * l'API Lichess cloud-eval côté serveur (`/api/judge/cloud-eval`) — aucun WASM GPL dans le
+ * navigateur.
  */
 export function StockfishTrainer({ initialFen, toleranceCp = 100 }: { initialFen: string; toleranceCp?: number }) {
   const t = useTranslations("Play.Stockfish");
-  const engineRef = useRef<StockfishEngine | null>(null);
   const chessRef = useRef(new Chess(initialFen));
   const [fen, setFen] = useState(initialFen);
   const [status, setStatus] = useState<"loading" | "playing" | "finished" | "error">("loading");
@@ -37,12 +34,10 @@ export function StockfishTrainer({ initialFen, toleranceCp = 100 }: { initialFen
   const playerColor = initialFen.split(" ")[1] === "b" ? "b" : "w";
 
   useEffect(() => {
-    const engine = new StockfishEngine();
-    engineRef.current = engine;
     let cancelled = false;
     (async () => {
       try {
-        const { score } = await engine.evaluate(initialFen, { depth: SEARCH_DEPTH });
+        const { score } = await evaluatePosition(initialFen);
         if (cancelled) return;
         setScoreLabel(formatScore(score, t));
         setStatus("playing");
@@ -50,10 +45,7 @@ export function StockfishTrainer({ initialFen, toleranceCp = 100 }: { initialFen
         if (!cancelled) setStatus("error");
       }
     })();
-    return () => {
-      cancelled = true;
-      engine.destroy();
-    };
+    return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialFen]);
 
@@ -62,10 +54,8 @@ export function StockfishTrainer({ initialFen, toleranceCp = 100 }: { initialFen
   }
 
   async function engineReply(): Promise<void> {
-    const engine = engineRef.current;
     const chess = chessRef.current;
-    if (!engine) return;
-    const { bestMoveUci } = await engine.evaluate(chess.fen(), { depth: SEARCH_DEPTH });
+    const { bestMoveUci } = await evaluatePosition(chess.fen());
     const played = chess.move({ from: bestMoveUci.slice(0, 2), to: bestMoveUci.slice(2, 4), promotion: bestMoveUci.slice(4) || undefined });
     if (played) {
       const side = played.color === "w" ? t("sideWhite") : t("sideBlack");
@@ -78,20 +68,19 @@ export function StockfishTrainer({ initialFen, toleranceCp = 100 }: { initialFen
       setOutcome(chess.isCheckmate() ? "loss" : "draw");
       return;
     }
-    const { score } = await engine.evaluate(chess.fen(), { depth: SEARCH_DEPTH });
-    setScoreLabel(formatScore(invertScore(score), t)); // reconverti du point de vue de l'élève
+    const { score } = await evaluatePosition(chess.fen());
+    setScoreLabel(formatScore(invertScore(score), t));
   }
 
   async function handleMove(from: string, to: string, promotion?: "q" | "r" | "b" | "n") {
     if (status !== "playing" || pending) return;
     const chess = chessRef.current;
-    const engine = engineRef.current;
-    if (!engine || chess.turn() !== playerColor) return;
+    if (chess.turn() !== playerColor) return;
 
     setPending(true);
     try {
       const fenBefore = chess.fen();
-      const { score: bestScoreBefore, bestMoveUci: bestMoveBefore, pv } = await engine.evaluate(fenBefore, { depth: SEARCH_DEPTH });
+      const { score: bestScoreBefore, bestMoveUci: bestMoveBefore, pv } = await evaluatePosition(fenBefore);
 
       const played = chess.move({ from, to, promotion });
       if (!played) {
@@ -107,7 +96,7 @@ export function StockfishTrainer({ initialFen, toleranceCp = 100 }: { initialFen
         return;
       }
 
-      const { score: scoreAfter } = await engine.evaluate(chess.fen(), { depth: SEARCH_DEPTH });
+      const { score: scoreAfter } = await evaluatePosition(chess.fen());
       const judged = judgeStockfishMove(bestScoreBefore, scoreAfter, toleranceCp);
 
       if (judged.blundered) {
@@ -145,7 +134,7 @@ export function StockfishTrainer({ initialFen, toleranceCp = 100 }: { initialFen
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <ChessBoard
+      <ZugBoard
         fen={fen}
         orientation={playerColor === "w" ? "white" : "black"}
         movableColor={status === "playing" && !pending ? (playerColor === "w" ? "white" : "black") : undefined}

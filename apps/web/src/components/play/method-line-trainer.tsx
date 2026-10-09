@@ -4,7 +4,7 @@ import { isPlayerStep, judgeMethodLineMove, type MethodLine } from "@zugchess/co
 import { Chess } from "chess.js";
 import { useTranslations } from "next-intl";
 import { useReducer, useRef, useState } from "react";
-import { ChessBoard } from "@/components/chess-board";
+import { ZugBoard } from "@/components/zug-board";
 import { TempoBar, type TempoBoxState } from "@/components/tempo-bar";
 import { frenchSan, legalDests } from "./chess-move-dests";
 import type { TrainerStats } from "./trainer-types";
@@ -75,7 +75,7 @@ export function MethodLineTrainer({ line, onComplete }: { line: MethodLine; onCo
     if (!judgement.correct) {
       blunderRef.current++;
       setHint(judgement.hint?.fr ?? null);
-      forceSync(); // le coup n'est pas appliqué : on force chessground à revenir à la position réelle.
+      forceSync(); // le coup n'est pas appliqué : on force ZugBoard à revenir à la position réelle.
       return;
     }
 
@@ -98,7 +98,7 @@ export function MethodLineTrainer({ line, onComplete }: { line: MethodLine; onCo
     <div className="flex flex-col items-center gap-4 md:flex-row md:items-start">
       {/* Colonne échiquier */}
       <div className="flex flex-col items-center gap-3">
-        <ChessBoard
+        <ZugBoard
           fen={fen}
           orientation={line.playerSide}
           movableColor={complete ? undefined : line.playerSide}

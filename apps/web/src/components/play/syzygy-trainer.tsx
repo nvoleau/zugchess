@@ -3,7 +3,7 @@
 import { Chess } from "chess.js";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
-import { ChessBoard } from "@/components/chess-board";
+import { ZugBoard } from "@/components/zug-board";
 import { TempoBar, type TempoBoxState } from "@/components/tempo-bar";
 import { frenchSan, legalDests, sanSequence } from "./chess-move-dests";
 import { MoveList, type HalfMove } from "./move-list";
@@ -287,7 +287,7 @@ export function SyzygyTrainer({
     <div className="flex flex-col items-center gap-4 md:flex-row md:items-start">
       {/* Colonne échiquier */}
       <div className="flex flex-col items-center gap-3">
-        <ChessBoard
+        <ZugBoard
           fen={fen}
           orientation={orientation}
           movableColor={status === "playing" && !pending ? (playerColor === "w" ? "white" : "black") : undefined}

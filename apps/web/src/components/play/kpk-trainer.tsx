@@ -4,7 +4,7 @@ import { bestKpkReply, judgeKpkMove, kpkPrincipalVariation } from "@zugchess/cor
 import { Chess, type Move } from "chess.js";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
-import { ChessBoard } from "@/components/chess-board";
+import { ZugBoard } from "@/components/zug-board";
 import { TempoBar, type TempoBoxState } from "@/components/tempo-bar";
 import { attackerColorOf, frenchSan, legalDests, sanSequence, type Color } from "./chess-move-dests";
 import { MoveList, type HalfMove } from "./move-list";
@@ -196,7 +196,7 @@ export function KpkTrainer({
       pushFeed(t(role === "attacker" ? "blunderAttacker" : "blunderDefender", { san: frenchSan(played.san), hints }));
       const pv = kpkPrincipalVariation(fenBefore, 5);
       if (pv.length > 0) pushFeed(t("principalVariation", { line: sanSequence(fenBefore, pv).join(" ") }));
-      forceSync(); // le coup n'est pas appliqué : on force chessground à revenir à la position réelle.
+      forceSync(); // le coup n'est pas appliqué : on force ZugBoard à revenir à la position réelle.
       return;
     }
 
@@ -281,7 +281,7 @@ export function KpkTrainer({
     <div className="flex flex-col items-center gap-4 md:flex-row md:items-start">
       {/* Colonne échiquier */}
       <div className="flex flex-col items-center gap-3">
-        <ChessBoard
+        <ZugBoard
           fen={fen}
           orientation={userColor}
           movableColor={won ? undefined : userColor}

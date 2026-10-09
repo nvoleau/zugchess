@@ -3,7 +3,7 @@
 import { type GameResult, kpkResult } from "@zugchess/core";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
-import { ChessBoard } from "@/components/chess-board";
+import { ZugBoard } from "@/components/zug-board";
 import type { PositionDetail } from "@/lib/positionService";
 import { AnnounceStep } from "./announce-step";
 import { attackerColorOf } from "./chess-move-dests";
@@ -81,7 +81,7 @@ export function SessionCard({ position, onComplete, nextLabel }: Props) {
     <div className="flex flex-col items-center gap-4 text-center">
       {phase === "announce" && (
         <>
-          <ChessBoard fen={position.fen} orientation={position.userSide} />
+          <ZugBoard fen={position.fen} orientation={position.userSide} />
           <AnnounceStep sideToMove={sideToMoveOf(position.fen)} onAnswer={handleAnnounce} />
         </>
       )}

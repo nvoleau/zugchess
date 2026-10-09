@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 /**
  * Observes a wrapper div's width and returns a clamped board size.
  * Use `wrapperRef` on an outer `width:100%/maxWidth:maxSize` div;
- * `effectiveSize` is the actual px to feed into the chessground container.
+ * `effectiveSize` is the actual px to feed into the board container.
  */
 export function useResizeBoardSize(maxSize: number) {
   const wrapperRef = useRef<HTMLDivElement>(null);
