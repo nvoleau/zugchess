@@ -242,10 +242,10 @@ export function SyzygyTrainer({
   }
 
   if (status === "loading") {
-    return <div className="flex h-[480px] w-[480px] items-center justify-center text-sm text-neutral-500">{t("evaluating")}</div>;
+    return <div className="flex h-[480px] w-[480px] items-center justify-center text-sm text-brand-muted">{t("evaluating")}</div>;
   }
   if (status === "error") {
-    return <p className="text-sm text-amber-600 dark:text-amber-400">{t("evalError")}</p>;
+    return <p className="text-sm text-brand-bad">{t("evalError")}</p>;
   }
 
   const remainingMoves = remainingHalfMoves === null ? null : Math.ceil(remainingHalfMoves / 2);
@@ -298,13 +298,13 @@ export function SyzygyTrainer({
           size={480}
         />
         {boxes.length > 0 && <TempoBar label={label} boxes={boxes} />}
-        {goal !== "win" && goal !== "draw" && <p className="text-sm text-neutral-600 dark:text-neutral-400">{label}</p>}
+        {goal !== "win" && goal !== "draw" && <p className="text-sm text-brand-muted">{label}</p>}
         {status === "finished" && outcome && (
           <p className="animate-pop-in text-sm font-medium text-brand-good">
             {outcome === "win" ? t("won") : outcome === "draw" ? t("drawn") : t("lost")}
           </p>
         )}
-        {hint && <p className="text-sm text-amber-600 dark:text-amber-400">{hint}</p>}
+        {hint && <p className="text-sm text-brand-accent2">{hint}</p>}
       </div>
 
       {/* Panneau latéral style étude Lichess */}
@@ -333,7 +333,7 @@ export function SyzygyTrainer({
               type="button"
               onClick={showHint}
               disabled={hintLoading}
-              className="min-h-[44px] rounded-full border border-brand-gold/40 px-4 py-2 font-brandMono text-xs text-brand-gold hover:bg-brand-gold/10 disabled:opacity-40"
+              className="min-h-[44px] rounded-full border border-brand-accent/40 px-4 py-2 font-brandMono text-xs text-brand-accent hover:bg-brand-accent/10 disabled:opacity-40"
             >
               {hintLoading ? "…" : t("hintButton")}
             </button>

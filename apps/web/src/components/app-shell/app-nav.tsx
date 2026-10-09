@@ -24,6 +24,15 @@ const TABS = [
     ),
   },
   {
+    href: "/app/rush",
+    key: "rush",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5">
+        <path d="M13 2L3 14h7l-1 8 11-14h-7l1-6z" strokeLinejoin="round" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
     href: "/app/lessons",
     key: "lessons",
     icon: (
@@ -62,7 +71,7 @@ export function AppNav({ labels }: { labels: Record<string, string> }) {
             href={tab.href}
             className={
               active
-                ? "rounded-full bg-brand-gold px-4 py-2 text-sm text-brand-ink"
+                ? "rounded-full bg-brand-accent px-4 py-2 text-sm text-brand-ink"
                 : "rounded-full px-4 py-2 text-sm text-brand-mutedLight hover:text-brand-cream"
             }
           >
@@ -87,7 +96,7 @@ export function AppBottomNav({ labels }: { labels: Record<string, string> }) {
             key={tab.href}
             href={tab.href}
             className={`flex flex-1 flex-col items-center gap-1 py-2 text-[10px] transition-colors ${
-              active ? "text-brand-gold" : "text-brand-mutedLight"
+              active ? "text-brand-accent" : "text-brand-mutedLight"
             }`}
           >
             {tab.icon}

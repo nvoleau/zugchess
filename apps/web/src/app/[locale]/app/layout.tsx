@@ -17,7 +17,7 @@ function initialsOf(name: string | null | undefined, email: string | null | unde
 }
 
 /**
- * Habillage sombre de l'app (identité de marque) : logo, 4 onglets, badge d'offre, avatar.
+ * Habillage sombre de l'app (identité de marque) : logo, 5 onglets, badge d'offre, avatar.
  * Centralise la garde d'authentification pour toutes les pages `/app/*` — avant, chaque page
  * (accueil, séance, jeu libre) refaisait le même `auth()` + redirect individuellement.
  */
@@ -44,13 +44,13 @@ export default async function AppShellLayout({
       <header className="sticky top-0 z-20 border-b border-white/10 bg-brand-ink/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-3 sm:px-8">
           <Link href="/" className="flex items-center gap-2.5">
-            <span className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-brand-gold text-lg leading-none text-brand-ink">
+            <span className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-brand-accent text-lg leading-none text-brand-ink">
               ♜
             </span>
-            <span className="font-brandSerif text-2xl">ZugChess</span>
+            <span className="font-brandDisplay text-2xl">ZugChess</span>
           </Link>
 
-          <AppNav labels={{ home: t("home"), session: t("session"), lessons: t("lessons"), ranking: t("ranking") }} />
+          <AppNav labels={{ home: t("home"), session: t("session"), rush: t("rush"), lessons: t("lessons"), ranking: t("ranking") }} />
 
           <UserMenu
             initials={initialsOf(user.name, user.email)}
@@ -62,7 +62,7 @@ export default async function AppShellLayout({
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-8 pb-24 sm:px-8 sm:py-10 md:pb-10">{children}</main>
-      <AppBottomNav labels={{ home: t("home"), session: t("session"), lessons: t("lessons"), ranking: t("ranking") }} />
+      <AppBottomNav labels={{ home: t("home"), session: t("session"), rush: t("rush"), lessons: t("lessons"), ranking: t("ranking") }} />
     </div>
   );
 }

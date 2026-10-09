@@ -31,6 +31,7 @@ export async function getEntitlementsForUser(userId: string): Promise<Entitlemen
     newPositions: usageRow?.newPositions ?? 0,
     reviews: usageRow?.reviews ?? 0,
     explanations: usageRow?.explanations ?? 0,
+    rushRuns: usageRow?.rushRuns ?? 0,
   });
 }
 
@@ -51,6 +52,7 @@ export async function consumeUsage(userId: string, kind: UsageKind): Promise<Ent
       newPositions: usageRow.newPositions,
       reviews: usageRow.reviews,
       explanations: usageRow.explanations,
+      rushRuns: usageRow.rushRuns,
     },
     kind,
   );
@@ -64,5 +66,6 @@ export async function consumeUsage(userId: string, kind: UsageKind): Promise<Ent
     newPositions: updated.newPositions,
     reviews: updated.reviews,
     explanations: updated.explanations,
+    rushRuns: updated.rushRuns,
   });
 }

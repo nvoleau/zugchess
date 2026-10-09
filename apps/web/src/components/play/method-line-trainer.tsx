@@ -15,13 +15,25 @@ import type { TrainerStats } from "./trainer-types";
  * la ligne ; un coup différent est refusé avec un indice, les coups du camp adverse s'enchaînent
  * automatiquement — chacun commenté dans le fil, comme ceux de l'élève.
  */
-export function MethodLineTrainer({ line, onComplete }: { line: MethodLine; onComplete?: (stats: TrainerStats) => void }) {
+export function MethodLineTrainer({
+  line,
+  onComplete,
+  texts,
+  autoHintOnBlunder,
+}: {
+  line: MethodLine;
+  onComplete?: (stats: TrainerStats) => void;
+  texts?: { title: string; intro: string; goal: string };
+  /** Affiche automatiquement la flèche du coup attendu après une maladresse, sans bouton (onboarding). */
+  autoHintOnBlunder?: boolean;
+}) {
   const t = useTranslations("Play.Method");
   const chessRef = useRef<Chess | null>(null);
   const [stepIndex, setStepIndex] = useState(0);
   const [fen, setFen] = useState(line.fen);
   const [hint, setHint] = useState<string | null>(null);
   const [feed, setFeed] = useState<string[]>([]);
+  const [hintShape, setHintShape] = useState<{ orig: string; dest: string } | null>(null);
   const [, forceSync] = useReducer((n: number) => n + 1, 0);
 
   const blunderRef = useRef(0);
@@ -75,11 +87,16 @@ export function MethodLineTrainer({ line, onComplete }: { line: MethodLine; onCo
     if (!judgement.correct) {
       blunderRef.current++;
       setHint(judgement.hint?.fr ?? null);
+      if (autoHintOnBlunder) {
+        const expected = line.steps[stepIndex]!.move;
+        setHintShape({ orig: expected.from, dest: expected.to });
+      }
       forceSync(); // le coup n'est pas appliqué : on force ZugBoard à revenir à la position réelle.
       return;
     }
 
     setHint(null);
+    setHintShape(null);
     moveDurationsRef.current.push(Date.now() - moveStartRef.current);
     moveStartRef.current = Date.now();
     const expected = line.steps[stepIndex]!.move;
@@ -104,22 +121,31 @@ export function MethodLineTrainer({ line, onComplete }: { line: MethodLine; onCo
           movableColor={complete ? undefined : line.playerSide}
           dests={complete || !chessRef.current ? undefined : legalDests(chessRef.current, playerColor)}
           onMove={handleMove}
+          shapes={hintShape ? [{ orig: hintShape.orig, dest: hintShape.dest, brush: "paleBlue" }] : undefined}
         />
         <TempoBar label={t("tempoLabel", { done: donePlayerSteps, total: playerStepIndices.length })} boxes={boxes} />
-        {complete && <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">{t("complete")}</p>}
-        {hint && !complete && <p className="text-sm text-amber-600 dark:text-amber-400">{hint}</p>}
+        {complete && <p className="text-sm font-medium text-brand-good">{t("complete")}</p>}
+        {hint && !complete && <p className="text-sm text-brand-accent2">{hint}</p>}
       </div>
 
       {/* Panneau latéral — commentaires */}
-      {feed.length > 0 && (
-        <ul className="flex w-full flex-col gap-1.5 text-sm max-h-40 overflow-y-auto md:max-h-[480px] md:w-64">
-          {feed.map((lineText, i) => (
-            <li key={i} className="rounded-md bg-neutral-100 px-3 py-1.5 dark:bg-neutral-800">
-              {lineText}
-            </li>
-          ))}
-        </ul>
-      )}
+      <div className="flex w-full flex-col gap-3 md:w-64">
+        {texts && (
+          <div className="shrink-0 border-b border-white/[0.08] pb-3">
+            <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-brand-muted">{texts.title}</p>
+            <p className="mt-1 text-sm text-brand-cream">{texts.goal}</p>
+          </div>
+        )}
+        {feed.length > 0 && (
+          <ul className="flex flex-col gap-1.5 text-sm max-h-40 overflow-y-auto md:max-h-[480px]">
+            {feed.map((lineText, i) => (
+              <li key={i} className="rounded-md bg-brand-panel px-3 py-1.5 text-brand-cream">
+                {lineText}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }

@@ -45,11 +45,14 @@ export function KpkTrainer({
   userColor,
   onWin,
   texts,
+  autoHintOnBlunder,
 }: {
   initialFen: string;
   userColor: Color;
   onWin?: (stats: TrainerStats) => void;
   texts?: { title: string; intro: string; goal: string };
+  /** Affiche automatiquement la flèche du bon coup après une maladresse, sans bouton (onboarding). */
+  autoHintOnBlunder?: boolean;
 }) {
   const t = useTranslations("Play.Kpk");
   const chessRef = useRef(new Chess(initialFen));
@@ -196,6 +199,9 @@ export function KpkTrainer({
       pushFeed(t(role === "attacker" ? "blunderAttacker" : "blunderDefender", { san: frenchSan(played.san), hints }));
       const pv = kpkPrincipalVariation(fenBefore, 5);
       if (pv.length > 0) pushFeed(t("principalVariation", { line: sanSequence(fenBefore, pv).join(" ") }));
+      if (autoHintOnBlunder && safe[0]) {
+        setHintShape({ orig: safe[0].from, dest: safe[0].to });
+      }
       forceSync(); // le coup n'est pas appliqué : on force ZugBoard à revenir à la position réelle.
       return;
     }
@@ -322,7 +328,7 @@ export function KpkTrainer({
             <button
               type="button"
               onClick={showHint}
-              className="min-h-[44px] rounded-full border border-brand-gold/40 px-4 py-2 font-brandMono text-xs text-brand-gold hover:bg-brand-gold/10"
+              className="min-h-[44px] rounded-full border border-brand-accent/40 px-4 py-2 font-brandMono text-xs text-brand-accent hover:bg-brand-accent/10"
             >
               {t("hintButton")}
             </button>

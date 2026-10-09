@@ -75,6 +75,9 @@ model User {
   /// comptes). Jamais modifiable depuis l'UI admin elle-même — seulement via `ADMIN_EMAILS` + seed,
   /// pour éviter qu'un admin ne puisse s'auto-élever ou élever quelqu'un d'autre par erreur.
   role          Role    @default(player)
+  /// Exclu des classements publics (chantier 4, anti-triche) — ne bloque jamais le jeu lui-même,
+  /// seulement sa visibilité dans les classements, miroir de `publicProfile`.
+  excludedFromLeaderboards Boolean @default(false)
 
   accounts          Account[]
   sessions          Session[]
@@ -87,6 +90,25 @@ model User {
   xpEvents          XpEvent[]
   streak            Streak?
   userAchievements  UserAchievement[]
+
+  // --- Chantier 4 : gamification compétitive ---
+  playerFamilyRatings        PlayerFamilyRating[]
+  ratingEvents                RatingEvent[]
+  antiCheatFlags              AntiCheatFlag[]
+  rushRuns                    RushRun[]
+  dailyChallengeAttempts      DailyChallengeAttempt[]
+  tablebasePrecisionAttempts  TablebasePrecisionAttempt[]
+  leagueProfile                LeagueProfile?
+  leagueMemberships           LeagueMembership[]
+  leaguePointEvents           LeaguePointEvent[]
+  clubMemberships              ClubMembership[]
+  friendInvitesSent            FriendInvite[]
+  friendshipsAsA               Friendship[]        @relation("FriendshipA")
+  friendshipsAsB               Friendship[]        @relation("FriendshipB")
+  // V2 (modèle de données seul, aucune logique ni UI en chantier 4)
+  duelRating                   DuelRating?
+  duelChallengesAsChallenger   DuelChallenge[]      @relation("DuelChallenger")
+  legendaryUnlocks             UserLegendaryUnlock[]
 }
 
 model UserSettings {
@@ -138,6 +160,8 @@ model DailyUsage {
   newPositions Int      @default(0)
   reviews      Int      @default(0)
   explanations Int      @default(0)
+  /// Runs Zug Rush démarrés ce jour (chantier 4, quota "1 Rush/jour" en gratuit).
+  rushRuns     Int      @default(0)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -311,12 +335,15 @@ model ReviewLog {
 
 /// Cote Glicko-2 du joueur (SPEC.md, table `player_ratings`). Mise à jour après chaque révision.
 model PlayerRating {
-  userId     String   @id
-  rating     Float    @default(1500)
-  deviation  Float    @default(350)
-  volatility Float    @default(0.06)
-  games      Int      @default(0)
-  updatedAt  DateTime @default(now())
+  userId       String    @id
+  rating       Float     @default(1500)
+  deviation    Float     @default(350)
+  volatility   Float     @default(0.06)
+  games        Int       @default(0)
+  /// Pic de cote jamais atteint (chantier 4, "meilleur classement atteint").
+  bestRating   Float?
+  bestRatingAt DateTime?
+  updatedAt    DateTime  @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -372,4 +399,378 @@ model UserAchievement {
 
   @@id([userId, code])
   @@index([userId])
+}
+
+// --- Gamification compétitive (chantier 4) ------------------------------------
+
+/// Cote Glicko-2 par famille de finales (`Theme.family`, chaîne libre — volontairement pas un enum
+/// pour ne jamais devoir migrer si une famille est ajoutée via l'admin). Même mécanique que
+/// `PlayerRating`, une ligne par (joueur, famille).
+model PlayerFamilyRating {
+  userId       String
+  family       String
+  rating       Float     @default(1500)
+  deviation    Float     @default(350)
+  volatility   Float     @default(0.06)
+  games        Int       @default(0)
+  bestRating   Float?
+  bestRatingAt DateTime?
+  updatedAt    DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, family])
+  @@index([family, rating])
+}
+
+/// Origine d'une variation de cote. Seule `review` est active en V1 (Rush / défi du jour /
+/// précision gardent leur propre score, ne font pas bouger le Glicko — décision produit actée).
+enum RatingSource {
+  review
+}
+
+/// Historique des variations de cote (globale ou par famille) — source du delta animé "+8/−6
+/// points" après un coup, et de la courbe de progression affichée au joueur.
+model RatingEvent {
+  id             String       @id @default(cuid())
+  userId         String
+  /// null = cote globale (`PlayerRating`), sinon valeur de `Theme.family`.
+  family         String?
+  source         RatingSource
+  ratingBefore   Float
+  ratingAfter    Float
+  delta          Float
+  deviationAfter Float
+  positionId     String?
+  createdAt      DateTime     @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, family, createdAt])
+}
+
+enum AntiCheatKind {
+  abnormal_speed
+  perfect_vs_tablebase
+  statistical_outlier
+}
+
+enum AntiCheatStatus {
+  open
+  cleared
+  confirmed
+}
+
+/// Signalement anti-triche (SPEC.md refonte : temps de réponse anormaux, précision parfaite
+/// répétée face à la tablebase...). Revu par un admin ; `confirmed` exclut des classements publics
+/// via `User.excludedFromLeaderboards`.
+model AntiCheatFlag {
+  id         String          @id @default(cuid())
+  userId     String
+  kind       AntiCheatKind
+  evidence   Json
+  status     AntiCheatStatus @default(open)
+  reviewedBy String?
+  createdAt  DateTime        @default(now())
+  reviewedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+}
+
+enum RushMode {
+  threeMin
+}
+
+enum RushRunStatus {
+  inProgress
+  completed
+  abandoned
+}
+
+/// Une partie de Zug Rush (SPEC.md refonte, chantier 4) : enchaîner un maximum de finales en 3
+/// minutes, élimination après 3 erreurs. `seed` fixe la séquence de difficulté (reproductibilité +
+/// vérification serveur, jamais calculée côté client).
+model RushRun {
+  id             String        @id @default(cuid())
+  userId         String
+  mode           RushMode      @default(threeMin)
+  status         RushRunStatus @default(inProgress)
+  score          Int           @default(0)
+  errors         Int           @default(0)
+  startedAt      DateTime      @default(now())
+  endedAt        DateTime?
+  seed           String
+  suspiciousFlag Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  attempts RushAttempt[]
+
+  @@index([userId, mode, score])
+  @@index([mode, createdAt, score])
+}
+
+/// Un coup/une position résolue pendant un run (séparé de `RushRun` pour agréger les temps de
+/// réponse à travers tous les runs côté anti-triche sans désérialiser du JSON en masse).
+model RushAttempt {
+  id              String   @id @default(cuid())
+  runId           String
+  positionId      String
+  order           Int
+  correct         Boolean
+  durationMs      Int
+  moveDurationsMs Json
+  createdAt       DateTime @default(now())
+
+  run RushRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId, order])
+}
+
+/// La position du défi du jour, identique pour tous les joueurs (SPEC.md refonte).
+model DailyChallenge {
+  id         String   @id @default(cuid())
+  date       DateTime @unique @db.Date
+  positionId String
+  createdAt  DateTime @default(now())
+}
+
+/// Tentative d'un joueur sur le défi du jour — un seul essai par jour (décision produit actée) :
+/// unique par (défi, joueur). `resultsJson` sert à régénérer la grille de partage façon Wordle sans
+/// stocker la position elle-même (pas de spoiler).
+model DailyChallengeAttempt {
+  id               String   @id @default(cuid())
+  dailyChallengeId String
+  userId           String
+  success          Boolean  @default(false)
+  durationMs       Int
+  resultsJson      Json
+  completedAt      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([dailyChallengeId, userId])
+  @@index([dailyChallengeId, success, durationMs])
+}
+
+enum JudgeOutcomeDb {
+  win
+  draw
+  loss
+}
+
+/// Mode « précision contre la tablebase » (SPEC.md refonte) : compare le nombre de coups joués au
+/// DTZ optimal, capturé côté serveur via le juge Syzygy déjà en place (`packages/core/judge/syzygy`).
+model TablebasePrecisionAttempt {
+  id           String         @id @default(cuid())
+  userId       String
+  positionId   String
+  movesPlayed  Int
+  optimalMoves Int
+  precisionPct Float
+  outcome      JudgeOutcomeDb
+  durationMs   Int
+  createdAt    DateTime       @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([positionId, precisionPct])
+}
+
+/// Paliers de ligue hebdomadaire (SPEC.md refonte) : Pion → Cavalier → Fou → Tour → Dame → Roi.
+enum LeagueDivision {
+  pion
+  cavalier
+  fou
+  tour
+  dame
+  roi
+}
+
+/// Division persistante du joueur, point de départ du rollover hebdomadaire (distincte de
+/// `LeagueMembership`, qui est l'état d'UNE semaine donnée et est recréée chaque lundi).
+model LeagueProfile {
+  userId          String         @id
+  currentDivision LeagueDivision @default(pion)
+  bestDivision    LeagueDivision @default(pion)
+  updatedAt       DateTime       @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/// Une semaine de compétition de ligue (lundi → dimanche). `rolledOver` évite un double traitement
+/// du cron de fin de semaine.
+model LeagueSeason {
+  id         String   @id @default(cuid())
+  weekStart  DateTime @unique @db.Date
+  weekEnd    DateTime @db.Date
+  rolledOver Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  groups      LeagueGroup[]
+  memberships LeagueMembership[]
+}
+
+/// Groupe d'environ 30 joueurs de niveau proche, pour une division et une semaine données.
+model LeagueGroup {
+  id       String         @id @default(cuid())
+  seasonId String
+  division LeagueDivision
+  index    Int
+
+  season      LeagueSeason       @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  memberships LeagueMembership[]
+
+  @@unique([seasonId, division, index])
+}
+
+/// Appartenance d'un joueur à un groupe pour une semaine donnée. `points` = XP gagné dans la
+/// semaine (décision produit actée : réutilise le système XP existant, pas de nouvelle formule).
+model LeagueMembership {
+  id        String   @id @default(cuid())
+  seasonId  String
+  groupId   String
+  userId    String
+  points    Int      @default(0)
+  rank      Int?
+  promoted  Boolean?
+  relegated Boolean?
+  joinedAt  DateTime @default(now())
+
+  season LeagueSeason @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  group  LeagueGroup  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user   User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([seasonId, userId])
+  @@index([groupId, points])
+}
+
+/// Source de vérité événementielle des points de ligue, même pattern que `XpEvent`.
+model LeaguePointEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  seasonId  String
+  amount    Int
+  reason    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, seasonId, createdAt])
+}
+
+/// Club (SPEC.md refonte : "premier club, le Cercle d'échecs spicéen"). `name` localisé comme
+/// `Theme.title`.
+model Club {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      Json
+  createdAt DateTime @default(now())
+
+  memberships ClubMembership[]
+}
+
+model ClubMembership {
+  clubId   String
+  userId   String
+  joinedAt DateTime @default(now())
+
+  club Club @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([clubId, userId])
+  @@index([userId])
+}
+
+/// Lien d'invitation ami, réutilisable sans expiration en V1.
+model FriendInvite {
+  id        String    @id @default(cuid())
+  inviterId String
+  token     String    @unique
+  createdAt DateTime  @default(now())
+  expiresAt DateTime?
+
+  inviter User @relation(fields: [inviterId], references: [id], onDelete: Cascade)
+}
+
+/// Relation d'amitié symétrique — `userAId` < `userBId` par convention applicative pour éviter les
+/// doublons de paire.
+model Friendship {
+  id        String   @id @default(cuid())
+  userAId   String
+  userBId   String
+  createdAt DateTime @default(now())
+
+  userA User @relation("FriendshipA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB User @relation("FriendshipB", fields: [userBId], references: [id], onDelete: Cascade)
+
+  @@unique([userAId, userBId])
+}
+
+// --- V2 : modèle de données préparé, aucune logique/route/UI en chantier 4 ----------------------
+
+enum DuelStatus {
+  pending
+  accepted
+  completed
+  expired
+}
+
+model DuelRating {
+  userId     String   @id
+  rating     Float    @default(1500)
+  deviation  Float    @default(350)
+  volatility Float    @default(0.06)
+  games      Int      @default(0)
+  updatedAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model DuelChallenge {
+  id           String     @id @default(cuid())
+  challengerId String
+  opponentId   String?
+  inviteToken  String     @unique
+  /// Série de positions figée à la création, identique pour les deux joueurs.
+  positionIds  Json
+  status       DuelStatus @default(pending)
+  createdAt    DateTime   @default(now())
+  expiresAt    DateTime?
+
+  challenger User @relation("DuelChallenger", fields: [challengerId], references: [id], onDelete: Cascade)
+}
+
+model DuelResult {
+  duelChallengeId String
+  userId          String
+  score           Int
+  accuracyPct     Float
+  totalDurationMs Int
+  completedAt     DateTime @default(now())
+
+  @@id([duelChallengeId, userId])
+}
+
+model LegendaryChallenge {
+  id            String @id @default(cuid())
+  positionId    String
+  requiredLevel Int
+  title         Json
+
+  unlocks UserLegendaryUnlock[]
+}
+
+model UserLegendaryUnlock {
+  userId      String
+  challengeId String
+  unlockedAt  DateTime @default(now())
+
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challenge LegendaryChallenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  @@id([userId, challengeId])
 }

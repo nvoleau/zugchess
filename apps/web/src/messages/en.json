@@ -165,13 +165,17 @@
     }
   },
   "Try": {
-    "title": "Try it without creating an account",
-    "intro": "3 random king + pawn vs king positions. No email, no sign-up — your progress stays on this device.",
+    "title": "5 positions that show you what you've been missing",
+    "intro": "No email, no sign-up — your progress stays on this device."
+  },
+  "Onboarding": {
     "progress": "Position {current} / {total}",
     "nextPosition": "Next position",
     "seeResult": "See results",
-    "done": "All 3 positions solved! Create an account to keep your progress and unlock every endgame.",
-    "signUpCta": "Create a free account"
+    "doneBadge": "Done",
+    "done": "All 5 positions solved!",
+    "doneIntro": "Sign in with Lichess to keep your progress and unlock the other 300 endgames in the program.",
+    "loginCta": "Sign in with Lichess"
   },
   "Login": {
     "title": "Sign in",
@@ -186,6 +190,7 @@
     "Nav": {
       "home": "Home",
       "session": "Session",
+      "rush": "Rush",
       "lessons": "Lessons",
       "ranking": "Leaderboard",
       "planFree": "Free",
@@ -211,6 +216,8 @@
       "signOut": "Sign out",
       "freePlayCta": "Free play",
       "statsElo": "Endgame rating",
+      "statsEloBest": "best {rating}",
+      "statsFamilyLocked": "Unlock per-family ratings — Premium",
       "statsLevel": "Level {level}",
       "statsStreak": "day streak",
       "statsStreakBest": "best",
@@ -225,11 +232,36 @@
       "xpGuideWrongAnnounce": "Wrong announce",
       "xpGuideErrors": "Move error"
     },
+    "Families": {
+      "pions": "Pawns",
+      "tours": "Rooks",
+      "piecesMineures": "Minor pieces",
+      "dame": "Queens",
+      "mats": "Checkmates",
+      "tourVsMineure": "Rook vs minor piece",
+      "etudes": "Studies"
+    },
     "ComingSoon": {
       "lessonsTitle": "Lessons",
       "lessonsBody": "Lessons by theme are coming soon — the content already exists in the database (lot 4), the reading page is still missing.",
       "rankingTitle": "Leaderboard",
       "rankingBody": "Leaderboards arrive with gamification (lot 6): XP, endgame Elo, streaks.",
+      "backToApp": "Back to home"
+    },
+    "Rush": {
+      "kicker": "Zug Rush",
+      "title": "Chain as many endgames as you can",
+      "intro": "3 minutes. Three mistakes and it's over. Every position counts.",
+      "start": "Start a run",
+      "personalRecord": "personal record",
+      "quotaReached": "Today's free run is already played. Come back tomorrow, or go Premium for unlimited Rush.",
+      "held": "Hold: {current} / {total}",
+      "doneBadge": "Done",
+      "finishedTitle": "Run over!",
+      "summaryScore": "positions solved",
+      "newRecord": "New personal record!",
+      "replay": "Replay",
+      "todayLeaderboard": "Today's leaderboard",
       "backToApp": "Back to home"
     },
     "Ranking": {
@@ -276,8 +308,13 @@
       "finishedCta": "Back to home",
       "summaryReviewed": "positions",
       "summaryXp": "XP earned this session",
+      "summaryRating": "ZugElo rating",
       "summaryStreak": "day streak",
       "summaryLevelUp": "Level {level} reached!",
+      "achievementUnlocked": "Trophy unlocked",
+      "achievement_streak_7": "7-day streak",
+      "achievement_streak_30": "30-day streak",
+      "achievement_streak_100": "100-day streak",
       "empty": "All caught up.",
       "emptyBody": "No reviews due right now. Come back tomorrow or explore free play.",
       "emptyCta": "Free play",

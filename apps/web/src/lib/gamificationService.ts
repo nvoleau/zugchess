@@ -1,5 +1,6 @@
 /**
- * GamificationService (SPEC.md, lot 6) : XP, Glicko-2, séries et trophées.
+ * GamificationService (SPEC.md lot 6 ; cote par famille et gel de série premium-gated, chantier 4) :
+ * XP, Glicko-2 (global + par famille), séries et trophées.
  * Appelé dans une transaction après chaque révision réussie.
  */
 import {
@@ -8,8 +9,10 @@ import {
   gradeToScore,
   levelForXp,
   updateGlicko,
+  type GlickoRating,
   type StreakState,
 } from "@zugchess/core";
+import { getEntitlementsForUser } from "./entitlements";
 import { prisma } from "./prisma";
 
 export interface GamificationResult {
@@ -18,6 +21,19 @@ export interface GamificationResult {
   level: number;
   streak: { current: number; best: number; freezes: number };
   newAchievements: string[];
+  /** Variation de la cote globale sur cette révision, 0 si ce n'est pas la première du jour (chantier 4). */
+  ratingDelta: number;
+  /** Famille de la position jouée (`Theme.family`), pour afficher le bon badge de cote. */
+  family: string;
+  /** Variation de la cote de famille sur cette révision, 0 si ce n'est pas la première du jour. */
+  familyRatingDelta: number;
+}
+
+const DEFAULT_GLICKO: GlickoRating = { rating: 1500, deviation: 350, volatility: 0.06 };
+
+/** Nouveau pic de cote, en tenant compte d'un `bestRating` pas encore renseigné (lignes pré-chantier 4). */
+function nextBestRating(previousBest: number | null | undefined, previousRating: number, nextRating: number): number {
+  return Math.max(previousBest ?? previousRating, nextRating);
 }
 
 /** Convertit une date UTC en "YYYY-MM-DD" dans le fuseau du joueur. */
@@ -66,13 +82,20 @@ export async function applyGamification(params: {
 }): Promise<GamificationResult> {
   const { userId, positionId, grade, isNewPosition, announceOk, errors } = params;
 
-  const [user, position, existingRating, existingStreak, currentXp] = await Promise.all([
+  const [user, position, existingRating, existingStreak, currentXp, entitlements] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId }, select: { timezone: true } }),
-    prisma.position.findUnique({ where: { id: positionId }, select: { rating: true, ratingDeviation: true } }),
+    prisma.position.findUnique({
+      where: { id: positionId },
+      select: { rating: true, ratingDeviation: true, theme: { select: { family: true } } },
+    }),
     prisma.playerRating.findUnique({ where: { userId } }),
     prisma.streak.findUnique({ where: { userId } }),
     getTotalXp(userId),
+    getEntitlementsForUser(userId),
   ]);
+
+  const family = position?.theme.family ?? "pions";
+  const existingFamilyRating = await prisma.playerFamilyRating.findUnique({ where: { userId_family: { userId, family } } });
 
   const timezone = user?.timezone ?? "Europe/Paris";
   const today = todayInTz(timezone);
@@ -102,24 +125,77 @@ export async function applyGamification(params: {
     });
   }
 
-  // --- 2. Glicko-2 ---
-  const playerRating = existingRating ?? { rating: 1500, deviation: 350, volatility: 0.06 };
+  // --- 2. Glicko-2 : cote globale + cote par famille (chantier 4) ---
+  const playerRating = existingRating ?? DEFAULT_GLICKO;
+  const familyRating = existingFamilyRating ?? DEFAULT_GLICKO;
   const posRating = { rating: position?.rating ?? 1500, deviation: position?.ratingDeviation ?? 350, volatility: 0.06 };
   const score = gradeToScore(grade);
+  let ratingDelta = 0;
+  let familyRatingDelta = 0;
   if (isFirstToday) {
     const nextPlayer = updateGlicko(playerRating, posRating, score);
+    ratingDelta = nextPlayer.rating - playerRating.rating;
+    const nextBestGlobal = nextBestRating(existingRating?.bestRating, playerRating.rating, nextPlayer.rating);
     await prisma.playerRating.upsert({
       where: { userId },
-      create: { userId, ...nextPlayer, games: 1 },
-      update: { ...nextPlayer, games: { increment: 1 }, updatedAt: new Date() },
+      create: { userId, ...nextPlayer, games: 1, bestRating: nextBestGlobal, bestRatingAt: new Date() },
+      update: {
+        ...nextPlayer,
+        games: { increment: 1 },
+        updatedAt: new Date(),
+        bestRating: nextBestGlobal,
+        ...(nextBestGlobal > (existingRating?.bestRating ?? -Infinity) ? { bestRatingAt: new Date() } : {}),
+      },
+    });
+
+    const nextFamily = updateGlicko(familyRating, posRating, score);
+    familyRatingDelta = nextFamily.rating - familyRating.rating;
+    const nextBestFamily = nextBestRating(existingFamilyRating?.bestRating, familyRating.rating, nextFamily.rating);
+    await prisma.playerFamilyRating.upsert({
+      where: { userId_family: { userId, family } },
+      create: { userId, family, ...nextFamily, games: 1, bestRating: nextBestFamily, bestRatingAt: new Date() },
+      update: {
+        ...nextFamily,
+        games: { increment: 1 },
+        updatedAt: new Date(),
+        bestRating: nextBestFamily,
+        ...(nextBestFamily > (existingFamilyRating?.bestRating ?? -Infinity) ? { bestRatingAt: new Date() } : {}),
+      },
+    });
+
+    await prisma.ratingEvent.createMany({
+      data: [
+        {
+          userId,
+          family: null,
+          source: "review",
+          ratingBefore: playerRating.rating,
+          ratingAfter: nextPlayer.rating,
+          delta: ratingDelta,
+          deviationAfter: nextPlayer.deviation,
+          positionId,
+        },
+        {
+          userId,
+          family,
+          source: "review",
+          ratingBefore: familyRating.rating,
+          ratingAfter: nextFamily.rating,
+          delta: familyRatingDelta,
+          deviationAfter: nextFamily.deviation,
+          positionId,
+        },
+      ],
     });
   }
 
-  // --- 3. Série ---
+  // --- 3. Série (gel premium-gated, chantier 4) ---
   const streakState: StreakState | null = existingStreak
     ? { current: existingStreak.current, best: existingStreak.best, freezes: existingStreak.freezes, lastDay: existingStreak.lastDay }
     : null;
-  const { next: nextStreak, incremented } = advanceStreak(streakState, today);
+  const { next: nextStreak, incremented } = advanceStreak(streakState, today, {
+    enabled: entitlements.features.streakFreezeEnabled,
+  });
 
   if (incremented) {
     await prisma.streak.upsert({
@@ -145,6 +221,9 @@ export async function applyGamification(params: {
     level: levelForXp(totalXp),
     streak: { current: nextStreak.current, best: nextStreak.best, freezes: nextStreak.freezes },
     newAchievements,
+    ratingDelta,
+    family,
+    familyRatingDelta,
   };
 }
 

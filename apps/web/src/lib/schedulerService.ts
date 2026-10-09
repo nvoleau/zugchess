@@ -104,6 +104,10 @@ export interface ReviewResult {
   level: number;
   streak: { current: number; best: number; freezes: number };
   newAchievements: string[];
+  /** Chantier 4 : variation de cote (globale et de famille) à animer côté client. */
+  ratingDelta: number;
+  family: string;
+  familyRatingDelta: number;
 }
 
 /** POST /api/reviews (SPEC.md) : note la révision via `rateReview`, met à jour la carte FSRS du

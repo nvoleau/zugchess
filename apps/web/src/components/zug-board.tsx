@@ -27,11 +27,10 @@ export interface ZugBoardProps {
 // ── helpers ──────────────────────────────────────────────────────────────────
 
 function brushColor(brush?: string): string {
-  if (brush === "green" || brush === "paleGreen") return "rgba(50,200,80,0.85)";
-  if (brush === "red") return "rgba(230,50,50,0.85)";
-  if (brush === "yellow") return "rgba(255,200,0,0.85)";
-  if (brush === "paleBlue") return "rgba(100,170,255,0.85)";
-  return "rgba(100,170,255,0.85)";
+  if (brush === "green" || brush === "paleGreen") return "rgba(79,216,168,0.85)"; // brand-good
+  if (brush === "red") return "rgba(229,88,74,0.85)"; // brand-bad
+  if (brush === "yellow") return "rgba(255,220,0,0.85)";
+  return "rgba(47,217,196,0.85)"; // paleBlue / défaut — brand-accent2, flèche d'indice
 }
 
 function kingSquare(fen: string, color: "white" | "black"): string | null {
@@ -72,7 +71,7 @@ function pieceTypeAt(fen: string, square: string): string | null {
 }
 
 const DOT_STYLE: CSSProperties = {
-  background: "radial-gradient(circle, rgba(226,182,90,0.6) 28%, transparent 68%)",
+  background: "radial-gradient(circle, rgba(255,95,60,0.6) 28%, transparent 68%)",
   borderRadius: "50%",
 };
 
@@ -108,13 +107,15 @@ export function ZugBoard({
   useEffect(() => {
     if (!moveResult || !lastMove) return;
     const color = moveResult === "good"
-      ? "rgba(50,200,80,0.55)"
-      : "rgba(230,50,50,0.55)";
+      ? "rgba(79,216,168,0.55)" // brand-good
+      : "rgba(229,88,74,0.55)"; // brand-bad
     if (flashTimer.current) clearTimeout(flashTimer.current);
     setFlashStyles({ [lastMove[1]]: { backgroundColor: color } });
     flashTimer.current = setTimeout(() => setFlashStyles({}), 650);
     return () => { if (flashTimer.current) clearTimeout(flashTimer.current); };
-  }, [moveResult]); // eslint-disable-line react-hooks/exhaustive-deps
+    // `lastMove` dans les dépendances : deux coups consécutifs au même résultat ("good"/"good")
+    // doivent quand même reflasher, pas seulement le premier changement de valeur.
+  }, [moveResult, lastMove]);
 
   // Reset selection when fen changes (move played or position reset)
   useEffect(() => {
@@ -200,12 +201,12 @@ export function ZugBoard({
   // Check highlight
   if (check && movableColor) {
     const ks = kingSquare(fen, movableColor);
-    if (ks) squareStyles[ks] = { backgroundColor: "rgba(230,50,50,0.45)" };
+    if (ks) squareStyles[ks] = { backgroundColor: "rgba(229,88,74,0.45)" }; // brand-bad
   }
 
   // Selected square
   if (selected) {
-    squareStyles[selected] = { backgroundColor: "rgba(226,182,90,0.35)" };
+    squareStyles[selected] = { backgroundColor: "rgba(255,95,60,0.35)" };
   }
 
   // Option squares (legal move dots)
@@ -248,13 +249,13 @@ export function ZugBoard({
           className="absolute inset-0 z-20 flex items-center justify-center"
           style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
         >
-          <div className="flex gap-2 rounded-xl bg-white p-3 shadow-2xl dark:bg-neutral-800">
+          <div className="flex gap-2 rounded-xl bg-brand-panel p-3 shadow-2xl">
             {PROMOTION_LABELS.map(({ piece, label }) => (
               <button
                 key={piece}
                 type="button"
                 onClick={() => commitPromotion(piece)}
-                className="flex h-12 w-12 items-center justify-center rounded-lg border-2 border-neutral-900 text-xl font-bold hover:bg-brand-gold/10 dark:border-white"
+                className="flex h-12 w-12 items-center justify-center rounded-lg border-2 border-white/30 text-xl font-bold text-brand-cream hover:bg-brand-accent/10 hover:border-brand-accent"
               >
                 {label}
               </button>

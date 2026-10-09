@@ -12,17 +12,38 @@ export interface ThemeMastery {
   familiar: number;     // stabilité > 3
 }
 
+export interface FamilyRating {
+  family: string;
+  rating: number;
+  deviation: number;
+  bestRating: number | null;
+}
+
+export interface RatingHistoryPoint {
+  family: string | null;
+  rating: number;
+  delta: number;
+  createdAt: Date;
+}
+
 export interface PlayerStats {
   rating: number;
   ratingDeviation: number;
+  bestRating: number | null;
   totalXp: number;
   level: number;
   streak: { current: number; best: number; freezes: number };
   themeMastery: ThemeMastery[];
+  /** Chantier 4 : cotes ZugElo par famille (`Theme.family`). */
+  familyRatings: FamilyRating[];
+  /** Chantier 4 : derniers points de la courbe de progression (cote globale), les plus récents en dernier. */
+  ratingHistory: RatingHistoryPoint[];
 }
 
+const RATING_HISTORY_LIMIT = 30;
+
 export async function getPlayerStats(userId: string, locale: "fr" | "en"): Promise<PlayerStats> {
-  const [rating, xpAgg, streak, themes, cards] = await Promise.all([
+  const [rating, xpAgg, streak, themes, cards, familyRatings, ratingHistoryRows] = await Promise.all([
     prisma.playerRating.findUnique({ where: { userId } }),
     prisma.xpEvent.aggregate({ where: { userId }, _sum: { amount: true } }),
     prisma.streak.findUnique({ where: { userId } }),
@@ -34,6 +55,12 @@ export async function getPlayerStats(userId: string, locale: "fr" | "en"): Promi
         fsrsState: true,
         position: { select: { themeId: true } },
       },
+    }),
+    prisma.playerFamilyRating.findMany({ where: { userId }, orderBy: { rating: "desc" } }),
+    prisma.ratingEvent.findMany({
+      where: { userId, family: null },
+      orderBy: { createdAt: "desc" },
+      take: RATING_HISTORY_LIMIT,
     }),
   ]);
 
@@ -77,6 +104,7 @@ export async function getPlayerStats(userId: string, locale: "fr" | "en"): Promi
   return {
     rating: rating?.rating ?? 1500,
     ratingDeviation: rating?.deviation ?? 350,
+    bestRating: rating?.bestRating ?? null,
     totalXp,
     level,
     streak: {
@@ -85,5 +113,18 @@ export async function getPlayerStats(userId: string, locale: "fr" | "en"): Promi
       freezes: streak?.freezes ?? 0,
     },
     themeMastery,
+    familyRatings: familyRatings.map((r) => ({
+      family: r.family,
+      rating: r.rating,
+      deviation: r.deviation,
+      bestRating: r.bestRating,
+    })),
+    // Renvoyé du plus ancien au plus récent, pour tracer la courbe dans l'ordre chronologique.
+    ratingHistory: ratingHistoryRows.reverse().map((r) => ({
+      family: r.family,
+      rating: r.ratingAfter,
+      delta: r.delta,
+      createdAt: r.createdAt,
+    })),
   };
 }

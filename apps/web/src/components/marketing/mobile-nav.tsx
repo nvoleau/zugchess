@@ -86,7 +86,7 @@ export function MobileNav({ isAuthenticated, labels }: MobileNavProps) {
             <Link
               href={isAuthenticated ? "/app" : "/try"}
               onClick={() => setOpen(false)}
-              className="rounded-full bg-brand-gold px-5 py-3.5 text-center text-sm font-semibold text-brand-ink"
+              className="rounded-full bg-brand-accent px-5 py-3.5 text-center text-sm font-semibold text-brand-ink"
             >
               {isAuthenticated ? labels.goToApp : labels.signup}
             </Link>

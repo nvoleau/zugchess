@@ -7,7 +7,7 @@ import {
 } from "../src/entitlement/entitlementService.js";
 
 function usage(overrides: Partial<DailyUsage> = {}): DailyUsage {
-  return { newPositions: 0, reviews: 0, explanations: 0, ...overrides };
+  return { newPositions: 0, reviews: 0, explanations: 0, rushRuns: 0, ...overrides };
 }
 
 describe("getEntitlements — plan gratuit", () => {
@@ -28,7 +28,17 @@ describe("getEntitlements — plan gratuit", () => {
 
   it("calcule le quota restant", () => {
     const entitlements = getEntitlements("free", usage({ newPositions: 1, reviews: 5, explanations: 0 }));
-    expect(entitlements.remaining).toEqual({ newPositions: 2, reviews: 15, explanations: 3 });
+    expect(entitlements.remaining).toEqual({ newPositions: 2, reviews: 15, explanations: 3, rushRuns: 1 });
+  });
+
+  it("autorise 1 partie Zug Rush par jour", () => {
+    expect(getEntitlements("free", usage({ rushRuns: 0 })).canStartRush).toBe(true);
+    expect(getEntitlements("free", usage({ rushRuns: 1 })).canStartRush).toBe(false);
+  });
+
+  it("n'expose aucune fonctionnalité premium", () => {
+    const { features } = getEntitlements("free", usage());
+    expect(features).toEqual({ familyRatingsVisible: false, streakFreezeEnabled: false });
   });
 });
 
@@ -36,16 +46,23 @@ describe("getEntitlements — plan premium", () => {
   it("n'a aucune limite", () => {
     const entitlements = getEntitlements(
       "premium",
-      usage({ newPositions: 1000, reviews: 1000, explanations: 1000 }),
+      usage({ newPositions: 1000, reviews: 1000, explanations: 1000, rushRuns: 1000 }),
     );
     expect(entitlements.canStartNewPosition).toBe(true);
     expect(entitlements.canReview).toBe(true);
     expect(entitlements.canSeeExplanation).toBe(true);
+    expect(entitlements.canStartRush).toBe(true);
     expect(entitlements.remaining).toEqual({
       newPositions: Infinity,
       reviews: Infinity,
       explanations: Infinity,
+      rushRuns: Infinity,
     });
+  });
+
+  it("expose toutes les fonctionnalités premium", () => {
+    const { features } = getEntitlements("premium", usage());
+    expect(features).toEqual({ familyRatingsVisible: true, streakFreezeEnabled: true });
   });
 });
 

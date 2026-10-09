@@ -34,13 +34,13 @@ export default async function PlayPage({ params }: { params: Promise<{ locale: s
         <Link href="/app" className={btnClass("ghost", "sm", "pl-0 text-brand-muted")}>
           ← {t("backToApp")}
         </Link>
-        <h1 className="mt-3 font-brandSerif text-3xl tracking-tight">{t("title")}</h1>
+        <h1 className="mt-3 font-brandDisplay text-3xl tracking-tight">{t("title")}</h1>
         <p className="mt-1.5 text-sm text-brand-muted">{t("intro")}</p>
       </div>
 
       {todaySession.items.length === 0 ? (
         <Card className="max-w-md">
-          <p className="font-brandSerif text-xl">{tSession("empty")}</p>
+          <p className="font-brandDisplay text-xl">{tSession("empty")}</p>
           <p className="mt-2 text-sm text-brand-muted">{tSession("emptyBody")}</p>
           <Link
             href="/app/free-play"

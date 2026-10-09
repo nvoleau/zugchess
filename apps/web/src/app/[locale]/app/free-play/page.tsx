@@ -19,15 +19,11 @@ export default async function FreePlayPage({ params }: { params: Promise<{ local
         <Link href="/app" className={btnClass("ghost", "sm", "pl-0 text-brand-muted")}>
           ← {t("backToApp")}
         </Link>
-        <h1 className="mt-3 font-brandSerif text-3xl tracking-tight">{t("title")}</h1>
+        <h1 className="mt-3 font-brandDisplay text-3xl tracking-tight">{t("title")}</h1>
         <p className="mt-1.5 text-sm text-brand-muted">{t("intro")}</p>
       </div>
 
-      {/* `dark` forcé : FreePlay utilise des classes neutral dark: — le layout sombre ne pose pas
-          la classe `dark` globalement (stratégie "class" de Tailwind), ce wrapper la rétablit. */}
-      <div className="dark">
-        <FreePlay />
-      </div>
+      <FreePlay />
     </div>
   );
 }

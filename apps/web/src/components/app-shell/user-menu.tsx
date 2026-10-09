@@ -29,7 +29,7 @@ export function UserMenu({ initials, name, plan, isAdmin, labels }: Props) {
       <button
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="flex h-9 w-9 items-center justify-center rounded-full border border-brand-gold/50 bg-[#2A251B] text-xs font-semibold transition-colors hover:border-brand-gold"
+        className="flex h-9 w-9 items-center justify-center rounded-full border border-brand-accent/50 bg-[#2A251B] text-xs font-semibold transition-colors hover:border-brand-accent"
       >
         {initials}
       </button>
@@ -38,7 +38,7 @@ export function UserMenu({ initials, name, plan, isAdmin, labels }: Props) {
         <div className="absolute right-0 top-11 z-30 w-52 overflow-hidden rounded-xl border border-white/10 bg-[#1A160F] shadow-2xl">
           <div className="border-b border-white/10 px-4 py-3">
             <p className="truncate text-sm font-medium text-brand-cream">{name ?? labels.myAccount}</p>
-            <p className="font-brandMono text-xs text-brand-gold">{plan}</p>
+            <p className="font-brandMono text-xs text-brand-accent">{plan}</p>
           </div>
           <div className="p-1">
             {isAdmin && (
