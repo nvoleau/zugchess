@@ -24,6 +24,15 @@ const TABS = [
     ),
   },
   {
+    href: "/app/rush",
+    key: "rush",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5">
+        <path d="M13 2L3 14h7l-1 8 11-14h-7l1-6z" strokeLinejoin="round" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
     href: "/app/lessons",
     key: "lessons",
     icon: (

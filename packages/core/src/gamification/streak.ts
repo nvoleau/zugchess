@@ -20,6 +20,13 @@ export interface StreakUpdate {
   frozeUsed: boolean;
 }
 
+/** Gating Premium du gel de série (chantier 4) : désactivé, le gel ne se gagne ni ne se consomme. */
+export interface FreezeConfig {
+  enabled: boolean;
+}
+
+const DEFAULT_FREEZE_CONFIG: FreezeConfig = { enabled: true };
+
 /** Nombre de jours entre deux dates "YYYY-MM-DD". */
 function dayDiff(a: string, b: string): number {
   return Math.round((Date.parse(b) - Date.parse(a)) / 86_400_000);
@@ -30,7 +37,11 @@ function dayDiff(a: string, b: string): number {
  * @param state   état actuel (null si première séance)
  * @param today   date locale du joueur ("YYYY-MM-DD")
  */
-export function advanceStreak(state: StreakState | null, today: string): StreakUpdate {
+export function advanceStreak(
+  state: StreakState | null,
+  today: string,
+  freezeConfig: FreezeConfig = DEFAULT_FREEZE_CONFIG,
+): StreakUpdate {
   const s: StreakState = state ?? { current: 0, best: 0, freezes: 0, lastDay: null };
 
   if (s.lastDay === today) {
@@ -49,8 +60,8 @@ export function advanceStreak(state: StreakState | null, today: string): StreakU
   if (diff === 1) {
     // Jour consécutif.
     const current = s.current + 1;
-    // Gel gagné tous les 7 jours (max 2).
-    const freezeGained = current % 7 === 0 ? 1 : 0;
+    // Gel gagné tous les 7 jours (max 2), seulement si la fonctionnalité est activée (Premium).
+    const freezeGained = freezeConfig.enabled && current % 7 === 0 ? 1 : 0;
     const next: StreakState = {
       current,
       best: Math.max(current, s.best),
@@ -60,7 +71,7 @@ export function advanceStreak(state: StreakState | null, today: string): StreakU
     return { next, incremented: true, frozeUsed: false };
   }
 
-  if (diff === 2 && s.freezes > 0) {
+  if (freezeConfig.enabled && diff === 2 && s.freezes > 0) {
     // Un jour manqué protégé par un gel.
     const current = s.current + 1;
     const freezeGained = current % 7 === 0 ? 1 : 0;

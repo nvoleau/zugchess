@@ -20,6 +20,8 @@ interface SessionSummary {
   xpGained: number;
   streak: number;
   levelReached: number | null;
+  /** Chantier 4 : somme des variations de cote globale accumulées pendant la séance. */
+  ratingDelta: number;
 }
 
 /**
@@ -35,9 +37,12 @@ export function SessionPlayer({ items, locale, initialTotalXp = 0 }: Props) {
   const [quotaReached, setQuotaReached] = useState(false);
   const [liveXp, setLiveXp] = useState(0);
   const [xpFlash, setXpFlash] = useState<number | null>(null);
+  const [ratingFlash, setRatingFlash] = useState<number | null>(null);
   const accXpRef = useRef(0);
+  const accRatingRef = useRef(0);
   const lastStreakRef = useRef(0);
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const ratingFlashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchPosition = useCallback(
     async (positionId: string) => {
@@ -90,17 +95,21 @@ export function SessionPlayer({ items, locale, initialTotalXp = 0 }: Props) {
         xpGained: accXpRef.current,
         streak: lastStreakRef.current,
         levelReached: null,
+        ratingDelta: accRatingRef.current,
       });
       return;
     }
 
     let gained = 0;
+    let ratingGained = 0;
     let newLevel: number | null = null;
 
     if (res.ok) {
       const data = await res.json();
       gained = data.xpGained ?? 0;
+      ratingGained = data.ratingDelta ?? 0;
       accXpRef.current += gained;
+      accRatingRef.current += ratingGained;
       setLiveXp(accXpRef.current);
       lastStreakRef.current = data.streak?.current ?? lastStreakRef.current;
 
@@ -120,6 +129,13 @@ export function SessionPlayer({ items, locale, initialTotalXp = 0 }: Props) {
       flashTimerRef.current = setTimeout(() => setXpFlash(null), 1400);
     }
 
+    // Flash cote ZugElo — "+8" vert ou "−6" (chantier 4), seulement si la cote a bougé (1ère révision du jour).
+    if (ratingGained !== 0) {
+      if (ratingFlashTimerRef.current) clearTimeout(ratingFlashTimerRef.current);
+      setRatingFlash(ratingGained);
+      ratingFlashTimerRef.current = setTimeout(() => setRatingFlash(null), 1400);
+    }
+
     const nextIndex = index + 1;
     if (nextIndex >= items.length) {
       setSummary({
@@ -127,6 +143,7 @@ export function SessionPlayer({ items, locale, initialTotalXp = 0 }: Props) {
         xpGained: accXpRef.current,
         streak: lastStreakRef.current,
         levelReached: newLevel,
+        ratingDelta: accRatingRef.current,
       });
     } else {
       setIndex(nextIndex);
@@ -159,6 +176,23 @@ export function SessionPlayer({ items, locale, initialTotalXp = 0 }: Props) {
             </span>
             <span className="font-brandMono text-xs uppercase tracking-[0.14em] text-brand-muted">
               {t("summaryXp")}
+            </span>
+          </div>
+        )}
+
+        {/* Cote ZugElo — chantier 4 */}
+        {summary.ratingDelta !== 0 && (
+          <div className="flex flex-col items-center gap-1">
+            <span
+              className={`font-brandMono text-2xl font-medium leading-none ${
+                summary.ratingDelta > 0 ? "text-brand-good" : "text-brand-bad"
+              }`}
+            >
+              {summary.ratingDelta > 0 ? "+" : ""}
+              {summary.ratingDelta}
+            </span>
+            <span className="font-brandMono text-xs uppercase tracking-[0.14em] text-brand-muted">
+              {t("summaryRating")}
             </span>
           </div>
         )}
@@ -207,16 +241,28 @@ export function SessionPlayer({ items, locale, initialTotalXp = 0 }: Props) {
             style={{ width: `${(index / items.length) * 100}%` }}
           />
         </div>
-        <div className="shrink-0 w-16 text-right">
-          {xpFlash !== null ? (
-            <span className="animate-pop-in font-brandMono text-xs font-medium text-brand-gold">
-              +{xpFlash} XP
+        <div className="flex shrink-0 items-center gap-2">
+          {ratingFlash !== null && (
+            <span
+              className={`animate-pop-in font-brandMono text-xs font-medium ${
+                ratingFlash > 0 ? "text-brand-good" : "text-brand-bad"
+              }`}
+            >
+              {ratingFlash > 0 ? "+" : ""}
+              {ratingFlash}
             </span>
-          ) : liveXp > 0 ? (
-            <span className="font-brandMono text-xs text-brand-muted">
-              +{liveXp} XP
-            </span>
-          ) : null}
+          )}
+          <div className="w-16 text-right">
+            {xpFlash !== null ? (
+              <span className="animate-pop-in font-brandMono text-xs font-medium text-brand-gold">
+                +{xpFlash} XP
+              </span>
+            ) : liveXp > 0 ? (
+              <span className="font-brandMono text-xs text-brand-muted">
+                +{liveXp} XP
+              </span>
+            ) : null}
+          </div>
         </div>
       </div>
 

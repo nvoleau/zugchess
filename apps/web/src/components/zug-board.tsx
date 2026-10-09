@@ -113,7 +113,9 @@ export function ZugBoard({
     setFlashStyles({ [lastMove[1]]: { backgroundColor: color } });
     flashTimer.current = setTimeout(() => setFlashStyles({}), 650);
     return () => { if (flashTimer.current) clearTimeout(flashTimer.current); };
-  }, [moveResult]); // eslint-disable-line react-hooks/exhaustive-deps
+    // `lastMove` dans les dépendances : deux coups consécutifs au même résultat ("good"/"good")
+    // doivent quand même reflasher, pas seulement le premier changement de valeur.
+  }, [moveResult, lastMove]);
 
   // Reset selection when fen changes (move played or position reset)
   useEffect(() => {

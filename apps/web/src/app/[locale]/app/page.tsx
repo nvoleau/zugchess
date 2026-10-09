@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { StatItem } from "@/components/ui/stat-item";
 import { btnClass } from "@/components/ui/button";
+import { RatingCurve } from "@/components/rating/rating-curve";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +25,7 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
   const user = session!.user;
 
   const t = await getTranslations("App.Home");
+  const tFamily = await getTranslations("App.Families");
   const localeTyped = (locale === "en" ? "en" : "fr") as "fr" | "en";
 
   const [entitlements, todaySession, stats] = await Promise.all([
@@ -162,10 +164,40 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
           </div>
         </div>
 
-        {/* Elo */}
-        <Card className="flex flex-col gap-0.5">
-          <span className="font-brandMono text-xl text-brand-cream">{stats.rating}</span>
-          <span className="text-xs text-brand-muted">{t("statsElo")}</span>
+        {/* ZugElo — cote globale, courbe de progression, cotes par famille (chantier 4) */}
+        <Card className="flex flex-col gap-3">
+          <div className="flex items-end justify-between">
+            <div className="flex flex-col gap-0.5">
+              <span className="font-brandMono text-xl text-brand-cream">{Math.round(stats.rating)}</span>
+              <span className="text-xs text-brand-muted">{t("statsElo")}</span>
+            </div>
+            {stats.bestRating != null && Math.round(stats.bestRating) > Math.round(stats.rating) && (
+              <span className="font-brandMono text-[10px] text-brand-muted">
+                {t("statsEloBest", { rating: Math.round(stats.bestRating) })}
+              </span>
+            )}
+          </div>
+
+          <RatingCurve points={stats.ratingHistory} />
+
+          {entitlements.features.familyRatingsVisible ? (
+            stats.familyRatings.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 border-t border-white/[0.06] pt-3">
+                {stats.familyRatings.map((fr) => (
+                  <span
+                    key={fr.family}
+                    className="rounded-full bg-white/[0.06] px-3 py-1 font-brandMono text-xs text-brand-mutedLight"
+                  >
+                    {tFamily(fr.family)} · {Math.round(fr.rating)}
+                  </span>
+                ))}
+              </div>
+            )
+          ) : (
+            <p className="border-t border-white/[0.06] pt-3 font-brandMono text-[11px] text-brand-muted">
+              {t("statsFamilyLocked")}
+            </p>
+          )}
         </Card>
       </div>
 

@@ -190,6 +190,7 @@
     "Nav": {
       "home": "Accueil",
       "session": "Séance",
+      "rush": "Rush",
       "lessons": "Leçons",
       "ranking": "Classement",
       "planFree": "Gratuit",
@@ -215,6 +216,8 @@
       "signOut": "Se déconnecter",
       "freePlayCta": "Jeu libre",
       "statsElo": "Elo de finales",
+      "statsEloBest": "record {rating}",
+      "statsFamilyLocked": "Débloquer les cotes par famille — Premium",
       "statsLevel": "Niveau {level}",
       "statsStreak": "jours de suite",
       "statsStreakBest": "record",
@@ -229,11 +232,36 @@
       "xpGuideWrongAnnounce": "Annonce incorrecte",
       "xpGuideErrors": "Erreur de jeu"
     },
+    "Families": {
+      "pions": "Pions",
+      "tours": "Tours",
+      "piecesMineures": "Pièces mineures",
+      "dame": "Dames",
+      "mats": "Mats",
+      "tourVsMineure": "Tour contre pièce mineure",
+      "etudes": "Études"
+    },
     "ComingSoon": {
       "lessonsTitle": "Leçons",
       "lessonsBody": "Les leçons par thème arrivent bientôt — elles existent déjà en base (lot 4), il manque la page qui les affiche.",
       "rankingTitle": "Classement",
       "rankingBody": "Les classements arrivent avec la gamification (lot 6) : XP, Elo de finales, séries.",
+      "backToApp": "Retour à l'accueil"
+    },
+    "Rush": {
+      "kicker": "Zug Rush",
+      "title": "Enchaîne un maximum de finales",
+      "intro": "3 minutes. Trois erreurs et c'est fini. Chaque position compte.",
+      "start": "Lancer une partie",
+      "personalRecord": "record personnel",
+      "quotaReached": "Partie gratuite du jour déjà jouée. Reviens demain, ou passe Premium pour un Rush illimité.",
+      "held": "Tenir : {current} / {total}",
+      "doneBadge": "Terminé",
+      "finishedTitle": "Partie terminée !",
+      "summaryScore": "positions résolues",
+      "newRecord": "Nouveau record personnel !",
+      "replay": "Rejouer",
+      "todayLeaderboard": "Classement du jour",
       "backToApp": "Retour à l'accueil"
     },
     "Ranking": {
@@ -280,6 +308,7 @@
       "finishedCta": "Retour à l'accueil",
       "summaryReviewed": "positions",
       "summaryXp": "XP gagnés cette séance",
+      "summaryRating": "cote ZugElo",
       "summaryStreak": "jours de suite",
       "summaryLevelUp": "Niveau {level} atteint !",
       "empty": "Tout est à jour.",

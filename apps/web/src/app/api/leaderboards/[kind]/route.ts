@@ -5,7 +5,7 @@ import { getLeaderboard, type LeaderboardKind } from "@/lib/leaderboardService";
 const VALID_KINDS: LeaderboardKind[] = ["rating", "xp", "streak"];
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ kind: string }> },
 ) {
   const session = await auth();
@@ -18,6 +18,8 @@ export async function GET(
     return NextResponse.json({ error: "invalid kind" }, { status: 400 });
   }
 
-  const entries = await getLeaderboard(kind as LeaderboardKind);
-  return NextResponse.json({ kind, entries });
+  // Chantier 4 : classement par famille (`Theme.family`) quand `kind=rating`.
+  const family = new URL(request.url).searchParams.get("family") ?? undefined;
+  const entries = await getLeaderboard(kind as LeaderboardKind, 20, { family });
+  return NextResponse.json({ kind, family: family ?? null, entries });
 }

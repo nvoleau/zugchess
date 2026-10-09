@@ -11,3 +11,4 @@ export * from "./scheduler/sessionQueue.js";
 export * from "./gamification/xp.js";
 export * from "./gamification/streak.js";
 export * from "./gamification/glicko.js";
+export * from "./gamification/rush.js";

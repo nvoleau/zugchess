@@ -14,13 +14,33 @@ export interface LeaderboardEntry {
   value: number;
 }
 
+/** Filtre commun à tous les classements publics : profil public, non exclu pour anti-triche (chantier 4). */
+const VISIBLE_USER = { publicProfile: true, excludedFromLeaderboards: false } as const;
+
 export async function getLeaderboard(
   kind: LeaderboardKind,
   limit = 20,
+  options?: { family?: string },
 ): Promise<LeaderboardEntry[]> {
   if (kind === "rating") {
+    if (options?.family) {
+      const rows = await prisma.playerFamilyRating.findMany({
+        where: { family: options.family, user: VISIBLE_USER },
+        orderBy: { rating: "desc" },
+        take: limit,
+        include: { user: { select: { name: true, image: true } } },
+      });
+      return rows.map((r, i) => ({
+        rank: i + 1,
+        userId: r.userId,
+        name: r.user.name ?? "—",
+        avatar: r.user.image,
+        value: Math.round(r.rating),
+      }));
+    }
+
     const rows = await prisma.playerRating.findMany({
-      where: { user: { publicProfile: true } },
+      where: { user: VISIBLE_USER },
       orderBy: { rating: "desc" },
       take: limit,
       include: { user: { select: { name: true, image: true } } },
@@ -43,7 +63,7 @@ export async function getLeaderboard(
     });
     const userIds = rows.map((r) => r.userId);
     const users = await prisma.user.findMany({
-      where: { id: { in: userIds }, publicProfile: true },
+      where: { id: { in: userIds }, ...VISIBLE_USER },
       select: { id: true, name: true, image: true },
     });
     const userMap = new Map(users.map((u) => [u.id, u]));
@@ -60,7 +80,7 @@ export async function getLeaderboard(
 
   // streak
   const rows = await prisma.streak.findMany({
-    where: { user: { publicProfile: true }, current: { gt: 0 } },
+    where: { user: VISIBLE_USER, current: { gt: 0 } },
     orderBy: { current: "desc" },
     take: limit,
     include: { user: { select: { name: true, image: true } } },
