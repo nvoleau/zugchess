@@ -7,8 +7,8 @@ type Size = "sm" | "md" | "lg";
 const BASE = "inline-flex items-center justify-center gap-2 rounded-full font-medium transition-colors";
 
 const VARIANTS: Record<Variant, string> = {
-  primary: "bg-brand-gold text-brand-ink hover:bg-brand-goldHover",
-  secondary: "border border-white/[0.22] text-brand-cream hover:border-brand-gold",
+  primary: "bg-brand-accent text-brand-ink hover:bg-brand-accentHover",
+  secondary: "border border-white/[0.22] text-brand-cream hover:border-brand-accent",
   ghost: "text-brand-muted hover:text-brand-cream",
 };
 

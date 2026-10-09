@@ -23,7 +23,7 @@ function ProgressDots({ current, total }: { current: number; total: number }) {
         <span
           key={i}
           className={`h-2 w-2 rounded-full transition-colors ${
-            i < current ? "bg-brand-gold" : i === current ? "bg-brand-gold/40 ring-2 ring-brand-gold/30" : "bg-white/15"
+            i < current ? "bg-brand-accent" : i === current ? "bg-brand-accent/40 ring-2 ring-brand-accent/30" : "bg-white/15"
           }`}
         />
       ))}
@@ -67,7 +67,7 @@ export function OnboardingTrial() {
   const finished = index >= TOTAL;
 
   return (
-    <div className="dark flex w-full flex-col gap-5 rounded-[22px] border border-brand-gold/20 bg-gradient-to-b from-[#1A1813] to-[#13110D] p-5 text-brand-cream shadow-[0_40px_80px_-30px_rgba(0,0,0,0.8)] sm:p-6">
+    <div className="dark flex w-full flex-col gap-5 rounded-[22px] border border-brand-accent/20 bg-gradient-to-b from-[#1A1813] to-[#13110D] p-5 text-brand-cream shadow-[0_40px_80px_-30px_rgba(0,0,0,0.8)] sm:p-6">
       <div className="flex items-center justify-between gap-3">
         <ProgressDots current={Math.min(index, TOTAL)} total={TOTAL} />
         <span className="font-brandMono text-[11px] uppercase tracking-[0.12em] text-brand-muted">
@@ -81,7 +81,7 @@ export function OnboardingTrial() {
           <p className="text-sm text-brand-muted">{t("doneIntro")}</p>
           <Link
             href="/login"
-            className="rounded-full bg-brand-gold px-6 py-3 font-semibold text-brand-ink transition-colors hover:bg-brand-goldHover"
+            className="rounded-full bg-brand-accent px-6 py-3 font-semibold text-brand-ink transition-colors hover:bg-brand-accentHover"
           >
             {t("loginCta")}
           </Link>
@@ -106,12 +106,12 @@ export function OnboardingTrial() {
           })()}
 
           {won && (
-            <div className="animate-pop-in flex flex-col items-center gap-3 rounded-2xl border border-brand-gold/20 bg-brand-gold/[0.06] p-4 text-center">
+            <div className="animate-pop-in flex flex-col items-center gap-3 rounded-2xl border border-brand-accent/20 bg-brand-accent/[0.06] p-4 text-center">
               <p className="text-sm font-medium text-brand-cream">{ONBOARDING_POSITIONS[index]!.celebration[locale]}</p>
               <button
                 type="button"
                 onClick={goToNext}
-                className="rounded-full bg-brand-gold px-6 py-2.5 font-semibold text-brand-ink transition-colors hover:bg-brand-goldHover"
+                className="rounded-full bg-brand-accent px-6 py-2.5 font-semibold text-brand-ink transition-colors hover:bg-brand-accentHover"
               >
                 {index + 1 >= TOTAL ? t("seeResult") : t("nextPosition")}
               </button>
@@ -127,7 +127,7 @@ function OnboardingChallenge({ locale, index }: { locale: "fr" | "en"; index: nu
   const position = ONBOARDING_POSITIONS[index]!;
   return (
     <div className="flex flex-col gap-1.5 border-b border-white/[0.08] pb-4">
-      <span className="font-brandMono text-[11px] uppercase tracking-[0.14em] text-brand-gold">{position.theme[locale]}</span>
+      <span className="font-brandMono text-[11px] uppercase tracking-[0.14em] text-brand-accent">{position.theme[locale]}</span>
       <p className="text-[15px] leading-snug text-brand-cream">{position.challenge[locale]}</p>
     </div>
   );

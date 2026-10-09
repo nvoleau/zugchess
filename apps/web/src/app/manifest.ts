@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Apprends, comprends et joue toutes les finales d'échecs.",
     start_url: "/",
     display: "standalone",
-    background_color: "#0d0d0d",
-    theme_color: "#0d0d0d",
+    background_color: "#0A0E12",
+    theme_color: "#0A0E12",
     orientation: "portrait",
     icons: [
       { src: "/icon-192.png", sizes: "192x192", type: "image/png" },

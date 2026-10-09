@@ -8,8 +8,8 @@ import type { PositionDetail, PositionMasteryItem } from "@/lib/positionService"
 
 const MASTERY_DOT: Record<string, string> = {
   new: "bg-white/20",
-  learning: "bg-amber-500",
-  familiar: "bg-brand-gold",
+  learning: "bg-brand-accent/35",
+  familiar: "bg-brand-accent",
   mastered: "bg-brand-good",
 };
 
@@ -71,7 +71,7 @@ export function ThemeStudyClient({
               onClick={() => setSelectedId(pos.id)}
               className={`flex items-center gap-2 rounded-lg px-3 py-2 text-left transition-colors md:rounded-none md:px-4 md:py-2.5 ${
                 pos.id === selectedId
-                  ? "bg-brand-gold/10 text-brand-cream"
+                  ? "bg-brand-accent/10 text-brand-cream"
                   : "text-brand-muted hover:bg-white/[0.04] hover:text-brand-cream"
               }`}
             >
@@ -92,7 +92,7 @@ export function ThemeStudyClient({
               </p>
               <Link
                 href="/app/upgrade"
-                className="mt-2 block rounded-lg border border-brand-gold/30 bg-brand-gold/[0.06] px-3 py-2 text-center font-brandMono text-xs text-brand-gold transition-colors hover:bg-brand-gold/10"
+                className="mt-2 block rounded-lg border border-brand-accent/30 bg-brand-accent/[0.06] px-3 py-2 text-center font-brandMono text-xs text-brand-accent transition-colors hover:bg-brand-accent/10"
               >
                 Passer Premium →
               </Link>

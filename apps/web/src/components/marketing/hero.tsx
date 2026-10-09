@@ -116,7 +116,7 @@ export async function Hero({ isAuthenticated }: { isAuthenticated: boolean }) {
         {/* Bottom fade */}
         <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-brand-ink to-transparent" />
         {/* Top-right gold glow */}
-        <div className="absolute -right-[10%] -top-[20%] h-[780px] w-[780px] rounded-full bg-[radial-gradient(closest-side,rgba(226,182,90,0.18),rgba(226,182,90,0))]" />
+        <div className="absolute -right-[10%] -top-[20%] h-[780px] w-[780px] rounded-full bg-[radial-gradient(closest-side,rgba(255,95,60,0.18),rgba(255,95,60,0))]" />
       </div>
 
       {/* ── Content ── */}
@@ -124,15 +124,15 @@ export async function Hero({ isAuthenticated }: { isAuthenticated: boolean }) {
 
         <div className="flex flex-col gap-7">
           <Reveal delay={0}>
-            <div className="flex items-center gap-2.5 font-brandMono text-xs uppercase tracking-[0.14em] text-brand-gold">
-              <span className="h-px w-6 bg-brand-gold" />
+            <div className="flex items-center gap-2.5 font-brandMono text-xs uppercase tracking-[0.14em] text-brand-accent">
+              <span className="h-px w-6 bg-brand-accent" />
               {t("kicker")}
             </div>
           </Reveal>
 
           <Reveal delay={100}>
-            <h1 className="text-balance font-brandSerif text-[clamp(48px,7vw,92px)] font-normal leading-[0.98] tracking-tight">
-              {t("titleLine1")} <em className="text-brand-gold">{t("titleEm")}</em>
+            <h1 className="text-balance font-brandDisplay text-[clamp(48px,7vw,92px)] font-normal leading-[0.98] tracking-tight">
+              {t("titleLine1")} <em className="text-brand-accent">{t("titleEm")}</em>
             </h1>
           </Reveal>
 
@@ -144,13 +144,13 @@ export async function Hero({ isAuthenticated }: { isAuthenticated: boolean }) {
             <div className="flex flex-wrap gap-3">
               <Link
                 href={isAuthenticated ? "/app" : "/login"}
-                className="flex items-center gap-3 rounded-full bg-brand-gold px-7 py-4 text-base font-semibold text-brand-ink transition-all hover:bg-brand-goldHover hover:scale-[1.02] active:scale-[0.97]"
+                className="flex items-center gap-3 rounded-full bg-brand-accent px-7 py-4 text-base font-semibold text-brand-ink transition-all hover:bg-brand-accentHover hover:scale-[1.02] active:scale-[0.97]"
               >
                 {t("ctaPrimary")} <span>→</span>
               </Link>
               <Link
                 href="/try"
-                className="flex items-center rounded-full border border-white/[0.22] px-[26px] py-4 text-base text-brand-cream transition-all hover:border-brand-gold hover:text-brand-gold hover:scale-[1.02] active:scale-[0.97]"
+                className="flex items-center rounded-full border border-white/[0.22] px-[26px] py-4 text-base text-brand-cream transition-all hover:border-brand-accent hover:text-brand-accent hover:scale-[1.02] active:scale-[0.97]"
               >
                 {t("ctaSecondary")}
               </Link>
@@ -160,15 +160,15 @@ export async function Hero({ isAuthenticated }: { isAuthenticated: boolean }) {
           <Reveal delay={400}>
             <div className="flex flex-wrap gap-6 border-t border-white/[0.08] pt-5 sm:gap-11">
               <div className="flex flex-col gap-1">
-                <span className="font-brandSerif text-4xl">{t("stat1Value")}</span>
+                <span className="font-brandDisplay text-4xl">{t("stat1Value")}</span>
                 <span className="text-[13px] text-brand-muted">{t("stat1Label")}</span>
               </div>
               <div className="flex flex-col gap-1">
-                <span className="font-brandSerif text-4xl">{t("stat2Value")}</span>
+                <span className="font-brandDisplay text-4xl">{t("stat2Value")}</span>
                 <span className="text-[13px] text-brand-muted">{t("stat2Label")}</span>
               </div>
               <div className="flex flex-col gap-1">
-                <span className="font-brandSerif text-4xl">{t("stat3Value")}</span>
+                <span className="font-brandDisplay text-4xl">{t("stat3Value")}</span>
                 <span className="text-[13px] text-brand-muted">{t("stat3Label")}</span>
               </div>
             </div>
@@ -178,20 +178,20 @@ export async function Hero({ isAuthenticated }: { isAuthenticated: boolean }) {
         {/* ── Right: Device frame around live chess demo ── */}
         <Reveal delay={180} className="relative flex w-full max-w-[520px] flex-col gap-4 justify-self-center">
           {/* Floating XP badge */}
-          <div className="absolute -left-4 top-[15%] z-10 hidden items-center gap-2 rounded-2xl border border-brand-gold/25 bg-brand-ink/90 px-3.5 py-2.5 shadow-lg backdrop-blur-sm sm:flex">
-            <span className="font-brandMono text-[11px] text-brand-gold">+10 XP</span>
+          <div className="absolute -left-4 top-[15%] z-10 hidden items-center gap-2 rounded-2xl border border-brand-accent/25 bg-brand-ink/90 px-3.5 py-2.5 shadow-lg backdrop-blur-sm sm:flex">
+            <span className="font-brandMono text-[11px] text-brand-accent">+10 XP</span>
             <span className="font-brandMono text-[11px] text-brand-muted">Bon coup</span>
           </div>
           {/* Floating streak badge */}
-          <div className="absolute -right-4 bottom-[20%] z-10 hidden items-center gap-2 rounded-2xl border border-amber-500/25 bg-brand-ink/90 px-3.5 py-2.5 shadow-lg backdrop-blur-sm sm:flex">
+          <div className="absolute -right-4 bottom-[20%] z-10 hidden items-center gap-2 rounded-2xl border border-brand-accent/25 bg-brand-ink/90 px-3.5 py-2.5 shadow-lg backdrop-blur-sm sm:flex">
             <span className="text-sm">🔥</span>
             <div className="flex flex-col">
-              <span className="font-brandMono text-[11px] leading-tight text-amber-400">7 jours</span>
+              <span className="font-brandMono text-[11px] leading-tight text-brand-accent">7 jours</span>
               <span className="font-brandMono text-[9px] leading-tight text-brand-muted">Série</span>
             </div>
           </div>
           {/* Device frame */}
-          <div className="relative overflow-hidden rounded-[18px] border border-white/[0.14] bg-[#080808] shadow-[0_32px_80px_rgba(0,0,0,0.7),0_0_80px_rgba(226,182,90,0.10)]">
+          <div className="relative overflow-hidden rounded-[18px] border border-white/[0.14] bg-[#080808] shadow-[0_32px_80px_rgba(0,0,0,0.7),0_0_80px_rgba(255,95,60,0.10)]">
             {/* Browser chrome */}
             <div className="flex items-center gap-2 border-b border-white/[0.07] bg-white/[0.03] px-4 py-2.5">
               <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]/70" />

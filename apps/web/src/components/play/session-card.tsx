@@ -99,7 +99,7 @@ export function SessionCard({ position, onComplete, nextLabel }: Props) {
             <button
               type="button"
               onClick={handleNext}
-              className="animate-pop-in rounded-full bg-brand-gold px-6 py-3 font-medium text-brand-ink transition-all hover:bg-brand-goldHover hover:scale-[1.02] active:scale-[0.97]"
+              className="animate-pop-in rounded-full bg-brand-accent px-6 py-3 font-medium text-brand-ink transition-all hover:bg-brand-accentHover hover:scale-[1.02] active:scale-[0.97]"
             >
               {btnLabel}
             </button>
@@ -122,7 +122,7 @@ export function SessionCard({ position, onComplete, nextLabel }: Props) {
           ) : position.judgeType === "stockfish" ? (
             <div className="mt-2 flex flex-col gap-2 text-sm text-brand-muted">
               <span>Juge Stockfish bientôt disponible.</span>
-              <button type="button" onClick={() => handleFinished({ errors: 0, tempoLost: false, moves: [], moveDurationsMs: [] })} className="self-center text-brand-gold underline">
+              <button type="button" onClick={() => handleFinished({ errors: 0, tempoLost: false, moves: [], moveDurationsMs: [] })} className="self-center text-brand-accent underline">
                 Passer
               </button>
             </div>
@@ -140,7 +140,7 @@ export function SessionCard({ position, onComplete, nextLabel }: Props) {
           <button
             type="button"
             onClick={handleNext}
-            className="animate-pop-in pointer-events-auto rounded-full bg-brand-gold px-8 py-3.5 font-semibold text-brand-ink shadow-[0_8px_30px_rgba(226,182,90,0.35)] transition-all hover:bg-brand-goldHover hover:scale-[1.02] active:scale-[0.97]"
+            className="animate-pop-in pointer-events-auto rounded-full bg-brand-accent px-8 py-3.5 font-semibold text-brand-ink shadow-[0_8px_30px_rgba(255,95,60,0.35)] transition-all hover:bg-brand-accentHover hover:scale-[1.02] active:scale-[0.97]"
           >
             {btnLabel}
           </button>

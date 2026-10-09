@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
+import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -20,18 +20,19 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0d0d0d",
+  themeColor: "#0A0E12",
   viewportFit: "cover",
   width: "device-width",
   initialScale: 1,
 };
 
-// Polices de l'identité de marque (accueil + app) — chargées une fois ici en variables CSS ;
-// sans effet sur les pages qui ne référencent pas font-brandSans/brandMono/brandSerif (admin,
-// login, try gardent leur typographie Tailwind par défaut).
-const brandSans = Geist({ subsets: ["latin"], variable: "--font-brand-sans" });
-const brandMono = Geist_Mono({ subsets: ["latin"], variable: "--font-brand-mono" });
-const brandSerif = Instrument_Serif({ subsets: ["latin"], style: ["normal", "italic"], weight: "400", variable: "--font-brand-serif" });
+// Polices de l'identité de marque (accueil + app, direction "Zugzwang" — chantier 3) — chargées
+// une fois ici en variables CSS ; sans effet sur les pages qui ne référencent pas
+// font-brandSans/brandMono/brandDisplay (admin, login, try gardent leur typographie Tailwind par
+// défaut). Pas de police serif distincte : le titrage utilise aussi IBM Plex Mono
+// (`fontFamily.brandDisplay` dans tailwind.config.ts pointe vers la même variable que brandMono).
+const brandSans = IBM_Plex_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-brand-sans" });
+const brandMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["500", "600"], variable: "--font-brand-mono" });
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -56,7 +57,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
-        className={`min-h-screen bg-white text-neutral-900 antialiased dark:bg-neutral-950 dark:text-neutral-100 ${brandSans.variable} ${brandMono.variable} ${brandSerif.variable}`}
+        className={`min-h-screen bg-white text-neutral-900 antialiased dark:bg-neutral-950 dark:text-neutral-100 ${brandSans.variable} ${brandMono.variable}`}
       >
         <Cursor />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>

@@ -71,7 +71,7 @@ export function AppNav({ labels }: { labels: Record<string, string> }) {
             href={tab.href}
             className={
               active
-                ? "rounded-full bg-brand-gold px-4 py-2 text-sm text-brand-ink"
+                ? "rounded-full bg-brand-accent px-4 py-2 text-sm text-brand-ink"
                 : "rounded-full px-4 py-2 text-sm text-brand-mutedLight hover:text-brand-cream"
             }
           >
@@ -96,7 +96,7 @@ export function AppBottomNav({ labels }: { labels: Record<string, string> }) {
             key={tab.href}
             href={tab.href}
             className={`flex flex-1 flex-col items-center gap-1 py-2 text-[10px] transition-colors ${
-              active ? "text-brand-gold" : "text-brand-mutedLight"
+              active ? "text-brand-accent" : "text-brand-mutedLight"
             }`}
           >
             {tab.icon}

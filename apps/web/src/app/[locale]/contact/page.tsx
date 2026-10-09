@@ -24,13 +24,13 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
           {/* En-tête */}
           <div className="flex flex-col gap-6">
             <Reveal delay={0}>
-              <span className="block font-brandMono text-xs uppercase tracking-[0.14em] text-brand-gold">
+              <span className="block font-brandMono text-xs uppercase tracking-[0.14em] text-brand-accent">
                 {t("kicker")}
               </span>
             </Reveal>
             <Reveal delay={100}>
-              <h1 className="font-brandSerif text-[clamp(48px,6vw,80px)] font-normal leading-[0.97] tracking-tight">
-                {t("title")} <em className="text-brand-gold">{t("titleEm")}</em>
+              <h1 className="font-brandDisplay text-[clamp(48px,6vw,80px)] font-normal leading-[0.97] tracking-tight">
+                {t("title")} <em className="text-brand-accent">{t("titleEm")}</em>
               </h1>
             </Reveal>
             <Reveal delay={200}>
@@ -43,7 +43,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
                 </span>
                 <a
                   href={`mailto:${t("emailAddress")}`}
-                  className="text-brand-gold transition-opacity hover:opacity-80"
+                  className="text-brand-accent transition-opacity hover:opacity-80"
                 >
                   {t("emailAddress")}
                 </a>
@@ -62,7 +62,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
                   type="text"
                   name="name"
                   autoComplete="name"
-                  className="rounded-[14px] border border-white/[0.12] bg-brand-panel px-4 py-3 text-brand-cream outline-none transition-all placeholder:text-brand-muted/50 focus:border-brand-gold/60 focus:ring-1 focus:ring-brand-gold/30"
+                  className="rounded-[14px] border border-white/[0.12] bg-brand-panel px-4 py-3 text-brand-cream outline-none transition-all placeholder:text-brand-muted/50 focus:border-brand-accent/60 focus:ring-1 focus:ring-brand-accent/30"
                   placeholder="Jean Dupont"
                 />
               </div>
@@ -75,7 +75,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
                   type="email"
                   name="email"
                   autoComplete="email"
-                  className="rounded-[14px] border border-white/[0.12] bg-brand-panel px-4 py-3 text-brand-cream outline-none transition-all placeholder:text-brand-muted/50 focus:border-brand-gold/60 focus:ring-1 focus:ring-brand-gold/30"
+                  className="rounded-[14px] border border-white/[0.12] bg-brand-panel px-4 py-3 text-brand-cream outline-none transition-all placeholder:text-brand-muted/50 focus:border-brand-accent/60 focus:ring-1 focus:ring-brand-accent/30"
                   placeholder="jean@exemple.fr"
                 />
               </div>
@@ -87,7 +87,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
                 <textarea
                   name="message"
                   rows={5}
-                  className="resize-none rounded-[14px] border border-white/[0.12] bg-brand-panel px-4 py-3 text-brand-cream outline-none transition-all placeholder:text-brand-muted/50 focus:border-brand-gold/60 focus:ring-1 focus:ring-brand-gold/30"
+                  className="resize-none rounded-[14px] border border-white/[0.12] bg-brand-panel px-4 py-3 text-brand-cream outline-none transition-all placeholder:text-brand-muted/50 focus:border-brand-accent/60 focus:ring-1 focus:ring-brand-accent/30"
                   placeholder="…"
                 />
               </div>
@@ -96,7 +96,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
                 <span className="text-[13px] text-brand-muted">{t("formNote")}</span>
                 <button
                   type="submit"
-                  className="rounded-full bg-brand-gold px-6 py-3 text-sm font-semibold text-brand-ink transition-all hover:bg-brand-goldHover hover:scale-[1.02] active:scale-[0.97]"
+                  className="rounded-full bg-brand-accent px-6 py-3 text-sm font-semibold text-brand-ink transition-all hover:bg-brand-accentHover hover:scale-[1.02] active:scale-[0.97]"
                 >
                   {t("formCta")}
                 </button>

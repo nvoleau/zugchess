@@ -77,7 +77,7 @@ function MethodBoardPreview() {
             </feMerge>
           </filter>
           <marker id="mbArrow" markerWidth="9" markerHeight="9" refX="4.5" refY="4.5" orient="auto">
-            <polygon points="0 1, 9 4.5, 0 8" fill="#E2B65A" />
+            <polygon points="0 1, 9 4.5, 0 8" fill="#FF5F3C" />
           </marker>
         </defs>
 
@@ -89,7 +89,7 @@ function MethodBoardPreview() {
             y={y}
             width={SQ}
             height={SQ}
-            fill={isHighlighted ? "rgba(226,182,90,0.52)" : isLight ? "url(#mbLight)" : "url(#mbDark)"}
+            fill={isHighlighted ? "rgba(255,95,60,0.52)" : isLight ? "url(#mbLight)" : "url(#mbDark)"}
           />
         ))}
 
@@ -118,7 +118,7 @@ function MethodBoardPreview() {
         {/* Arrow with glow */}
         <line
           x1={x1} y1={y1} x2={x2s} y2={y2s}
-          stroke="#E2B65A"
+          stroke="#FF5F3C"
           strokeWidth="5"
           strokeOpacity="0.92"
           strokeLinecap="round"
@@ -154,8 +154,8 @@ export async function MethodSection() {
     <section id="methode" className="mx-auto flex max-w-6xl flex-col gap-14 px-5 py-16 sm:px-10 sm:py-28">
       <Reveal>
         <div className="flex flex-wrap items-end justify-between gap-8">
-          <h2 className="max-w-[640px] text-balance font-brandSerif text-[clamp(40px,5.5vw,68px)] font-normal leading-none tracking-tight">
-            {t("title")} <em className="text-brand-gold">{t("titleEm")}</em>
+          <h2 className="max-w-[640px] text-balance font-brandDisplay text-[clamp(40px,5.5vw,68px)] font-normal leading-none tracking-tight">
+            {t("title")} <em className="text-brand-accent">{t("titleEm")}</em>
           </h2>
           <p className="max-w-[380px] text-base leading-relaxed text-brand-muted">{t("body")}</p>
         </div>
@@ -179,7 +179,7 @@ export async function MethodSection() {
         </Reveal>
 
         <Reveal delay={200}>
-          <div className="flex h-full flex-col gap-[18px] rounded-[22px] bg-brand-gold p-7 text-brand-ink transition-all duration-300 hover:-translate-y-1">
+          <div className="flex h-full flex-col gap-[18px] rounded-[22px] bg-brand-accent p-7 text-brand-ink transition-all duration-300 hover:-translate-y-1">
             <span className="self-start rounded-full border-[1.5px] border-brand-ink px-3.5 py-1 font-brandMono text-[15px]">03</span>
             <h3 className="text-[22px] font-medium">{t("step3Title")}</h3>
             <p className="text-[15px] leading-relaxed text-[#2B2214]">{t("step3Body")}</p>
@@ -191,10 +191,10 @@ export async function MethodSection() {
       <Reveal delay={100}>
         <div className="grid grid-cols-1 items-center gap-8 rounded-[28px] border border-white/[0.08] bg-brand-panel p-7 sm:grid-cols-2 sm:p-10">
           <div className="flex flex-col gap-4">
-            <span className="font-brandMono text-xs uppercase tracking-[0.14em] text-brand-gold">
+            <span className="font-brandMono text-xs uppercase tracking-[0.14em] text-brand-accent">
               {t("boardTitle")}
             </span>
-            <h3 className="font-brandSerif text-[clamp(26px,3.5vw,38px)] font-normal leading-[1.08]">
+            <h3 className="font-brandDisplay text-[clamp(26px,3.5vw,38px)] font-normal leading-[1.08]">
               {t("boardHeading")}
             </h3>
             <p className="text-[15px] leading-relaxed text-brand-muted">
@@ -210,9 +210,9 @@ export async function MethodSection() {
       <Reveal delay={0}>
         <div className="grid grid-cols-1 items-center gap-10 rounded-[28px] border border-white/[0.08] bg-brand-panel p-7 transition-all duration-300 hover:border-white/[0.14] sm:grid-cols-2 sm:p-12">
           <div className="flex flex-col gap-4">
-            <span className="font-brandMono text-xs uppercase tracking-[0.14em] text-brand-gold">{tempo("kicker")}</span>
-            <h3 className="font-brandSerif text-[clamp(32px,4vw,46px)] font-normal leading-[1.05]">
-              {tempo("title")} <em className="text-brand-gold">{tempo("titleEm")}</em>
+            <span className="font-brandMono text-xs uppercase tracking-[0.14em] text-brand-accent">{tempo("kicker")}</span>
+            <h3 className="font-brandDisplay text-[clamp(32px,4vw,46px)] font-normal leading-[1.05]">
+              {tempo("title")} <em className="text-brand-accent">{tempo("titleEm")}</em>
             </h3>
             <p className="max-w-[460px] text-[15px] leading-relaxed text-brand-muted">{tempo("body")}</p>
           </div>
@@ -220,11 +220,11 @@ export async function MethodSection() {
             <div className="flex flex-col gap-3 rounded-2xl bg-brand-ink p-5">
               <div className="flex justify-between text-sm">
                 <span className="text-brand-muted">{tempo("attackLabel")}</span>
-                <span className="font-medium text-brand-gold">{tempo("attackValue")}</span>
+                <span className="font-medium text-brand-accent">{tempo("attackValue")}</span>
               </div>
               <div className="flex gap-1.5">
-                <span className="h-3 flex-1 rounded-[3px] bg-brand-gold" />
-                <span className="h-3 flex-1 rounded-[3px] bg-brand-gold" />
+                <span className="h-3 flex-1 rounded-[3px] bg-brand-accent" />
+                <span className="h-3 flex-1 rounded-[3px] bg-brand-accent" />
                 <span className="h-3 flex-1 rounded-[3px] bg-brand-bad" />
                 <span className="h-3 flex-1 rounded-[3px] shadow-[inset_0_0_0_1px_rgba(242,237,227,0.25)]" />
                 <span className="h-3 flex-1 rounded-[3px] shadow-[inset_0_0_0_1px_rgba(242,237,227,0.25)]" />

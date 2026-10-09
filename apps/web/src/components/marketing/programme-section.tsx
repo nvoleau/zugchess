@@ -30,7 +30,7 @@ export async function ProgrammeSection() {
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-12 px-5 py-16 sm:px-10 sm:py-28">
         <div className="flex flex-wrap items-end justify-between gap-8">
-          <h2 className="max-w-[700px] text-balance font-brandSerif text-[clamp(40px,5.5vw,68px)] font-normal leading-none tracking-tight">
+          <h2 className="max-w-[700px] text-balance font-brandDisplay text-[clamp(40px,5.5vw,68px)] font-normal leading-none tracking-tight">
             {t("title")}
           </h2>
           <p className="max-w-[360px] text-base leading-relaxed text-[#55504A]">{t("body")}</p>

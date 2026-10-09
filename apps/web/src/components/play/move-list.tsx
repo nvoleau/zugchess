@@ -33,12 +33,12 @@ export function MoveList({ moves }: { moves: HalfMove[] }) {
         <div key={ri} className="flex items-baseline gap-1 leading-7">
           <span className="w-6 shrink-0 text-brand-muted/60 text-xs">{row.n}.</span>
           <span
-            className={`w-[80px] rounded px-1 ${ri === lastRow && lastColor === "w" ? "bg-brand-gold/20 text-brand-gold" : "text-brand-cream"}`}
+            className={`w-[80px] rounded px-1 ${ri === lastRow && lastColor === "w" ? "bg-brand-accent/20 text-brand-accent" : "text-brand-cream"}`}
           >
             {row.white ?? "…"}
           </span>
           <span
-            className={`w-[80px] rounded px-1 ${ri === lastRow && lastColor === "b" ? "bg-brand-gold/20 text-brand-gold" : "text-brand-muted"}`}
+            className={`w-[80px] rounded px-1 ${ri === lastRow && lastColor === "b" ? "bg-brand-accent/20 text-brand-accent" : "text-brand-muted"}`}
           >
             {row.black ?? ""}
           </span>

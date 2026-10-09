@@ -5,10 +5,12 @@ import { Link } from "@/i18n/navigation";
 
 export const dynamic = "force-dynamic";
 
+// Rampe de progression à une seule teinte (accent, de plus en plus saturé), qui casse sur le vert
+// à la maîtrise complète — la couleur devient elle-même le signal de récompense.
 const MASTERY_COLOR = {
   mastered: "bg-brand-good",
-  familiar: "bg-brand-gold",
-  learning: "bg-amber-500",
+  familiar: "bg-brand-accent",
+  learning: "bg-brand-accent/35",
   new: "bg-white/10",
 } as const;
 
@@ -28,7 +30,7 @@ export default async function LessonsPage({ params }: { params: Promise<{ locale
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="font-brandSerif text-3xl tracking-tight">{t("title")}</h1>
+        <h1 className="font-brandDisplay text-3xl tracking-tight">{t("title")}</h1>
         <p className="mt-1.5 max-w-xl text-sm text-brand-muted">{t("intro")}</p>
       </div>
 
@@ -40,14 +42,14 @@ export default async function LessonsPage({ params }: { params: Promise<{ locale
             <Link
               key={theme.id}
               href={`/app/lessons/theme/${theme.slug}`}
-              className="group flex flex-col gap-4 rounded-2xl border border-white/[0.07] bg-brand-panel p-5 transition-colors hover:border-brand-gold/30"
+              className="group flex flex-col gap-4 rounded-2xl border border-white/[0.07] bg-brand-panel p-5 transition-colors hover:border-brand-accent/30"
             >
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <p className="font-brandMono text-[10px] uppercase tracking-[0.12em] text-brand-muted">
                     {theme.family}
                   </p>
-                  <h2 className="mt-0.5 font-brandSerif text-lg leading-tight text-brand-cream group-hover:text-brand-gold">
+                  <h2 className="mt-0.5 font-brandDisplay text-lg leading-tight text-brand-cream group-hover:text-brand-accent">
                     {theme.title}
                   </h2>
                 </div>
@@ -69,7 +71,7 @@ export default async function LessonsPage({ params }: { params: Promise<{ locale
 
               <div className="flex items-center justify-between text-xs text-brand-muted">
                 <span>{done} / {theme.total} {localeTyped === "fr" ? "maîtrisées" : "mastered"}</span>
-                <span className="font-brandMono text-brand-gold opacity-60 transition-opacity group-hover:opacity-100">
+                <span className="font-brandMono text-brand-accent opacity-60 transition-opacity group-hover:opacity-100">
                   {t("explore")}
                 </span>
               </div>

@@ -20,9 +20,9 @@ export async function ProgressionSection() {
   return (
     <section id="progression" className="mx-auto flex max-w-6xl flex-col gap-12 px-5 py-16 sm:px-10 sm:py-28">
       <div className="flex max-w-[760px] flex-col gap-[18px]">
-        <span className="font-brandMono text-xs uppercase tracking-[0.14em] text-brand-gold">{t("kicker")}</span>
-        <h2 className="text-balance font-brandSerif text-[clamp(40px,5.5vw,68px)] font-normal leading-none tracking-tight">
-          {t("title")} <em className="text-brand-gold">{t("titleEm")}</em>
+        <span className="font-brandMono text-xs uppercase tracking-[0.14em] text-brand-accent">{t("kicker")}</span>
+        <h2 className="text-balance font-brandDisplay text-[clamp(40px,5.5vw,68px)] font-normal leading-none tracking-tight">
+          {t("title")} <em className="text-brand-accent">{t("titleEm")}</em>
         </h2>
         <p className="max-w-[600px] text-base leading-relaxed text-brand-muted">{t("body")}</p>
       </div>
@@ -33,7 +33,7 @@ export async function ProgressionSection() {
             <span className="font-brandMono text-[11px] uppercase tracking-[0.12em] text-brand-muted">{card.label}</span>
             {card.value && (
               <div className="flex items-baseline gap-2.5">
-                <span className="font-brandSerif text-[52px] leading-none">{card.value}</span>
+                <span className="font-brandDisplay text-[52px] leading-none">{card.value}</span>
                 {card.sub && <span className="text-sm text-brand-good">{card.sub}</span>}
               </div>
             )}

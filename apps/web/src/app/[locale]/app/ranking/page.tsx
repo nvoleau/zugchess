@@ -48,7 +48,7 @@ export default async function RankingPage({
         <Link href="/app" className={btnClass("ghost", "sm", "pl-0 text-brand-muted")}>
           ← {t("backToApp")}
         </Link>
-        <h1 className="mt-4 font-brandSerif text-4xl tracking-tight sm:text-5xl">{t("title")}</h1>
+        <h1 className="mt-4 font-brandDisplay text-4xl tracking-tight sm:text-5xl">{t("title")}</h1>
       </div>
 
       {/* Onglets */}
@@ -60,7 +60,7 @@ export default async function RankingPage({
             className={[
               "px-4 py-2 font-brandMono text-sm transition-colors",
               kind === key
-                ? "border-b-2 border-brand-gold text-brand-gold"
+                ? "border-b-2 border-brand-accent text-brand-accent"
                 : "text-brand-muted hover:text-brand-cream",
             ].join(" ")}
           >
@@ -83,7 +83,7 @@ export default async function RankingPage({
                     key={entry.userId}
                     className={[
                       "flex items-center gap-4 px-5 py-3 border-b border-white/[0.06] last:border-0",
-                      isMe ? "bg-brand-gold/[0.07]" : "hover:bg-white/[0.03]",
+                      isMe ? "bg-brand-accent/[0.07]" : "hover:bg-white/[0.03]",
                     ].join(" ")}
                   >
                     <td className="w-7 font-brandMono text-brand-muted text-right shrink-0">
@@ -102,10 +102,10 @@ export default async function RankingPage({
                     <td className="flex-1 text-brand-cream truncate">
                       {entry.name}
                       {isMe && (
-                        <span className="ml-2 font-brandMono text-xs text-brand-gold">{t("you")}</span>
+                        <span className="ml-2 font-brandMono text-xs text-brand-accent">{t("you")}</span>
                       )}
                     </td>
-                    <td className="font-brandMono text-brand-gold shrink-0">
+                    <td className="font-brandMono text-brand-accent shrink-0">
                       {valueLabel(kind, entry.value, t)}
                     </td>
                   </tr>

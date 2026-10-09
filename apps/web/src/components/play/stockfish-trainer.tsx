@@ -126,10 +126,10 @@ export function StockfishTrainer({ initialFen, toleranceCp = 100 }: { initialFen
   }
 
   if (status === "loading") {
-    return <div className="flex h-64 w-full max-w-[480px] items-center justify-center text-sm text-neutral-500">{t("evaluating")}</div>;
+    return <div className="flex h-64 w-full max-w-[480px] items-center justify-center text-sm text-brand-muted">{t("evaluating")}</div>;
   }
   if (status === "error") {
-    return <p className="text-sm text-amber-600 dark:text-amber-400">{t("evalError")}</p>;
+    return <p className="text-sm text-brand-bad">{t("evalError")}</p>;
   }
 
   return (
@@ -141,18 +141,18 @@ export function StockfishTrainer({ initialFen, toleranceCp = 100 }: { initialFen
         dests={status === "playing" && !pending ? legalDests(chessRef.current, playerColor) : undefined}
         onMove={handleMove}
       />
-      {scoreLabel && status === "playing" && <p className="text-sm font-medium">{t("evalLabel", { score: scoreLabel })}</p>}
-      {pending && <p className="text-xs text-neutral-500">{t("thinking")}</p>}
+      {scoreLabel && status === "playing" && <p className="text-sm font-medium text-brand-cream">{t("evalLabel", { score: scoreLabel })}</p>}
+      {pending && <p className="text-xs text-brand-muted">{t("thinking")}</p>}
       {status === "finished" && outcome && (
-        <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
+        <p className="text-sm font-medium text-brand-good">
           {outcome === "win" ? t("won") : outcome === "draw" ? t("drawn") : t("lost")}
         </p>
       )}
-      {hint && <p className="text-sm text-amber-600 dark:text-amber-400">{hint}</p>}
+      {hint && <p className="text-sm text-brand-accent2">{hint}</p>}
       {feed.length > 0 && (
         <ul className="flex w-full max-w-[480px] flex-col gap-1.5 text-sm">
           {feed.map((line, i) => (
-            <li key={i} className="rounded-md bg-neutral-100 px-3 py-1.5 dark:bg-neutral-800">
+            <li key={i} className="rounded-md bg-brand-panel px-3 py-1.5 text-brand-cream">
               {line}
             </li>
           ))}

@@ -22,7 +22,18 @@ interface SessionSummary {
   levelReached: number | null;
   /** Chantier 4 : somme des variations de cote globale accumulées pendant la séance. */
   ratingDelta: number;
+  /** Codes des trophées débloqués pendant la séance (ex. "streak_7") — calculés côté serveur,
+   * jamais affichés nulle part avant (chantier 3) malgré une logique de déblocage déjà en place. */
+  newAchievements: string[];
 }
+
+/** Icône par code de trophée (catalogue statique, `prisma/seed.ts`) — peu de trophées existent
+ * aujourd'hui (séries), pas besoin d'un aller-retour serveur pour une poignée d'emoji connus. */
+const ACHIEVEMENT_ICON: Record<string, string> = {
+  streak_7: "🔥",
+  streak_30: "⚡",
+  streak_100: "👑",
+};
 
 /**
  * Orchestre la séance du jour : charge les positions une par une depuis l'API,
@@ -41,6 +52,7 @@ export function SessionPlayer({ items, locale, initialTotalXp = 0 }: Props) {
   const accXpRef = useRef(0);
   const accRatingRef = useRef(0);
   const lastStreakRef = useRef(0);
+  const achievementsRef = useRef<string[]>([]);
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const ratingFlashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -96,6 +108,7 @@ export function SessionPlayer({ items, locale, initialTotalXp = 0 }: Props) {
         streak: lastStreakRef.current,
         levelReached: null,
         ratingDelta: accRatingRef.current,
+        newAchievements: achievementsRef.current,
       });
       return;
     }
@@ -112,6 +125,9 @@ export function SessionPlayer({ items, locale, initialTotalXp = 0 }: Props) {
       accRatingRef.current += ratingGained;
       setLiveXp(accXpRef.current);
       lastStreakRef.current = data.streak?.current ?? lastStreakRef.current;
+      if (Array.isArray(data.newAchievements) && data.newAchievements.length > 0) {
+        achievementsRef.current = [...achievementsRef.current, ...data.newAchievements];
+      }
 
       // Détecter une montée de niveau
       const totalXpNow = initialTotalXp + accXpRef.current;
@@ -144,6 +160,7 @@ export function SessionPlayer({ items, locale, initialTotalXp = 0 }: Props) {
         streak: lastStreakRef.current,
         levelReached: newLevel,
         ratingDelta: accRatingRef.current,
+        newAchievements: achievementsRef.current,
       });
     } else {
       setIndex(nextIndex);
@@ -162,16 +179,16 @@ export function SessionPlayer({ items, locale, initialTotalXp = 0 }: Props) {
     return (
       <div className="flex flex-col items-center gap-8 py-12 text-center">
         <div>
-          <p className="font-brandMono text-xs uppercase tracking-[0.14em] text-brand-gold">
+          <p className="font-brandMono text-xs uppercase tracking-[0.14em] text-brand-accent">
             {quotaReached ? t("quotaReached") : t("finished")}
           </p>
-          <h2 className="mt-2 font-brandSerif text-4xl text-brand-cream">{t("finishedTitle")}</h2>
+          <h2 className="mt-2 font-brandDisplay text-4xl text-brand-cream">{t("finishedTitle")}</h2>
         </div>
 
         {/* XP — centrepiece */}
         {summary.xpGained > 0 && (
           <div className="flex flex-col items-center gap-1">
-            <span className="font-brandMono text-7xl font-medium leading-none text-brand-gold">
+            <span className="font-brandMono text-7xl font-medium leading-none text-brand-accent">
               +{summary.xpGained}
             </span>
             <span className="font-brandMono text-xs uppercase tracking-[0.14em] text-brand-muted">
@@ -199,10 +216,31 @@ export function SessionPlayer({ items, locale, initialTotalXp = 0 }: Props) {
 
         {/* Level up */}
         {summary.levelReached && (
-          <div className="rounded-full border border-brand-gold/30 bg-brand-gold/10 px-5 py-2">
-            <span className="font-brandMono text-sm text-brand-gold">
+          <div className="rounded-full border border-brand-accent/30 bg-brand-accent/10 px-5 py-2">
+            <span className="font-brandMono text-sm text-brand-accent">
               {t("summaryLevelUp", { level: summary.levelReached })}
             </span>
+          </div>
+        )}
+
+        {/* Trophées débloqués — chantier 3 : calculés côté serveur depuis le lot 6, jamais montrés avant. */}
+        {summary.newAchievements.length > 0 && (
+          <div className="flex flex-col items-center gap-2.5">
+            {summary.newAchievements.map((code, i) => (
+              <div
+                key={code}
+                className="animate-pop-in flex items-center gap-3 rounded-2xl border border-brand-accent/30 bg-brand-panel px-5 py-3"
+                style={{ animationDelay: `${i * 120}ms` }}
+              >
+                <span className="text-2xl">{ACHIEVEMENT_ICON[code] ?? "🏆"}</span>
+                <div className="text-left">
+                  <p className="font-brandMono text-[10px] uppercase tracking-[0.14em] text-brand-accent">
+                    {t("achievementUnlocked")}
+                  </p>
+                  <p className="text-sm text-brand-cream">{t(`achievement_${code}`)}</p>
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
@@ -214,7 +252,7 @@ export function SessionPlayer({ items, locale, initialTotalXp = 0 }: Props) {
           </div>
           {summary.streak > 0 && (
             <div className="flex flex-col items-center gap-1">
-              <span className="font-brandMono text-3xl text-amber-400">{summary.streak}</span>
+              <span className="font-brandMono text-3xl text-brand-accent">{summary.streak}</span>
               <span className="text-xs text-brand-muted">{t("summaryStreak")}</span>
             </div>
           )}
@@ -237,7 +275,7 @@ export function SessionPlayer({ items, locale, initialTotalXp = 0 }: Props) {
         </span>
         <div className="h-[3px] flex-1 overflow-hidden rounded-full bg-white/[0.08]">
           <div
-            className="h-full rounded-full bg-brand-gold transition-all duration-500"
+            className="h-full rounded-full bg-brand-accent transition-all duration-500"
             style={{ width: `${(index / items.length) * 100}%` }}
           />
         </div>
@@ -254,7 +292,7 @@ export function SessionPlayer({ items, locale, initialTotalXp = 0 }: Props) {
           )}
           <div className="w-16 text-right">
             {xpFlash !== null ? (
-              <span className="animate-pop-in font-brandMono text-xs font-medium text-brand-gold">
+              <span className="animate-pop-in font-brandMono text-xs font-medium text-brand-accent">
                 +{xpFlash} XP
               </span>
             ) : liveXp > 0 ? (

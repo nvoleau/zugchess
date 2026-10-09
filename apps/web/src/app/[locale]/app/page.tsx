@@ -58,9 +58,9 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
           <Badge variant="kicker" className="mb-3 block">
             {t("greeting", { name: user.name ?? user.email ?? "" })}
           </Badge>
-          <h1 className="font-brandSerif text-4xl leading-tight tracking-tight sm:text-5xl">
+          <h1 className="font-brandDisplay text-4xl leading-tight tracking-tight sm:text-5xl">
             {t("titleLine1")}{" "}
-            <em className="not-italic text-brand-gold">{t("titleEm")}</em>
+            <em className="not-italic text-brand-accent">{t("titleEm")}</em>
           </h1>
         </div>
 
@@ -93,7 +93,7 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
         </div>
       ) : (
         <Card className="max-w-md">
-          <p className="font-brandSerif text-xl text-brand-cream">{t("allDoneTitle")}</p>
+          <p className="font-brandDisplay text-xl text-brand-cream">{t("allDoneTitle")}</p>
           <p className="mt-2 text-sm text-brand-muted">{t("allDoneBody")}</p>
         </Card>
       )}
@@ -102,12 +102,12 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
       <div className="flex flex-col gap-3 max-w-sm">
 
         {/* Série — mise en avant */}
-        <div className="rounded-xl border border-amber-500/20 bg-amber-500/[0.04] p-5">
-          <p className="font-brandMono text-[10px] uppercase tracking-[0.14em] text-amber-400/60">
+        <div className="rounded-xl border border-brand-accent/20 bg-brand-accent/[0.04] p-5">
+          <p className="font-brandMono text-[10px] uppercase tracking-[0.14em] text-brand-accent/60">
             {t("statsStreak")}
           </p>
           <div className="mt-2 flex items-end justify-between">
-            <span className="font-brandMono text-6xl leading-none text-amber-400">
+            <span className="font-brandMono text-6xl leading-none text-brand-accent">
               {stats.streak.current}
             </span>
             {stats.streak.best > 0 && (
@@ -130,7 +130,7 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
           </div>
           <div className="mt-3 h-[5px] w-full overflow-hidden rounded-full bg-white/[0.08]">
             <div
-              className="h-full rounded-full bg-brand-gold transition-all duration-700"
+              className="h-full rounded-full bg-brand-accent transition-all duration-700"
               style={{ width: `${Math.max(xpProgress * 100, 2)}%` }}
             />
           </div>
@@ -155,7 +155,7 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
               ].map(({ label, xp, positive }) => (
                 <li key={label} className="flex items-center justify-between">
                   <span className="text-xs text-brand-muted">{label}</span>
-                  <span className={`font-brandMono text-xs ${positive ? "text-brand-gold" : "text-red-400/80"}`}>
+                  <span className={`font-brandMono text-xs ${positive ? "text-brand-accent" : "text-brand-bad"}`}>
                     {xp} XP
                   </span>
                 </li>

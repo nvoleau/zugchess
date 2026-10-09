@@ -15,7 +15,7 @@ html {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #e2b65a;
+  background: #ff5f3c;
   pointer-events: none;
   z-index: 9999;
   opacity: 0;
@@ -33,7 +33,7 @@ html {
   width: 26px;
   height: 26px;
   background: transparent;
-  border: 1.5px solid #e2b65a;
+  border: 1.5px solid #ff5f3c;
   opacity: 1 !important;
 }
 
@@ -45,7 +45,7 @@ html {
 }
 
 @layer utilities {
-  /* Lien de navigation : trait or qui s'étend au survol */
+  /* Lien de navigation : trait accent qui s'étend au survol */
   .nav-link {
     @apply relative transition-colors duration-200;
   }
@@ -56,7 +56,7 @@ html {
     left: 0;
     height: 1px;
     width: 0;
-    background-color: theme("colors.brand.gold");
+    background-color: theme("colors.brand.accent");
     transition: width 0.25s ease;
   }
   .nav-link:hover::after {

@@ -328,7 +328,7 @@ export function KpkTrainer({
             <button
               type="button"
               onClick={showHint}
-              className="min-h-[44px] rounded-full border border-brand-gold/40 px-4 py-2 font-brandMono text-xs text-brand-gold hover:bg-brand-gold/10"
+              className="min-h-[44px] rounded-full border border-brand-accent/40 px-4 py-2 font-brandMono text-xs text-brand-accent hover:bg-brand-accent/10"
             >
               {t("hintButton")}
             </button>

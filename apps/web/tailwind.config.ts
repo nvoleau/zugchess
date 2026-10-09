@@ -7,26 +7,32 @@ const config: Config = {
     extend: {
       // Identité de marque (accueil marketing + app) — additif, ne remplace pas les tokens
       // Tailwind par défaut utilisés par admin/login/try.
+      // Direction "Zugzwang" (chantier 3, refonte) : la tension du coup forcé, esthétique pendule
+      // d'échecs — fond graphite froid, accent vermillon (pas l'or de la V1), accent2 ice-teal pour
+      // les états secondaires. `paper`/`paperInk` restent inchangés : section claire isolée de
+      // l'accueil marketing (`programme-section.tsx`), indépendante de la palette sombre.
       colors: {
         brand: {
-          ink: "#0E0D0B",
-          panel: "#16140F",
-          panelAlt: "#121110",
+          ink: "#0A0E12",
+          panel: "#11161C",
+          panelAlt: "#161D25",
           paper: "#EFECE6",
           paperInk: "#141210",
-          cream: "#F2EDE3",
-          muted: "#A39D90",
-          mutedLight: "#CFC9BC",
-          gold: "#E2B65A",
-          goldHover: "#EEC877",
-          good: "#7FCB94",
-          bad: "#E06B57",
+          cream: "#DCE4EA",
+          muted: "#6B7682",
+          mutedLight: "#97A3AE",
+          accent: "#FF5F3C",
+          accentHover: "#FF7A54",
+          accent2: "#2FD9C4",
+          good: "#4FD8A8",
+          bad: "#E5584A",
         },
       },
       fontFamily: {
         brandSans: ["var(--font-brand-sans)"],
         brandMono: ["var(--font-brand-mono)"],
-        brandSerif: ["var(--font-brand-serif)"],
+        // Pas de police serif distincte dans cette direction : le titrage réutilise IBM Plex Mono.
+        brandDisplay: ["var(--font-brand-mono)"],
       },
       keyframes: {
         "pop-in": {

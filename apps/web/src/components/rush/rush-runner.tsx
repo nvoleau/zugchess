@@ -124,14 +124,14 @@ export function RushRunner({ locale, currentUserId }: { locale: "fr" | "en"; cur
     return (
       <div className="flex flex-col items-center gap-6 py-10 text-center">
         <div>
-          <p className="font-brandMono text-xs uppercase tracking-[0.14em] text-brand-gold">{t("kicker")}</p>
-          <h1 className="mt-2 font-brandSerif text-4xl tracking-tight">{t("title")}</h1>
+          <p className="font-brandMono text-xs uppercase tracking-[0.14em] text-brand-accent">{t("kicker")}</p>
+          <h1 className="mt-2 font-brandDisplay text-4xl tracking-tight">{t("title")}</h1>
           <p className="mt-3 max-w-md text-sm text-brand-muted">{t("intro")}</p>
         </div>
 
         {meta && meta.record.best > 0 && (
           <Card className="flex flex-col items-center gap-1 px-8 py-5">
-            <span className="font-brandMono text-3xl text-brand-gold">{meta.record.best}</span>
+            <span className="font-brandMono text-3xl text-brand-accent">{meta.record.best}</span>
             <span className="text-xs text-brand-muted">{t("personalRecord")}</span>
           </Card>
         )}
@@ -151,18 +151,18 @@ export function RushRunner({ locale, currentUserId }: { locale: "fr" | "en"; cur
     return (
       <div className="flex flex-col items-center gap-8 py-12 text-center">
         <div>
-          <p className="font-brandMono text-xs uppercase tracking-[0.14em] text-brand-gold">{t("doneBadge")}</p>
-          <h2 className="mt-2 font-brandSerif text-4xl text-brand-cream">{t("finishedTitle")}</h2>
+          <p className="font-brandMono text-xs uppercase tracking-[0.14em] text-brand-accent">{t("doneBadge")}</p>
+          <h2 className="mt-2 font-brandDisplay text-4xl text-brand-cream">{t("finishedTitle")}</h2>
         </div>
 
         <div className="flex flex-col items-center gap-1">
-          <span className="font-brandMono text-7xl font-medium leading-none text-brand-gold">{finalScore}</span>
+          <span className="font-brandMono text-7xl font-medium leading-none text-brand-accent">{finalScore}</span>
           <span className="font-brandMono text-xs uppercase tracking-[0.14em] text-brand-muted">{t("summaryScore")}</span>
         </div>
 
         {meta && finalScore >= meta.record.best && finalScore > 0 && (
-          <div className="rounded-full border border-brand-gold/30 bg-brand-gold/10 px-5 py-2">
-            <span className="font-brandMono text-sm text-brand-gold">{t("newRecord")}</span>
+          <div className="rounded-full border border-brand-accent/30 bg-brand-accent/10 px-5 py-2">
+            <span className="font-brandMono text-sm text-brand-accent">{t("newRecord")}</span>
           </div>
         )}
 
@@ -179,11 +179,11 @@ export function RushRunner({ locale, currentUserId }: { locale: "fr" | "en"; cur
               {meta.entries.slice(0, 5).map((entry) => (
                 <li
                   key={entry.userId}
-                  className={`flex items-center gap-3 px-5 py-2 text-sm ${entry.userId === currentUserId ? "bg-brand-gold/[0.07]" : ""}`}
+                  className={`flex items-center gap-3 px-5 py-2 text-sm ${entry.userId === currentUserId ? "bg-brand-accent/[0.07]" : ""}`}
                 >
                   <span className="w-5 font-brandMono text-brand-muted">{entry.rank}</span>
                   <span className="flex-1 truncate text-brand-cream">{entry.name}</span>
-                  <span className="font-brandMono text-brand-gold">{entry.score}</span>
+                  <span className="font-brandMono text-brand-accent">{entry.score}</span>
                 </li>
               ))}
             </ul>
@@ -202,7 +202,7 @@ export function RushRunner({ locale, currentUserId }: { locale: "fr" | "en"; cur
     <div className="flex flex-col items-center gap-5">
       <div className="flex w-full max-w-[420px] items-center justify-between">
         <span className="font-brandMono text-2xl tabular-nums text-brand-cream">{formatClock(displayMs)}</span>
-        <span className="font-brandMono text-xl text-brand-gold">{score}</span>
+        <span className="font-brandMono text-xl text-brand-accent">{score}</span>
         <div className="flex gap-1.5">
           {Array.from({ length: RUSH_MAX_ERRORS }, (_, i) => (
             <span

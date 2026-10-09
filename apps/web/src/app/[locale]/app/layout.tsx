@@ -44,10 +44,10 @@ export default async function AppShellLayout({
       <header className="sticky top-0 z-20 border-b border-white/10 bg-brand-ink/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-3 sm:px-8">
           <Link href="/" className="flex items-center gap-2.5">
-            <span className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-brand-gold text-lg leading-none text-brand-ink">
+            <span className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-brand-accent text-lg leading-none text-brand-ink">
               ♜
             </span>
-            <span className="font-brandSerif text-2xl">ZugChess</span>
+            <span className="font-brandDisplay text-2xl">ZugChess</span>
           </Link>
 
           <AppNav labels={{ home: t("home"), session: t("session"), rush: t("rush"), lessons: t("lessons"), ranking: t("ranking") }} />

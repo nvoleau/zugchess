@@ -34,7 +34,7 @@ export function HeroTrial() {
   }
 
   return (
-    <div className="dark flex flex-col gap-4 rounded-[22px] border border-brand-gold/20 bg-gradient-to-b from-[#1A1813] to-[#13110D] p-[18px] text-brand-cream shadow-[0_40px_80px_-30px_rgba(0,0,0,0.8)]">
+    <div className="dark flex flex-col gap-4 rounded-[22px] border border-brand-accent/20 bg-gradient-to-b from-[#1A1813] to-[#13110D] p-[18px] text-brand-cream shadow-[0_40px_80px_-30px_rgba(0,0,0,0.8)]">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-col gap-0.5">
           <span className="font-brandMono text-[11px] uppercase tracking-[0.12em] text-brand-muted">{t("label")}</span>
@@ -52,7 +52,7 @@ export function HeroTrial() {
       {phase !== "announce" && (
         <>
           {announceOk !== null && (
-            <p className={`text-center text-sm font-medium ${announceOk ? "text-emerald-400" : "text-rose-400"}`}>
+            <p className={`text-center text-sm font-medium ${announceOk ? "text-brand-good" : "text-brand-bad"}`}>
               {announceOk ? t("announceCorrect") : t("announceWrong")}
             </p>
           )}
@@ -63,7 +63,7 @@ export function HeroTrial() {
       {phase === "done" && (
         <Link
           href="/login"
-          className="rounded-full bg-brand-gold px-4 py-3 text-center text-sm font-semibold text-brand-ink transition-colors hover:bg-brand-goldHover"
+          className="rounded-full bg-brand-accent px-4 py-3 text-center text-sm font-semibold text-brand-ink transition-colors hover:bg-brand-accentHover"
         >
           {t("cta")}
         </Link>

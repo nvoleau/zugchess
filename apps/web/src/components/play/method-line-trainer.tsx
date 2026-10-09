@@ -124,22 +124,22 @@ export function MethodLineTrainer({
           shapes={hintShape ? [{ orig: hintShape.orig, dest: hintShape.dest, brush: "paleBlue" }] : undefined}
         />
         <TempoBar label={t("tempoLabel", { done: donePlayerSteps, total: playerStepIndices.length })} boxes={boxes} />
-        {complete && <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">{t("complete")}</p>}
-        {hint && !complete && <p className="text-sm text-amber-600 dark:text-amber-400">{hint}</p>}
+        {complete && <p className="text-sm font-medium text-brand-good">{t("complete")}</p>}
+        {hint && !complete && <p className="text-sm text-brand-accent2">{hint}</p>}
       </div>
 
       {/* Panneau latéral — commentaires */}
       <div className="flex w-full flex-col gap-3 md:w-64">
         {texts && (
-          <div className="shrink-0 border-b border-neutral-200 pb-3 dark:border-white/[0.08]">
-            <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-neutral-500 dark:text-brand-muted">{texts.title}</p>
-            <p className="mt-1 text-sm text-neutral-800 dark:text-brand-cream">{texts.goal}</p>
+          <div className="shrink-0 border-b border-white/[0.08] pb-3">
+            <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-brand-muted">{texts.title}</p>
+            <p className="mt-1 text-sm text-brand-cream">{texts.goal}</p>
           </div>
         )}
         {feed.length > 0 && (
           <ul className="flex flex-col gap-1.5 text-sm max-h-40 overflow-y-auto md:max-h-[480px]">
             {feed.map((lineText, i) => (
-              <li key={i} className="rounded-md bg-neutral-100 px-3 py-1.5 dark:bg-neutral-800">
+              <li key={i} className="rounded-md bg-brand-panel px-3 py-1.5 text-brand-cream">
                 {lineText}
               </li>
             ))}

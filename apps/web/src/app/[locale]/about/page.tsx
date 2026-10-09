@@ -28,13 +28,13 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         {/* En-tête */}
         <div className="mb-16 max-w-3xl sm:mb-24">
           <Reveal delay={0}>
-            <span className="mb-4 block font-brandMono text-xs uppercase tracking-[0.14em] text-brand-gold">
+            <span className="mb-4 block font-brandMono text-xs uppercase tracking-[0.14em] text-brand-accent">
               {t("kicker")}
             </span>
           </Reveal>
           <Reveal delay={100}>
-            <h1 className="font-brandSerif text-[clamp(52px,7vw,96px)] font-normal leading-[0.97] tracking-tight">
-              {t("title")} <em className="text-brand-gold">{t("titleEm")}</em>
+            <h1 className="font-brandDisplay text-[clamp(52px,7vw,96px)] font-normal leading-[0.97] tracking-tight">
+              {t("title")} <em className="text-brand-accent">{t("titleEm")}</em>
             </h1>
           </Reveal>
           <Reveal delay={200}>
@@ -59,8 +59,8 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
 
         {/* Closing statement */}
         <Reveal delay={0}>
-          <div className="mt-10 rounded-[28px] border border-brand-gold/20 bg-brand-panel p-8 sm:p-12">
-            <h2 className="font-brandSerif text-[clamp(32px,4vw,48px)] font-normal leading-tight tracking-tight">
+          <div className="mt-10 rounded-[28px] border border-brand-accent/20 bg-brand-panel p-8 sm:p-12">
+            <h2 className="font-brandDisplay text-[clamp(32px,4vw,48px)] font-normal leading-tight tracking-tight">
               {t("closingTitle")}
             </h2>
             <p className="mt-4 max-w-[580px] text-[15px] leading-relaxed text-brand-muted">

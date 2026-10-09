@@ -3,6 +3,7 @@
 import { Chess } from "chess.js";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { btnClass } from "@/components/ui/button";
 import { pieceCountOf } from "./chess-move-dests";
 import { StockfishTrainer } from "./stockfish-trainer";
 import { SyzygyTrainer } from "./syzygy-trainer";
@@ -50,7 +51,7 @@ export function FreePlay() {
     const useStockfish = pieceCountOf(fen) > SYZYGY_MAX_PIECES;
     return (
       <div className="flex flex-col items-center gap-4">
-        <button type="button" onClick={() => setFen(null)} className="text-sm text-neutral-500 underline dark:text-neutral-400">
+        <button type="button" onClick={() => setFen(null)} className="text-sm text-brand-muted underline underline-offset-2 hover:text-brand-cream">
           {t("newPosition")}
         </button>
         {useStockfish ? <StockfishTrainer key={fen} initialFen={fen} /> : <SyzygyTrainer key={fen} initialFen={fen} />}
@@ -59,9 +60,9 @@ export function FreePlay() {
   }
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-6">
       <div className="flex w-full max-w-[420px] flex-col gap-2">
-        <label htmlFor="free-play-fen" className="text-sm font-medium">
+        <label htmlFor="free-play-fen" className="text-sm font-medium text-brand-cream">
           {t("fenLabel")}
         </label>
         <input
@@ -70,27 +71,23 @@ export function FreePlay() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="4k3/8/4K3/8/8/8/8/4R3 w - - 0 1"
-          className="rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900"
+          className="rounded-md border border-white/15 bg-brand-panel px-3 py-2 font-brandMono text-sm text-brand-cream placeholder:text-brand-muted focus:border-brand-accent focus:outline-none"
         />
-        {error && <p className="text-sm text-amber-600 dark:text-amber-400">{error}</p>}
-        <button
-          type="button"
-          onClick={() => start(input.trim())}
-          className="rounded-md bg-neutral-900 px-5 py-2.5 font-medium text-white dark:bg-white dark:text-neutral-900"
-        >
+        {error && <p className="text-sm text-brand-bad">{error}</p>}
+        <button type="button" onClick={() => start(input.trim())} className={btnClass("primary", "md", "self-start")}>
           {t("start")}
         </button>
       </div>
 
-      <div className="flex w-full max-w-[420px] flex-col gap-2">
-        <p className="text-sm text-neutral-600 dark:text-neutral-400">{t("orChooseFamily")}</p>
+      <div className="flex w-full max-w-[420px] flex-col gap-2.5">
+        <p className="text-sm text-brand-muted">{t("orChooseFamily")}</p>
         <div className="flex flex-wrap gap-2">
           {PRESETS.map((preset) => (
             <button
               key={preset.fen}
               type="button"
               onClick={() => start(preset.fen)}
-              className="rounded-full border-2 border-neutral-900 px-4 py-1.5 text-sm font-medium dark:border-white"
+              className="rounded-full border border-white/15 bg-brand-panel px-4 py-1.5 text-sm font-medium text-brand-cream transition-colors hover:border-brand-accent/50 hover:text-brand-accent"
             >
               {t(preset.labelKey)}
             </button>
