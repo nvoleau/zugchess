@@ -49,18 +49,31 @@ async function fetchTablebase(
   if (API_KEY) headers["Authorization"] = `Bearer ${API_KEY}`;
 
   const url = `${TABLEBASE_URL}?fen=${encodeURIComponent(fen)}`;
-  let resp = await fetch(url, { headers });
+  let resp: Response | null = null;
 
-  for (const backoff of BACKOFFS_MS) {
-    if (resp.status !== 429) break;
-    process.stderr.write(`429 Rate-limited — attente ${backoff / 1000}s …\n`);
-    await new Promise((r) => setTimeout(r, backoff));
-    lastFetch = Date.now();
-    resp = await fetch(url, { headers });
+  for (let attempt = 0; attempt <= BACKOFFS_MS.length; attempt++) {
+    try {
+      resp = await fetch(url, { headers });
+    } catch (err) {
+      const delay = BACKOFFS_MS[attempt] ?? 120_000;
+      process.stderr.write(`Erreur réseau (${String(err instanceof Error ? err.message : err)}) — retry dans ${delay / 1000}s…\n`);
+      await new Promise((r) => setTimeout(r, delay));
+      lastFetch = Date.now();
+      continue;
+    }
+    if (resp.status === 429) {
+      const delay = BACKOFFS_MS[attempt] ?? 120_000;
+      process.stderr.write(`429 Rate-limited — attente ${delay / 1000}s …\n`);
+      await new Promise((r) => setTimeout(r, delay));
+      lastFetch = Date.now();
+      resp = null;
+      continue;
+    }
+    break;
   }
 
-  if (!resp.ok) {
-    process.stderr.write(`Tablebase ${resp.status} pour ${fen}\n`);
+  if (!resp || !resp.ok) {
+    process.stderr.write(`Tablebase ${resp?.status ?? "erreur réseau"} pour ${fen}\n`);
     return null;
   }
   const payload = (await resp.json()) as SyzygyPosition;
@@ -430,13 +443,33 @@ async function main() {
     let attempts = 0;
     const generator = systematicPhilidorFens();
 
+    // Limite par bucket (pawnFile, pawnRank) pour garantir la diversité des positions générées.
+    // Avec 18 combinaisons (6 fichiers × 3 rangs), chaque bucket reçoit au plus ceil(target/18) FEN.
+    const maxPerBucket = Math.ceil(target / 18);
+    const bucketCounts = new Map<string, number>();
+
     for (const { fen, attackerColor } of generator) {
       if (philidorBucket.length >= target) break;
-      if (attempts >= MAX_ATTEMPTS * 3) break; // espace de recherche grand, on s'arrête quand même
+      if (attempts >= MAX_ATTEMPTS * 30) break; // espace de recherche grand + contrainte de diversité
       attempts++;
       totalAttempts++;
 
       if (!isPlayableFen(fen)) continue;
+
+      // Extraire la clé de diversité depuis la FEN (position du pion)
+      const parts = fen.split(" ");
+      const chess = new Chess(fen);
+      const board = chess.board();
+      let pawnKey = "unknown";
+      for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+          const cell = board[row]?.[col];
+          if (cell && cell.type === "p" && cell.color === "w") {
+            pawnKey = `${col},${7 - row}`;
+          }
+        }
+      }
+      if ((bucketCounts.get(pawnKey) ?? 0) >= maxPerBucket) continue;
 
       const normFen = normalizeFenForTablebase(fen);
       if (seenFens.has(normFen)) continue;
@@ -446,15 +479,16 @@ async function main() {
       if (!tablebase) continue;
 
       const { category, dtz } = tablebase;
-      if (dtz === null || Math.abs(dtz) < MIN_DTZ || Math.abs(dtz) > MAX_DTZ) continue;
-
-      const turnField = fen.split(" ")[1] as "w" | "b";
+      const turnField = parts[1] as "w" | "b";
       const attackerToMove = turnField === attackerColor;
 
+      // Philidor : défenseur au trait, position théoriquement nulle.
+      // dtz=0 est normal pour une draw — pas de filtre DTZ pour les draws.
       if (!attackerToMove && (category === "draw" || category === "blessed-loss")) {
         seenFens.add(normFen);
         philidorBucket.push(fen);
-        process.stdout.write(`[philidor ${philidorBucket.length}/${target}] dtz=${dtz} ${fen}\n`);
+        bucketCounts.set(pawnKey, (bucketCounts.get(pawnKey) ?? 0) + 1);
+        process.stdout.write(`[philidor ${philidorBucket.length}/${target}] dtz=${dtz} cat=${category} pawn=${pawnKey} ${fen}\n`);
       }
     }
     process.stdout.write(`philidor: ${philidorBucket.length}/${target} en ${attempts} tentatives.\n`);

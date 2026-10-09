@@ -27,10 +27,11 @@ export interface ZugBoardProps {
 // ── helpers ──────────────────────────────────────────────────────────────────
 
 function brushColor(brush?: string): string {
-  if (brush === "green") return "rgba(50,200,80,0.85)";
+  if (brush === "green" || brush === "paleGreen") return "rgba(50,200,80,0.85)";
   if (brush === "red") return "rgba(230,50,50,0.85)";
-  if (brush === "yellow") return "rgba(255,220,0,0.85)";
-  return "rgba(100,170,255,0.85)"; // paleBlue / default
+  if (brush === "yellow") return "rgba(255,200,0,0.85)";
+  if (brush === "paleBlue") return "rgba(100,170,255,0.85)";
+  return "rgba(100,170,255,0.85)";
 }
 
 function kingSquare(fen: string, color: "white" | "black"): string | null {

@@ -30,7 +30,7 @@ export default async function ThemeLessonsPage({
   const [t, entitlements, { positions, total }, theme] = await Promise.all([
     getTranslations("App.Lessons"),
     getEntitlementsForUser(userId),
-    listPositionsForTheme(slug, userId, localeTyped, 0, 500),
+    listPositionsForTheme(slug, userId, localeTyped, 0, 2000),
     prisma.theme.findUnique({ where: { slug }, select: { title: true } }),
   ]);
 
