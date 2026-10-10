@@ -212,17 +212,17 @@ const THEMES: ThemeSeed[] = [
     slug: "philidor", family: "tours", order: 1, title: { fr: "Philidor", en: "Philidor" },
     defaultTexts: {
       fr: {
-        intro: "La défense de Philidor est la technique nulle de référence en finale de tour avec pion : la tour en 6e rangée bloque le roi adverse, puis passe derrière pour des échecs perpétuels.",
-        attackTitle: "Philidor – Forcer la dame",
+        intro: "En finale tour+pion contre tour, la défense de Philidor tient la nulle : la tour en 6e rangée bloque le roi adverse, puis recule en 1re rangée pour des échecs perpétuels. L'attaquant doit déjouer cette barrière ; le défenseur doit l'appliquer avec précision.",
+        attackTitle: "Philidor – Déjouer la défense",
         defendTitle: "Philidor – Tenir la nulle",
-        attackGoal: "Contourne la défense de Philidor et fais dame.",
+        attackGoal: "Ton adversaire joue la défense de Philidor (tour en 6e rangée). Tu as le pion — contourne cette barrière et fais dame.",
         defendGoal: "Applique la défense de Philidor et tiens la nulle.",
       },
       en: {
-        intro: "Philidor's defense is the reference drawing technique in rook-and-pawn endings: the rook on the 6th rank holds back the opposing king, then drops behind for perpetual checks.",
-        attackTitle: "Philidor – Force promotion",
+        intro: "In a rook-and-pawn versus rook ending, Philidor's defense holds the draw: the rook on the 6th rank blocks the opposing king, then drops to the 1st rank for perpetual checks. The attacker must overcome this barrier; the defender must apply it precisely.",
+        attackTitle: "Philidor – Overcome the defence",
         defendTitle: "Philidor – Hold the draw",
-        attackGoal: "Overcome Philidor's defense and promote.",
+        attackGoal: "Your opponent plays the Philidor defence (rook on the 6th rank). You have the pawn — get past that barrier and promote.",
         defendGoal: "Apply Philidor's defense and hold the draw.",
       },
     },
@@ -889,6 +889,26 @@ async function main() {
       create: { id: position.id, ...base },
       update: base,
     });
+  }
+
+  // --- Patch : textes des positions Philidor générées (attaquant = camp avec le pion) ---
+  // Les positions générées par generate-syzygy.ts pour le thème Philidor en mode "attaquant"
+  // avaient des textes confus (pas de contexte sur le rôle). Ce patch les met à jour sans
+  // toucher aux positions manuelles (id: "philidor") qui ont leurs propres texts.
+  {
+    const philidorThemeId = themeIdBySlug.get("philidor");
+    if (philidorThemeId) {
+      const philidorDefaultTexts = THEMES.find((t) => t.slug === "philidor")!.defaultTexts!;
+      await prisma.position.updateMany({
+        where: { themeId: philidorThemeId, generated: true, userSide: "black" },
+        data: {
+          texts: {
+            fr: { title: philidorDefaultTexts.fr.attackTitle, intro: philidorDefaultTexts.fr.intro, goal: philidorDefaultTexts.fr.attackGoal },
+            en: { title: philidorDefaultTexts.en.attackTitle, intro: philidorDefaultTexts.en.intro, goal: philidorDefaultTexts.en.attackGoal },
+          } as unknown as Prisma.InputJsonValue,
+        },
+      });
+    }
   }
 
   // --- Trophées (Achievement) ---
