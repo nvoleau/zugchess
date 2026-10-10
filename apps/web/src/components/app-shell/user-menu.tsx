@@ -35,7 +35,7 @@ export function UserMenu({ initials, name, plan, isAdmin, labels }: Props) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-11 z-30 w-52 overflow-hidden rounded-xl border border-white/10 bg-[#1A160F] shadow-2xl">
+        <div className="absolute right-0 top-11 z-30 w-52 overflow-hidden rounded-xl border border-white/10 bg-brand-ink shadow-2xl">
           <div className="border-b border-white/10 px-4 py-3">
             <p className="truncate text-sm font-medium text-brand-cream">{name ?? labels.myAccount}</p>
             <p className="font-brandMono text-xs text-brand-accent">{plan}</p>

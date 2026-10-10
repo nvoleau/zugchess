@@ -122,6 +122,7 @@ export function MethodLineTrainer({
           dests={complete || !chessRef.current ? undefined : legalDests(chessRef.current, playerColor)}
           onMove={handleMove}
           shapes={hintShape ? [{ orig: hintShape.orig, dest: hintShape.dest, brush: "paleBlue" }] : undefined}
+          size={420}
         />
         <TempoBar label={t("tempoLabel", { done: donePlayerSteps, total: playerStepIndices.length })} boxes={boxes} />
         {complete && <p className="text-sm font-medium text-brand-good">{t("complete")}</p>}

@@ -1,6 +1,6 @@
 "use client";
 
-import { RUSH_HELD_TO_DRAW, bestKpkReply } from "@zugchess/core";
+import { RUSH_HELD_TO_DRAW, RUSH_WIN_THRESHOLD, bestKpkReply, judgeKpkMove } from "@zugchess/core";
 import { Chess } from "chess.js";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
@@ -94,9 +94,33 @@ export function RushBoard({
     const played = chess.move({ from, to, promotion });
     if (!played) return;
 
-    setFen(chess.fen());
+    const fenAfterUser = chess.fen();
+    setFen(fenAfterUser);
     setLastMove([from, to]);
     moveDurationsRef.current.push(Date.now() - moveStartRef.current);
+
+    // KPK attacker: pre-apply opponent reply client-side for instant visual feedback.
+    // judgeKpkMove + bestKpkReply use the same bitboard as the server — result is always identical.
+    // Skipped for: draw-goal (defender), promotions (KPK judge breaks on KQ vs K), captures
+    // (pawn capture ends the position without opponent reply).
+    let opponentPreApplied = false;
+    if (position.judgeType === "kpk" && !isDrawGoal && !played.promotion && !played.captured) {
+      try {
+        const clientJudge = judgeKpkMove(fenBefore, fenAfterUser);
+        if (!clientJudge.blundered) {
+          const oppReply = bestKpkReply(fenAfterUser);
+          const oppMoved = chess.move({ from: oppReply.from, to: oppReply.to, promotion: oppReply.promotion ?? undefined });
+          if (oppMoved) {
+            setFen(chess.fen());
+            setLastMove([oppReply.from, oppReply.to]);
+            opponentPreApplied = true;
+          }
+        }
+      } catch {
+        // bestKpkReply may fail for edge-case positions — skip pre-apply, server handles normally
+      }
+    }
+
     setPending(true);
 
     try {
@@ -122,9 +146,17 @@ export function RushBoard({
 
       if (!data.accepted) {
         setMoveResult("bad");
-        if (data.fenAfterReply) {
-          // Show the opponent's punishing move (e.g. pawn capture) before concluding,
-          // so the user understands why their move was a blunder.
+        if (opponentPreApplied) {
+          // Revert the optimistic opponent reply, then show server's punishment response
+          chess.load(fenBefore);
+          setFen(chess.fen());
+          setLastMove(undefined);
+          if (data.fenAfterReply) {
+            await delay(420);
+            chess.load(data.fenAfterReply);
+            setFen(chess.fen());
+          }
+        } else if (data.fenAfterReply) {
           await delay(420);
           chess.load(data.fenAfterReply);
           setFen(chess.fen());
@@ -152,7 +184,8 @@ export function RushBoard({
       if (position.judgeType === "line" && data.nextStepIndex !== undefined) stepIndexRef.current = data.nextStepIndex;
       if (isDrawGoal) setHeld((h) => h + 1);
       else movesCorrectRef.current += 1;
-      if (data.fenAfterReply) {
+      // Skip chess.load/setFen if opponent reply was already pre-applied client-side
+      if (data.fenAfterReply && !opponentPreApplied) {
         chess.load(data.fenAfterReply);
         setFen(chess.fen());
       }

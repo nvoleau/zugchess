@@ -285,7 +285,7 @@ export function SyzygyTrainer({
 
   return (
     <div className="flex flex-col items-center gap-4 md:flex-row md:items-start">
-      {/* Colonne échiquier */}
+      {/* Colonne échiquier — 420 px max pour tenir dans un viewport laptop sans scroller */}
       <div className="flex flex-col items-center gap-3">
         <ZugBoard
           fen={fen}
@@ -295,20 +295,35 @@ export function SyzygyTrainer({
           onMove={handleMove}
           lastMove={lastMove}
           shapes={hintShape ? [{ orig: hintShape.orig, dest: hintShape.dest, brush: "paleBlue" }] : undefined}
-          size={480}
+          size={420}
         />
-        {boxes.length > 0 && <TempoBar label={label} boxes={boxes} />}
-        {goal !== "win" && goal !== "draw" && <p className="text-sm text-brand-muted">{label}</p>}
-        {status === "finished" && outcome && (
-          <p className="animate-pop-in text-sm font-medium text-brand-good">
-            {outcome === "win" ? t("won") : outcome === "draw" ? t("drawn") : t("lost")}
-          </p>
-        )}
-        {hint && <p className="text-sm text-brand-accent2">{hint}</p>}
+        {/* TempoBar + statut sous l'échiquier sur mobile ; sur desktop ils passent dans le panneau droit */}
+        <div className="md:hidden w-full">
+          {boxes.length > 0 && <TempoBar label={label} boxes={boxes} />}
+          {goal !== "win" && goal !== "draw" && <p className="mt-1 text-sm text-brand-muted">{label}</p>}
+          {status === "finished" && outcome && (
+            <p className="animate-pop-in mt-1 text-sm font-medium text-brand-good">
+              {outcome === "win" ? t("won") : outcome === "draw" ? t("drawn") : t("lost")}
+            </p>
+          )}
+          {hint && <p className="mt-1 text-sm text-brand-accent2">{hint}</p>}
+        </div>
       </div>
 
-      {/* Panneau latéral style étude Lichess */}
-      <div className="flex w-full flex-col md:h-[480px] md:w-72">
+      {/* Panneau latéral style étude Lichess — même hauteur que l'échiquier sur desktop */}
+      <div className="flex h-44 w-full flex-col md:h-[420px] md:w-72">
+        {/* TempoBar + statut en tête du panneau sur desktop uniquement */}
+        <div className="hidden md:block shrink-0 border-b border-white/[0.08] pb-3 mb-3">
+          {boxes.length > 0 && <TempoBar label={label} boxes={boxes} />}
+          {goal !== "win" && goal !== "draw" && <p className="mt-1 text-sm text-brand-muted">{label}</p>}
+          {status === "finished" && outcome && (
+            <p className="animate-pop-in mt-1 text-sm font-medium text-brand-good">
+              {outcome === "win" ? t("won") : outcome === "draw" ? t("drawn") : t("lost")}
+            </p>
+          )}
+          {hint && <p className="mt-1 text-sm text-brand-accent2">{hint}</p>}
+        </div>
+
         {texts && (
           <div className="shrink-0 border-b border-white/[0.08] pb-3 mb-3">
             <p className="font-brandMono text-[10px] uppercase tracking-[0.14em] text-brand-muted">{texts.title}</p>

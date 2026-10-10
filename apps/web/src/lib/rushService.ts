@@ -17,16 +17,18 @@ import {
   createSeededRandom,
   isRushOver,
   isRushTimeUp,
+  kpkResult,
   nextRushTargetRating,
   pickSeeded,
   rushRemainingMs,
 } from "@zugchess/core";
-import { Prisma } from "@prisma/client";
+import { type ExpectedResult, type Side, Prisma } from "@prisma/client";
 import { randomUUID } from "crypto";
 import { consumeUsage } from "./entitlements";
 import { attackerColorOf } from "@/components/play/chess-move-dests";
 import { judgeKpkPositionMove, judgeLinePositionMove, judgeSyzygyPositionMove } from "./judgeService";
 import { getPosition, type PositionDetail } from "./positionService";
+import { markRushBlunderForReview } from "./schedulerService";
 import { prisma } from "./prisma";
 
 const ELIGIBLE_JUDGE_TYPES: Array<"kpk" | "syzygy" | "line"> = ["kpk", "syzygy", "line"];
@@ -45,61 +47,97 @@ export class RushRunNotFoundError extends Error {
   }
 }
 
+/**
+ * Tente de trouver une position jouable. `lastJudgeType` active l'alternance de types : on essaie
+ * d'abord un type différent du dernier (ex. Syzygy après KPK) pour varier les finales, puis on se
+ * rabat sur tous les types si le pool alternatif est vide.
+ */
 async function pickPosition(
   targetRating: number,
   excludeIds: string[],
   seed: string,
   locale: "fr" | "en",
+  lastJudgeType?: string,
 ): Promise<PositionDetail> {
   // Working copy: grows as we discover unplayable positions.
   const skipped = new Set(excludeIds);
 
-  for (const window of RATING_WINDOWS) {
-    // Try several draws per rating window in case early picks are unplayable.
-    for (let attempt = 0; attempt < 12; attempt++) {
-      const notIn = [...skipped];
-      const where =
-        window === Infinity
-          ? { status: "published" as const, judgeType: { in: ELIGIBLE_JUDGE_TYPES }, id: { notIn } }
-          : {
-              status: "published" as const,
-              judgeType: { in: ELIGIBLE_JUDGE_TYPES },
-              id: { notIn },
-              rating: { gte: targetRating - window, lte: targetRating + window },
-            };
+  // Exclude positions the player is expected to LOSE — e.g. "Lucena defender" where White always
+  // wins regardless of Black's play. Only keep win-for-the-player or draw positions in Rush.
+  const NOT_LOSING: Array<{ userSide: Side; expectedResult: ExpectedResult }> = [
+    { userSide: "white", expectedResult: "black" },
+    { userSide: "black", expectedResult: "white" },
+  ];
 
-      const candidates = await prisma.position.findMany({ where, select: { id: true }, take: 60 });
-      if (candidates.length === 0) break;
+  // Two tiers: first prefer a different judge type (variety), then fall back to all types.
+  const alternatTypes = lastJudgeType
+    ? ELIGIBLE_JUDGE_TYPES.filter((t) => t !== lastJudgeType)
+    : [];
+  const typeTiers: Array<Array<"kpk" | "syzygy" | "line">> =
+    alternatTypes.length > 0
+      ? [alternatTypes, ELIGIBLE_JUDGE_TYPES]
+      : [ELIGIBLE_JUDGE_TYPES];
 
-      const random = createSeededRandom(`${seed}:${notIn.length}:${window}:${attempt}`);
-      const chosenId = pickSeeded(candidates, random).id;
-      const position = await getPosition(chosenId, locale);
+  for (const judgeTypes of typeTiers) {
+    for (const window of RATING_WINDOWS) {
+      for (let attempt = 0; attempt < 12; attempt++) {
+        const notIn = [...skipped];
+        const baseWhere = {
+          status: "published" as const,
+          judgeType: { in: judgeTypes },
+          id: { notIn },
+          NOT: NOT_LOSING,
+        };
+        const where =
+          window === Infinity
+            ? baseWhere
+            : { ...baseWhere, rating: { gte: targetRating - window, lte: targetRating + window } };
 
-      if (!position) { skipped.add(chosenId); continue; }
+        const candidates = await prisma.position.findMany({ where, select: { id: true }, take: 60 });
+        if (candidates.length === 0) break;
 
-      // Non-KPK positions where the initial turn doesn't match userSide can't be played in Rush
-      // (KPK has a client-side auto-play for the first opponent move; Syzygy/Line do not).
-      if (position.judgeType !== "kpk") {
-        const fenTurn = position.fen.split(" ")[1];
-        const playerTurn = position.userSide === "white" ? "w" : "b";
-        if (fenTurn !== playerTurn) { skipped.add(chosenId); continue; }
-      }
+        const random = createSeededRandom(`${seed}:${notIn.length}:${window}:${attempt}`);
+        const chosenId = pickSeeded(candidates, random).id;
+        const position = await getPosition(chosenId, locale);
 
-      // KPK defender: skip if the opponent's first auto-played move is a pawn promotion.
-      // After promotion the position becomes K+Q vs K, which the KPK bitboard judge can't
-      // handle (kpkResult only works for King+Pawn+King). This leaves the Rush stuck.
-      if (position.judgeType === "kpk") {
-        const fenTurn = position.fen.split(" ")[1];
-        const playerTurn = position.userSide === "white" ? "w" : "b";
-        if (fenTurn !== playerTurn) {
-          // Opponent moves first (auto-play in RushBoard) — check for immediate promotion.
-          const autoMove = bestKpkReply(position.fen);
-          if (autoMove.promotion) { skipped.add(chosenId); continue; }
+        if (!position) { skipped.add(chosenId); continue; }
+
+        // Non-KPK positions where the initial turn doesn't match userSide can't be played in Rush
+        // (KPK has a client-side auto-play for the first opponent move; Syzygy/Line do not).
+        if (position.judgeType !== "kpk") {
+          const fenTurn = position.fen.split(" ")[1];
+          const playerTurn = position.userSide === "white" ? "w" : "b";
+          if (fenTurn !== playerTurn) { skipped.add(chosenId); continue; }
         }
-      }
 
-      return position;
+        // KPK defender: skip if the opponent's first auto-played move is a pawn promotion.
+        // After promotion the position becomes K+Q vs K, which the KPK bitboard judge can't
+        // handle (kpkResult only works for King+Pawn+King). This leaves the Rush stuck.
+        if (position.judgeType === "kpk") {
+          const fenTurn = position.fen.split(" ")[1];
+          const playerTurn = position.userSide === "white" ? "w" : "b";
+          if (fenTurn !== playerTurn) {
+            const autoMove = bestKpkReply(position.fen);
+            if (autoMove.promotion) { skipped.add(chosenId); continue; }
+          }
+        }
+
+        // KPK defender: skip if theoretically lost — the bitboard says attacker wins with
+        // optimal play, so every defender move is rejected (none maintain resultAfter === "draw").
+        // Such positions are generated from randomWinningKpkFen() which only produces attacker-wins
+        // FENs, making ALL their defender pairs unplayable.
+        if (position.judgeType === "kpk") {
+          const attackerColor = position.fen.split(" ")[0]!.includes("P") ? "white" : "black";
+          const userIsDefender = position.userSide !== attackerColor;
+          if (userIsDefender && kpkResult(position.fen) === "win") {
+            skipped.add(chosenId); continue;
+          }
+        }
+
+        return position;
+      }
     }
+    // First tier exhausted (no variety available) — continue to fallback tier.
   }
 
   throw new Error("Aucune position disponible pour Zug Rush.");
@@ -252,6 +290,11 @@ export async function submitMove(userId: string, runId: string, locale: "fr" | "
     },
   });
 
+  // Erreur Rush → programmer la position en révision FSRS (note Again, pas de quota/XP).
+  if (!correct) {
+    await markRushBlunderForReview(userId, position.id);
+  }
+
   const nextScore = correct ? run.score + 1 : run.score;
   const nextErrors = correct ? run.errors : run.errors + 1;
 
@@ -268,7 +311,7 @@ export async function submitMove(userId: string, runId: string, locale: "fr" | "
   // Exclude ALL positions already attempted in this run (not just the current one) to avoid repeats.
   const attempted = await prisma.rushAttempt.findMany({ where: { runId }, select: { positionId: true } });
   const excludeIds = [...new Set([...attempted.map((a) => a.positionId), position.id])];
-  const nextPosition = await pickPosition(nextRushTargetRating(nextScore), excludeIds, run.seed, locale);
+  const nextPosition = await pickPosition(nextRushTargetRating(nextScore), excludeIds, run.seed, locale, position.judgeType);
 
   return {
     live: true,

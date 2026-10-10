@@ -88,7 +88,7 @@ export function AppBottomNav({ labels }: { labels: Record<string, string> }) {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-30 flex md:hidden border-t border-white/10 bg-brand-ink/95 backdrop-blur-md">
+    <nav className="fixed bottom-0 left-0 right-0 z-30 flex md:hidden border-t border-white/10 bg-brand-ink">
       {TABS.map((tab) => {
         const active = isActive(tab.href, pathname);
         return (

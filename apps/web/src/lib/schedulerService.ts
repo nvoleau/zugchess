@@ -1,5 +1,6 @@
 import {
   buildSessionQueue,
+  kpkResult,
   newCardState,
   rateReview,
   scheduleNextReview,
@@ -16,6 +17,15 @@ import { applyGamification } from "./gamificationService";
 /** `player_ratings` (SPEC.md) n'existe pas encore (lot Glicko à venir) : on compare à l'Elo de
  * finales par défaut pour trier les nouvelles positions par difficulté. */
 const DEFAULT_PLAYER_RATING = 1500;
+
+/** KPK positions generated from randomWinningKpkFen() all have the attacker winning. Their defender
+ * counterparts are theoretically lost — every defender move is rejected by KpkTrainer, leaving the
+ * player stuck. Filter them out before they enter the session queue. */
+function isLostKpkDefender(row: { judgeType: string; fen: string; userSide: string }): boolean {
+  if (row.judgeType !== "kpk") return false;
+  const attackerColor = row.fen.split(" ")[0]!.includes("P") ? "white" : "black";
+  return row.userSide !== attackerColor && kpkResult(row.fen) === "win";
+}
 
 export interface SessionQueueEntry {
   positionId: string;
@@ -47,9 +57,23 @@ export async function getTodaySession(userId: string, locale: "fr" | "en"): Prom
   const reviewQuota = Math.min(settings?.reviewsPerDay ?? 100, entitlements.remaining.reviews);
   const newQuota = Math.min(settings?.newPerDay ?? 10, entitlements.remaining.newPositions);
 
+  const filteredNewRows = newRows.filter((row) => !isLostKpkDefender(row));
+
+  const dueFullRowsAll =
+    dueRows.length > 0
+      ? await prisma.position.findMany({
+          where: { id: { in: dueRows.map((r) => r.positionId) } },
+          include: { theme: true },
+        })
+      : [];
+  const dueFullRows = dueFullRowsAll.filter((row) => !isLostKpkDefender(row));
+  const validDueIds = new Set(dueFullRows.map((r) => r.id));
+
   const queue = buildSessionQueue({
-    dueCards: dueRows.map((row) => ({ positionId: row.positionId, due: row.due })),
-    newPositions: newRows.map((row) => ({
+    dueCards: dueRows
+      .filter((row) => validDueIds.has(row.positionId))
+      .map((row) => ({ positionId: row.positionId, due: row.due })),
+    newPositions: filteredNewRows.map((row) => ({
       positionId: row.id,
       themeOrder: row.theme.order,
       ratingDistance: Math.abs(row.rating - DEFAULT_PLAYER_RATING),
@@ -58,14 +82,7 @@ export async function getTodaySession(userId: string, locale: "fr" | "en"): Prom
     newQuota,
   });
 
-  const positionsById = new Map(newRows.map((row) => [row.id, row]));
-  const dueFullRows =
-    dueRows.length > 0
-      ? await prisma.position.findMany({
-          where: { id: { in: dueRows.map((r) => r.positionId) } },
-          include: { theme: true },
-        })
-      : [];
+  const positionsById = new Map(filteredNewRows.map((row) => [row.id, row]));
   for (const row of dueFullRows) positionsById.set(row.id, row);
 
   const items: SessionQueueEntry[] = queue.map((entry) => {
@@ -175,4 +192,25 @@ export async function recordReview(userId: string, submission: ReviewSubmission)
   });
 
   return { rating, due, isNewPosition, ...gamification };
+}
+
+/**
+ * Enregistre une erreur Rush dans la file FSRS — sans consommer de quota, sans XP, sans Glicko.
+ * La position sera programmée pour être revue en séance d'entraînement très prochainement (note 1 = Again).
+ * Positions correctes en Rush : pas de mise à jour (le mode arcade ne remplace pas la séance).
+ */
+export async function markRushBlunderForReview(userId: string, positionId: string): Promise<void> {
+  const existingCard = await prisma.card.findUnique({
+    where: { userId_positionId: { userId, positionId } },
+  });
+
+  const now = new Date();
+  const baseCard = existingCard ? (existingCard.fsrsState as unknown as FsrsCardState) : newCardState(now);
+  const { card: nextCard, due } = scheduleNextReview(baseCard, 1 as ReviewGrade, now);
+
+  await prisma.card.upsert({
+    where: { userId_positionId: { userId, positionId } },
+    create: { userId, positionId, fsrsState: nextCard as unknown as Prisma.InputJsonValue, due },
+    update: { fsrsState: nextCard as unknown as Prisma.InputJsonValue, due },
+  });
 }

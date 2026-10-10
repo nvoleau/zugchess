@@ -80,10 +80,17 @@ export function SessionCard({ position, onComplete, nextLabel }: Props) {
   return (
     <div className="flex flex-col items-center gap-4 text-center">
       {phase === "announce" && (
-        <>
-          <ZugBoard fen={position.fen} orientation={position.userSide} />
-          <AnnounceStep sideToMove={sideToMoveOf(position.fen)} onAnswer={handleAnnounce} />
-        </>
+        <div className="flex w-full flex-col items-center gap-6 md:flex-row md:items-center md:justify-center md:gap-10">
+          <div className="shrink-0">
+            <ZugBoard fen={position.fen} orientation={position.userSide} size={380} />
+          </div>
+          <div className="flex flex-col items-center gap-4 md:items-start md:text-left">
+            {position.texts?.intro && (
+              <p className="max-w-xs text-sm text-brand-muted">{position.texts.intro}</p>
+            )}
+            <AnnounceStep sideToMove={sideToMoveOf(position.fen)} onAnswer={handleAnnounce} />
+          </div>
+        </div>
       )}
 
       {phase !== "announce" && (
@@ -134,9 +141,10 @@ export function SessionCard({ position, onComplete, nextLabel }: Props) {
         </>
       )}
 
-      {/* Bouton sticky — toujours accessible sans scroller, quel que soit la longueur du feed */}
+      {/* Bouton sticky — toujours accessible sans scroller. Sur mobile : bottom-20 pour passer au-dessus
+          de la barre de navigation fixe (~64 px) ; sur desktop : bottom-6. */}
       {phase === "done" && (
-        <div className="pointer-events-none fixed bottom-6 left-0 right-0 z-50 flex justify-center">
+        <div className="pointer-events-none fixed bottom-20 left-0 right-0 z-50 flex justify-center md:bottom-6">
           <button
             type="button"
             onClick={handleNext}

@@ -271,10 +271,13 @@ export function ZugBoard({
     {turn && (
       <div className="mt-2 flex items-center justify-center gap-2">
         <span
-          className={`h-3 w-3 rounded-sm ring-1 ${turn === "w" ? "bg-white ring-white/40" : "bg-zinc-950 ring-white/20"}`}
-          style={turn === "w" ? { boxShadow: "0 0 8px rgba(255,255,255,0.5)" } : undefined}
+          className={`h-3.5 w-3.5 rounded-full ${
+            turn === "w"
+              ? "bg-white shadow-[0_0_6px_rgba(255,255,255,0.55)]"
+              : "border-2 border-white/65 bg-transparent"
+          }`}
         />
-        <span className="font-brandMono text-[10px] uppercase tracking-[0.12em] text-brand-muted">
+        <span className="font-brandMono text-xs tracking-[0.08em] text-brand-cream/75">
           {turn === "w" ? "Blancs" : "Noirs"}
         </span>
       </div>
