@@ -24,6 +24,40 @@ export interface SessionQueueItem {
   kind: "due" | "new";
 }
 
+/**
+ * Distributes new positions across themes in round-robin order so each session contains
+ * variety. Within each theme, positions are ordered by ratingDistance (closest Elo first).
+ * Themes are visited in ascending themeOrder so the pedagogical sequence is respected
+ * globally, but no single theme monopolises the session quota.
+ */
+function interleaveByTheme(positions: NewPositionCandidate[], quota: number): NewPositionCandidate[] {
+  const sorted = [...positions].sort(
+    (a, b) => a.themeOrder - b.themeOrder || a.ratingDistance - b.ratingDistance,
+  );
+  const grouped = new Map<number, NewPositionCandidate[]>();
+  for (const p of sorted) {
+    const bucket = grouped.get(p.themeOrder) ?? [];
+    bucket.push(p);
+    grouped.set(p.themeOrder, bucket);
+  }
+  const buckets = [...grouped.values()];
+  const result: NewPositionCandidate[] = [];
+  let round = 0;
+  while (result.length < quota) {
+    let added = false;
+    for (const bucket of buckets) {
+      if (result.length >= quota) break;
+      if (round < bucket.length) {
+        result.push(bucket[round]!);
+        added = true;
+      }
+    }
+    if (!added) break;
+    round++;
+  }
+  return result;
+}
+
 export function buildSessionQueue({
   dueCards,
   newPositions,
@@ -40,10 +74,9 @@ export function buildSessionQueue({
     .slice(0, Math.max(0, reviewQuota))
     .map((c): SessionQueueItem => ({ positionId: c.positionId, kind: "due" }));
 
-  const fresh = [...newPositions]
-    .sort((a, b) => a.themeOrder - b.themeOrder || a.ratingDistance - b.ratingDistance)
-    .slice(0, Math.max(0, newQuota))
-    .map((p): SessionQueueItem => ({ positionId: p.positionId, kind: "new" }));
+  const fresh = interleaveByTheme(newPositions, Math.max(0, newQuota)).map(
+    (p): SessionQueueItem => ({ positionId: p.positionId, kind: "new" }),
+  );
 
   return [...due, ...fresh];
 }

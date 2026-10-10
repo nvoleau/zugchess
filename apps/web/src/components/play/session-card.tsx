@@ -135,7 +135,7 @@ export function SessionCard({ position, onComplete, nextLabel }: Props) {
             </div>
           ) : (
             position.methodLine && (
-              <MethodLineTrainer line={position.methodLine} onComplete={handleFinished} />
+              <MethodLineTrainer line={position.methodLine} onComplete={handleFinished} texts={position.texts ?? undefined} />
             )
           )}
         </>
