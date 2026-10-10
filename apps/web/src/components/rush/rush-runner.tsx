@@ -23,6 +23,7 @@ interface RushMeta {
 }
 
 type Phase = "idle" | "starting" | "running" | "finished" | "quota";
+type PuzzleResult = { correct: boolean } | null;
 
 function formatClock(ms: number): string {
   const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
@@ -42,7 +43,9 @@ export function RushRunner({ locale, currentUserId }: { locale: "fr" | "en"; cur
   const [remainingMs, setRemainingMs] = useState(0);
   const [displayMs, setDisplayMs] = useState(0);
   const [finalScore, setFinalScore] = useState(0);
+  const [puzzleResult, setPuzzleResult] = useState<PuzzleResult>(null);
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const puzzleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   async function loadMeta() {
     const res = await fetch("/api/rush/leaderboard?period=day");
@@ -100,14 +103,19 @@ export function RushRunner({ locale, currentUserId }: { locale: "fr" | "en"; cur
     setRemainingMs(result.remainingMs);
     setDisplayMs(result.remainingMs);
 
-    if (result.runOver || !result.nextPosition) {
-      setFinalScore(result.score);
-      setPhase("finished");
-      loadMeta();
-      return;
-    }
-
-    setPosition(result.nextPosition);
+    // Show result overlay, then advance after 680ms (overlay animation duration)
+    setPuzzleResult({ correct: result.correct });
+    if (puzzleTimerRef.current) clearTimeout(puzzleTimerRef.current);
+    puzzleTimerRef.current = setTimeout(() => {
+      setPuzzleResult(null);
+      if (result.runOver || !result.nextPosition) {
+        setFinalScore(result.score);
+        setPhase("finished");
+        loadMeta();
+      } else {
+        setPosition(result.nextPosition);
+      }
+    }, 680);
   }
 
   // Fin du temps détectée côté affichage (cosmétique) — le serveur reste seul juge de la fin réelle,
@@ -213,7 +221,40 @@ export function RushRunner({ locale, currentUserId }: { locale: "fr" | "en"; cur
         </div>
       </div>
 
-      {position && <RushBoard key={position.id} runId={runId!} position={position} locale={locale} onConcluded={handleConcluded} />}
+      <div className="relative">
+        {position && <RushBoard key={position.id} runId={runId!} position={position} locale={locale} onConcluded={handleConcluded} />}
+
+        {puzzleResult !== null && (
+          <div
+            className="pointer-events-none absolute inset-0 z-40 flex flex-col items-center justify-center gap-2 rounded-lg"
+            style={{
+              background: "rgba(10,14,18,0.86)",
+              borderTop: `2px solid ${puzzleResult.correct ? "#4FD8A8" : "#E5584A"}`,
+              animation: "rush-overlay 0.68s ease-out forwards",
+            }}
+          >
+            <span
+              className="select-none leading-none"
+              style={{
+                fontSize: "5.5rem",
+                color: puzzleResult.correct ? "#4FD8A8" : "#E5584A",
+                animation: "rush-icon 0.38s cubic-bezier(0.175,0.885,0.32,1.275) forwards",
+              }}
+            >
+              {puzzleResult.correct ? "✓" : "✗"}
+            </span>
+            <span
+              className="font-brandMono text-sm tracking-[0.2em]"
+              style={{
+                color: puzzleResult.correct ? "#4FD8A8" : "#E5584A",
+                animation: "rush-label 0.28s 0.12s ease-out both",
+              }}
+            >
+              {puzzleResult.correct ? "+1" : t("blunder")}
+            </span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

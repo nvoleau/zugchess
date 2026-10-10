@@ -48,7 +48,7 @@ export default async function AdminUsersPage({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-neutral-200 text-left dark:border-neutral-800">
-              <th className="py-2 pr-4">{t("columns.email")}</th>
+              <th className="py-2 pr-4">{t("columns.identity")}</th>
               <th className="py-2 pr-4">{t("columns.plan")}</th>
               <th className="py-2 pr-4">{t("columns.status")}</th>
               <th className="py-2 pr-4">{t("columns.founder")}</th>
@@ -60,8 +60,11 @@ export default async function AdminUsersPage({
               <tr key={user.id} className="border-b border-neutral-100 dark:border-neutral-900">
                 <td className="py-2 pr-4">
                   <Link href={`/admin/users/${user.id}`} className="underline">
-                    {user.email ?? user.id}
+                    {user.name ?? user.email ?? user.id}
                   </Link>
+                  {user.name && user.email && (
+                    <span className="ml-2 text-xs text-neutral-500">{user.email}</span>
+                  )}
                 </td>
                 <td className="py-2 pr-4">{user.plan}</td>
                 <td className="py-2 pr-4">{user.status}</td>

@@ -53,8 +53,9 @@ async function isFirstReviewToday(userId: string, positionId: string, _timezone:
   const count = await prisma.reviewLog.count({
     where: { userId, positionId, reviewedAt: { gte: todayStart } },
   });
-  // La révision courante n'est pas encore en base, donc count === 0 ⟺ première révision du jour.
-  return count === 0;
+  // La révision courante est déjà en base (insérée avant cet appel) :
+  // count === 1 ⟺ seul log = le courant ⟺ première révision du jour pour cette position.
+  return count === 1;
 }
 
 /** Calcule la somme totale d'XP pour un joueur depuis la table `XpEvent`. */

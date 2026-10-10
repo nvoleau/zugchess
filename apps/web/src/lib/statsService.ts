@@ -26,6 +26,20 @@ export interface RatingHistoryPoint {
   createdAt: Date;
 }
 
+export interface WeakSpot {
+  themeSlug: string;
+  title: string;
+  totalReviews: number;
+  errorRate: number; // 0–1
+}
+
+export interface RushStats {
+  runs: number;
+  bestScore: number;
+  totalCorrect: number;
+  totalErrors: number;
+}
+
 export interface PlayerStats {
   rating: number;
   ratingDeviation: number;
@@ -34,6 +48,10 @@ export interface PlayerStats {
   level: number;
   streak: { current: number; best: number; freezes: number };
   themeMastery: ThemeMastery[];
+  /** Thèmes avec le taux d'erreur le plus élevé (min 3 révisions), triés du pire au meilleur. */
+  weakSpots: WeakSpot[];
+  /** Stats des Rush runs terminés. */
+  rushStats: RushStats | null;
   /** Chantier 4 : cotes ZugElo par famille (`Theme.family`). */
   familyRatings: FamilyRating[];
   /** Chantier 4 : derniers points de la courbe de progression (cote globale), les plus récents en dernier. */
@@ -43,7 +61,7 @@ export interface PlayerStats {
 const RATING_HISTORY_LIMIT = 30;
 
 export async function getPlayerStats(userId: string, locale: "fr" | "en"): Promise<PlayerStats> {
-  const [rating, xpAgg, streak, themes, cards, familyRatings, ratingHistoryRows] = await Promise.all([
+  const [rating, xpAgg, streak, themes, cards, familyRatings, ratingHistoryRows, reviewLogsWithTheme, rushRuns] = await Promise.all([
     prisma.playerRating.findUnique({ where: { userId } }),
     prisma.xpEvent.aggregate({ where: { userId }, _sum: { amount: true } }),
     prisma.streak.findUnique({ where: { userId } }),
@@ -61,6 +79,14 @@ export async function getPlayerStats(userId: string, locale: "fr" | "en"): Promi
       where: { userId, family: null },
       orderBy: { createdAt: "desc" },
       take: RATING_HISTORY_LIMIT,
+    }),
+    prisma.reviewLog.findMany({
+      where: { userId },
+      select: { errors: true, position: { select: { themeId: true } } },
+    }),
+    prisma.rushRun.findMany({
+      where: { userId, status: "completed" },
+      select: { score: true, errors: true },
     }),
   ]);
 
@@ -101,6 +127,41 @@ export async function getPlayerStats(userId: string, locale: "fr" | "en"): Promi
     };
   });
 
+  // Points faibles : taux d'erreur par thème (min 3 révisions, triés du pire au meilleur)
+  const themeById = new Map(themes.map((t) => [t.id, t]));
+  const reviewsByTheme = new Map<string, { total: number; errors: number }>();
+  for (const rl of reviewLogsWithTheme) {
+    const themeId = rl.position.themeId;
+    const entry = reviewsByTheme.get(themeId) ?? { total: 0, errors: 0 };
+    entry.total++;
+    if (rl.errors > 0) entry.errors++;
+    reviewsByTheme.set(themeId, entry);
+  }
+  const weakSpots: WeakSpot[] = Array.from(reviewsByTheme.entries())
+    .filter(([, v]) => v.total >= 3)
+    .map(([themeId, v]) => {
+      const theme = themeById.get(themeId);
+      const title = theme
+        ? ((theme.title as Record<string, string>)[locale] ?? (theme.title as Record<string, string>)["fr"] ?? theme.slug)
+        : themeId;
+      return {
+        themeSlug: theme?.slug ?? themeId,
+        title,
+        totalReviews: v.total,
+        errorRate: v.errors / v.total,
+      };
+    })
+    .sort((a, b) => b.errorRate - a.errorRate)
+    .slice(0, 5);
+
+  // Stats Rush
+  const rushStats: RushStats | null = rushRuns.length === 0 ? null : {
+    runs: rushRuns.length,
+    bestScore: Math.max(...rushRuns.map((r) => r.score)),
+    totalCorrect: rushRuns.reduce((s, r) => s + r.score, 0),
+    totalErrors: rushRuns.reduce((s, r) => s + r.errors, 0),
+  };
+
   return {
     rating: rating?.rating ?? 1500,
     ratingDeviation: rating?.deviation ?? 350,
@@ -113,6 +174,8 @@ export async function getPlayerStats(userId: string, locale: "fr" | "en"): Promi
       freezes: streak?.freezes ?? 0,
     },
     themeMastery,
+    weakSpots,
+    rushStats,
     familyRatings: familyRatings.map((r) => ({
       family: r.family,
       rating: r.rating,

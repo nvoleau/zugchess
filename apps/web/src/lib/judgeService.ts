@@ -46,7 +46,20 @@ export function judgeKpkPositionMove(fen: string, uci: string): KpkJudgeResult {
 
   const judged = judgeKpkMove(fen, chess.fen());
   if (judged.blundered) {
-    return { kind: "kpk", resultAfter: judged.resultAfter, blundered: true, tempoLost: false, gameOverReason: null };
+    // Compute Black's best response to show why the move was bad (used by Rush mode to display the
+    // "punishment" move — e.g. pawn capture — before concluding the position as failed).
+    let fenAfterBlunder: string | undefined;
+    try {
+      if (!gameOverReason(chess)) {
+        const blunderReply = bestKpkReply(chess.fen());
+        const chessCopy = new Chess(chess.fen());
+        applyUci(chessCopy, `${blunderReply.from}${blunderReply.to}${blunderReply.promotion ?? ""}`);
+        fenAfterBlunder = chessCopy.fen();
+      }
+    } catch {
+      // silently ignore — fenAfterBlunder remains undefined
+    }
+    return { kind: "kpk", resultAfter: judged.resultAfter, blundered: true, tempoLost: false, gameOverReason: null, fenAfterReply: fenAfterBlunder };
   }
 
   const endReason = gameOverReason(chess);

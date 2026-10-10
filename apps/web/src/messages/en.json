@@ -65,13 +65,62 @@
       "body": "1,000+ positions across 7 families. The « Fundamentals » path — 40 positions — is free.",
       "positionsLabel": "positions",
       "families": [
-        { "num": "01", "name": "Pawn endgames", "themes": "Opposition, key squares, rule of the square, triangulation, distant passed pawn, breakthrough.", "count": "90", "free": "20 free", "glyph": "♟" },
-        { "num": "02", "name": "Rook endgames", "themes": "Lucena, Philidor, frontal defense, Vancura, cut-off king, rook behind the pawn.", "count": "80", "free": "Premium", "glyph": "♜" },
-        { "num": "03", "name": "Minor pieces", "themes": "Bishop vs pawns, opposite-colored bishops, knight vs pawns, bad bishop.", "count": "55", "free": "Premium", "glyph": "♝" },
-        { "num": "04", "name": "Queen endgames", "themes": "Queen vs pawn on the 7th, queen vs rook, queen and pawn vs queen.", "count": "25", "free": "Premium", "glyph": "♛" },
-        { "num": "05", "name": "Basic mates", "themes": "Mating with the queen, the rook, two bishops, then bishop and knight.", "count": "20", "free": "20 free", "glyph": "♚" },
-        { "num": "06", "name": "Rook vs minor piece", "themes": "Rook vs bishop, rook vs knight, rook and bishop vs rook.", "count": "20", "free": "Premium", "glyph": "♞" },
-        { "num": "07", "name": "Famous studies", "themes": "Reti, Saavedra, Troitzky and other classics to replay.", "count": "10", "free": "Premium", "glyph": "★" }
+        {
+          "num": "01",
+          "name": "Pawn endgames",
+          "themes": "Opposition, key squares, rule of the square, triangulation, distant passed pawn, breakthrough.",
+          "count": "90",
+          "free": "20 free",
+          "glyph": "♟"
+        },
+        {
+          "num": "02",
+          "name": "Rook endgames",
+          "themes": "Lucena, Philidor, frontal defense, Vancura, cut-off king, rook behind the pawn.",
+          "count": "80",
+          "free": "Premium",
+          "glyph": "♜"
+        },
+        {
+          "num": "03",
+          "name": "Minor pieces",
+          "themes": "Bishop vs pawns, opposite-colored bishops, knight vs pawns, bad bishop.",
+          "count": "55",
+          "free": "Premium",
+          "glyph": "♝"
+        },
+        {
+          "num": "04",
+          "name": "Queen endgames",
+          "themes": "Queen vs pawn on the 7th, queen vs rook, queen and pawn vs queen.",
+          "count": "25",
+          "free": "Premium",
+          "glyph": "♛"
+        },
+        {
+          "num": "05",
+          "name": "Basic mates",
+          "themes": "Mating with the queen, the rook, two bishops, then bishop and knight.",
+          "count": "20",
+          "free": "20 free",
+          "glyph": "♚"
+        },
+        {
+          "num": "06",
+          "name": "Rook vs minor piece",
+          "themes": "Rook vs bishop, rook vs knight, rook and bishop vs rook.",
+          "count": "20",
+          "free": "Premium",
+          "glyph": "♞"
+        },
+        {
+          "num": "07",
+          "name": "Famous studies",
+          "themes": "Reti, Saavedra, Troitzky and other classics to replay.",
+          "count": "10",
+          "free": "Premium",
+          "glyph": "★"
+        }
       ]
     },
     "progression": {
@@ -80,16 +129,48 @@
       "titleEm": "right before you'd forget it.",
       "body": "Your daily session surfaces due positions first, then new ones matched to your level. The grade is computed automatically from your moves: you never self-assess.",
       "cards": [
-        { "label": "Endgame Elo", "value": "1524", "sub": "+24", "body": "A Glicko-2 rating specific to endgames. Positions have one too: difficulty calibrates itself." },
-        { "label": "Streak", "value": "12", "sub": "days", "body": "A streak freeze earned every 7 days protects a missed day. A reminder at 7 PM if the streak is at risk." },
-        { "label": "Mastery by theme", "value": "", "sub": "", "body": "A badge per theme, based on how solid your memory is: 7, 21, 60, then 180 days." },
-        { "label": "Trophies and leaderboards", "value": "30", "sub": "trophies", "body": "Global and weekly leaderboards. Consistency and accuracy are rewarded, never raw volume." }
+        {
+          "label": "Endgame Elo",
+          "value": "1524",
+          "sub": "+24",
+          "body": "A Glicko-2 rating specific to endgames. Positions have one too: difficulty calibrates itself."
+        },
+        {
+          "label": "Streak",
+          "value": "12",
+          "sub": "days",
+          "body": "A streak freeze earned every 7 days protects a missed day. A reminder at 7 PM if the streak is at risk."
+        },
+        {
+          "label": "Mastery by theme",
+          "value": "",
+          "sub": "",
+          "body": "A badge per theme, based on how solid your memory is: 7, 21, 60, then 180 days."
+        },
+        {
+          "label": "Trophies and leaderboards",
+          "value": "30",
+          "sub": "trophies",
+          "body": "Global and weekly leaderboards. Consistency and accuracy are rewarded, never raw volume."
+        }
       ],
       "features": [
-        { "title": "Local table", "body": "King and pawn vs king, computed in your browser. Works offline." },
-        { "title": "Syzygy tables", "body": "Exact judgment up to 7 pieces, via Lichess's endgame tables." },
-        { "title": "Method lines", "body": "Lucena, Philidor, Vancura: the expected continuation, commented move by move." },
-        { "title": "Stockfish", "body": "Beyond 7 pieces, the engine evaluates every move in the browser." }
+        {
+          "title": "Local table",
+          "body": "King and pawn vs king, computed in your browser. Works offline."
+        },
+        {
+          "title": "Syzygy tables",
+          "body": "Exact judgment up to 7 pieces, via Lichess's endgame tables."
+        },
+        {
+          "title": "Method lines",
+          "body": "Lucena, Philidor, Vancura: the expected continuation, commented move by move."
+        },
+        {
+          "title": "Stockfish",
+          "body": "Beyond 7 pieces, the engine evaluates every move in the browser."
+        }
       ]
     },
     "pricing": {
@@ -102,7 +183,14 @@
         "name": "Free",
         "price": "€0",
         "priceSub": "forever",
-        "features": ["Fundamentals path (40 positions)", "3 new positions per day", "20 reviews per day", "First lesson of every family", "3 error explanations per day", "Streak, XP, Elo, leaderboards"],
+        "features": [
+          "Fundamentals path (40 positions)",
+          "3 new positions per day",
+          "20 reviews per day",
+          "First lesson of every family",
+          "3 error explanations per day",
+          "Streak, XP, Elo, leaderboards"
+        ],
         "cta": "Create an account"
       },
       "premium": {
@@ -111,7 +199,14 @@
         "priceMonthlySub": "per month",
         "priceAnnual": "€59",
         "priceAnnualSub": "per year · €4.92/month",
-        "features": ["All positions (1,000+) and every new one", "Unlimited new positions and reviews", "Every lesson", "Free play from any FEN", "Unlimited error explanations", "Mastery by theme, history, weak spots"],
+        "features": [
+          "All positions (1,000+) and every new one",
+          "Unlimited new positions and reviews",
+          "Every lesson",
+          "Free play from any FEN",
+          "Unlimited error explanations",
+          "Mastery by theme, history, weak spots"
+        ],
         "cta": "Go Premium"
       },
       "founder": {
@@ -230,7 +325,18 @@
       "xpGuideNew": "New position cleared",
       "xpGuideSession": "Full session",
       "xpGuideWrongAnnounce": "Wrong announce",
-      "xpGuideErrors": "Move error"
+      "xpGuideErrors": "Move error",
+      "masteryTitle": "Theme mastery",
+      "masteryLegendMastered": "Mastered",
+      "masteryLegendFamiliar": "Familiar",
+      "weakSpotsTitle": "Areas to work on",
+      "weakSpotsHint": "These themes have the most errors in your reviews.",
+      "rushStatsTitle": "Zug Rush",
+      "rushStatsBest": "best score",
+      "rushStatsRuns": "runs",
+      "rushStatsAccuracy": "accuracy",
+      "statsLevelLabel": "Level",
+      "masteryEmpty": "Play your first session to see your progress."
     },
     "Families": {
       "pions": "Pawns",
@@ -256,6 +362,7 @@
       "personalRecord": "personal record",
       "quotaReached": "Today's free run is already played. Come back tomorrow, or go Premium for unlimited Rush.",
       "held": "Hold: {current} / {total}",
+      "blunder": "MISSED",
       "doneBadge": "Done",
       "finishedTitle": "Run over!",
       "summaryScore": "positions solved",
@@ -455,7 +562,8 @@
         "plan": "Plan",
         "status": "Status",
         "founder": "Founder",
-        "createdAt": "Joined"
+        "createdAt": "Joined",
+        "identity": "Identity"
       },
       "prev": "Previous",
       "next": "Next",

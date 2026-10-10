@@ -11,7 +11,7 @@ function MethodBoardPreview() {
   const pieces: Array<{ sq: string; glyph: string; white: boolean }> = [
     { sq: "e6", glyph: "♔", white: true },
     { sq: "d5", glyph: "♙", white: true },
-    { sq: "c8", glyph: "♚", white: false },
+    { sq: "a8", glyph: "♚", white: false },
   ];
 
   function sqToXY(sq: string): [number, number] {

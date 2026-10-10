@@ -97,6 +97,7 @@ export function ZugBoard({
   moveResult,
 }: ZugBoardProps) {
   const { wrapperRef, effectiveSize } = useResizeBoardSize(size);
+  const turn = fen.split(" ")[1] as "w" | "b" | undefined;
   const [selected, setSelected] = useState<string | null>(null);
   const [optionSquares, setOptionSquares] = useState<Record<string, CSSProperties>>({});
   const [pendingPromo, setPendingPromo] = useState<{ from: string; to: string } | null>(null);
@@ -221,7 +222,8 @@ export function ZugBoard({
     .map((s) => ({ startSquare: s.orig, endSquare: s.dest!, color: brushColor(s.brush) }));
 
   return (
-    <div ref={wrapperRef} style={{ width: "100%", maxWidth: size, position: "relative" }}>
+    <div style={{ width: "100%", maxWidth: size }}>
+    <div ref={wrapperRef} style={{ width: "100%", position: "relative" }}>
       <Chessboard
         options={{
           position: fen,
@@ -263,6 +265,20 @@ export function ZugBoard({
           </div>
         </div>
       )}
+    </div>
+
+    {/* Turn indicator */}
+    {turn && (
+      <div className="mt-2 flex items-center justify-center gap-2">
+        <span
+          className={`h-3 w-3 rounded-sm ring-1 ${turn === "w" ? "bg-white ring-white/40" : "bg-zinc-950 ring-white/20"}`}
+          style={turn === "w" ? { boxShadow: "0 0 8px rgba(255,255,255,0.5)" } : undefined}
+        />
+        <span className="font-brandMono text-[10px] uppercase tracking-[0.12em] text-brand-muted">
+          {turn === "w" ? "Blancs" : "Noirs"}
+        </span>
+      </div>
+    )}
     </div>
   );
 }

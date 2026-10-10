@@ -12,6 +12,8 @@
 import {
   RUSH_DURATION_MS,
   RUSH_HELD_TO_DRAW,
+  RUSH_WIN_THRESHOLD,
+  bestKpkReply,
   createSeededRandom,
   isRushOver,
   isRushTimeUp,
@@ -49,24 +51,55 @@ async function pickPosition(
   seed: string,
   locale: "fr" | "en",
 ): Promise<PositionDetail> {
+  // Working copy: grows as we discover unplayable positions.
+  const skipped = new Set(excludeIds);
+
   for (const window of RATING_WINDOWS) {
-    const where =
-      window === Infinity
-        ? { status: "published" as const, judgeType: { in: ELIGIBLE_JUDGE_TYPES }, id: { notIn: excludeIds } }
-        : {
-            status: "published" as const,
-            judgeType: { in: ELIGIBLE_JUDGE_TYPES },
-            id: { notIn: excludeIds },
-            rating: { gte: targetRating - window, lte: targetRating + window },
-          };
+    // Try several draws per rating window in case early picks are unplayable.
+    for (let attempt = 0; attempt < 12; attempt++) {
+      const notIn = [...skipped];
+      const where =
+        window === Infinity
+          ? { status: "published" as const, judgeType: { in: ELIGIBLE_JUDGE_TYPES }, id: { notIn } }
+          : {
+              status: "published" as const,
+              judgeType: { in: ELIGIBLE_JUDGE_TYPES },
+              id: { notIn },
+              rating: { gte: targetRating - window, lte: targetRating + window },
+            };
 
-    const candidates = await prisma.position.findMany({ where, select: { id: true }, take: 60 });
-    if (candidates.length === 0) continue;
+      const candidates = await prisma.position.findMany({ where, select: { id: true }, take: 60 });
+      if (candidates.length === 0) break;
 
-    const random = createSeededRandom(`${seed}:${excludeIds.length}:${window}`);
-    const chosenId = pickSeeded(candidates, random).id;
-    const position = await getPosition(chosenId, locale);
-    if (position) return position;
+      const random = createSeededRandom(`${seed}:${notIn.length}:${window}:${attempt}`);
+      const chosenId = pickSeeded(candidates, random).id;
+      const position = await getPosition(chosenId, locale);
+
+      if (!position) { skipped.add(chosenId); continue; }
+
+      // Non-KPK positions where the initial turn doesn't match userSide can't be played in Rush
+      // (KPK has a client-side auto-play for the first opponent move; Syzygy/Line do not).
+      if (position.judgeType !== "kpk") {
+        const fenTurn = position.fen.split(" ")[1];
+        const playerTurn = position.userSide === "white" ? "w" : "b";
+        if (fenTurn !== playerTurn) { skipped.add(chosenId); continue; }
+      }
+
+      // KPK defender: skip if the opponent's first auto-played move is a pawn promotion.
+      // After promotion the position becomes K+Q vs K, which the KPK bitboard judge can't
+      // handle (kpkResult only works for King+Pawn+King). This leaves the Rush stuck.
+      if (position.judgeType === "kpk") {
+        const fenTurn = position.fen.split(" ")[1];
+        const playerTurn = position.userSide === "white" ? "w" : "b";
+        if (fenTurn !== playerTurn) {
+          // Opponent moves first (auto-play in RushBoard) — check for immediate promotion.
+          const autoMove = bestKpkReply(position.fen);
+          if (autoMove.promotion) { skipped.add(chosenId); continue; }
+        }
+      }
+
+      return position;
+    }
   }
 
   throw new Error("Aucune position disponible pour Zug Rush.");
@@ -103,6 +136,8 @@ export interface RushMoveParams {
   stepIndex?: number;
   /** Uniquement pour une position "tenir la nulle" : nombre de coups déjà tenus avant celui-ci. */
   heldSoFar?: number;
+  /** Nombre de coups corrects déjà joués sur cette position (pour le seuil `RUSH_WIN_THRESHOLD`). */
+  movesSoFar?: number;
   /** Durées de réflexion cumulées pour cette position (y compris le coup courant), en ms. */
   moveDurationsMs: number[];
 }
@@ -164,7 +199,10 @@ export async function submitMove(userId: string, runId: string, locale: "fr" | "
     if (!blundered) {
       const role = attackerColorOf(position.fen) === position.userSide ? "attacker" : "defender";
       const terminal = result.gameOverReason != null || result.fenAfterReply === undefined;
-      solved = role === "attacker" ? terminal : terminal || (params.heldSoFar ?? 0) + 1 >= RUSH_HELD_TO_DRAW;
+      const thresholdReached = (params.movesSoFar ?? 0) + 1 >= RUSH_WIN_THRESHOLD;
+      solved = role === "attacker"
+        ? terminal || thresholdReached
+        : terminal || (params.heldSoFar ?? 0) + 1 >= RUSH_HELD_TO_DRAW;
     }
   } else if (position.judgeType === "syzygy") {
     const result = await judgeSyzygyPositionMove(params.fenBefore, params.uci);
@@ -174,7 +212,10 @@ export async function submitMove(userId: string, runId: string, locale: "fr" | "
     hints = result.hints;
     if (!blundered) {
       const terminal = result.gameOverReason != null || result.reply === undefined;
-      solved = goal === "win" ? terminal : terminal || (params.heldSoFar ?? 0) + 1 >= RUSH_HELD_TO_DRAW;
+      const thresholdReached = (params.movesSoFar ?? 0) + 1 >= RUSH_WIN_THRESHOLD;
+      solved = goal === "win"
+        ? terminal || thresholdReached
+        : terminal || (params.heldSoFar ?? 0) + 1 >= RUSH_HELD_TO_DRAW;
     }
   } else if (position.judgeType === "line" && position.methodLine) {
     const stepIndex = params.stepIndex ?? 0;
@@ -224,7 +265,10 @@ export async function submitMove(userId: string, runId: string, locale: "fr" | "
 
   await prisma.rushRun.update({ where: { id: runId }, data: { score: nextScore, errors: nextErrors } });
 
-  const nextPosition = await pickPosition(nextRushTargetRating(nextScore), [position.id], run.seed, locale);
+  // Exclude ALL positions already attempted in this run (not just the current one) to avoid repeats.
+  const attempted = await prisma.rushAttempt.findMany({ where: { runId }, select: { positionId: true } });
+  const excludeIds = [...new Set([...attempted.map((a) => a.positionId), position.id])];
+  const nextPosition = await pickPosition(nextRushTargetRating(nextScore), excludeIds, run.seed, locale);
 
   return {
     live: true,

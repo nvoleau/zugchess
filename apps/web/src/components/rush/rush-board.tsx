@@ -1,9 +1,9 @@
 "use client";
 
-import { RUSH_HELD_TO_DRAW } from "@zugchess/core";
+import { RUSH_HELD_TO_DRAW, bestKpkReply } from "@zugchess/core";
 import { Chess } from "chess.js";
 import { useTranslations } from "next-intl";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ZugBoard } from "@/components/zug-board";
 import { legalDests } from "@/components/play/chess-move-dests";
 import type { PositionDetail } from "@/lib/positionService";
@@ -64,11 +64,26 @@ export function RushBoard({
   const [held, setHeld] = useState(0);
 
   const stepIndexRef = useRef(0);
+  const movesCorrectRef = useRef(0);
   const moveDurationsRef = useRef<number[]>([]);
   const moveStartRef = useRef(Date.now());
 
   const isDrawGoal = position.expectedResult === "draw";
   const playerColor = position.userSide === "white" ? "w" : "b";
+
+  // KPK defender positions start with the attacker's turn — auto-play the first opponent move
+  // so the board immediately shows a position where the player can interact.
+  useEffect(() => {
+    if (position.judgeType !== "kpk") return;
+    const chess = chessRef.current;
+    if (chess.turn() !== playerColor) {
+      const reply = bestKpkReply(chess.fen());
+      chess.move({ from: reply.from, to: reply.to, promotion: reply.promotion ?? undefined });
+      setLastMove([reply.from, reply.to]);
+      setFen(chess.fen());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleMove(from: string, to: string, promotion?: "q" | "r" | "b" | "n") {
     if (pending || concluded) return;
@@ -94,6 +109,7 @@ export function RushBoard({
           uci: `${from}${to}${promotion ?? ""}`,
           stepIndex: position.judgeType === "line" ? stepIndexRef.current : undefined,
           heldSoFar: isDrawGoal ? held : undefined,
+          movesSoFar: position.judgeType !== "line" && !isDrawGoal ? movesCorrectRef.current : undefined,
           moveDurationsMs: moveDurationsRef.current,
         }),
       });
@@ -105,12 +121,21 @@ export function RushBoard({
       }
 
       if (!data.accepted) {
-        chess.undo();
-        setFen(chess.fen());
-        setLastMove(undefined);
         setMoveResult("bad");
+        if (data.fenAfterReply) {
+          // Show the opponent's punishing move (e.g. pawn capture) before concluding,
+          // so the user understands why their move was a blunder.
+          await delay(420);
+          chess.load(data.fenAfterReply);
+          setFen(chess.fen());
+          setLastMove(undefined);
+        } else {
+          chess.undo();
+          setFen(chess.fen());
+          setLastMove(undefined);
+        }
         setConcluded(true);
-        await delay(650);
+        await delay(120);
         onConcluded({
           correct: false,
           nextPosition: data.nextPosition ?? null,
@@ -126,6 +151,7 @@ export function RushBoard({
       moveStartRef.current = Date.now();
       if (position.judgeType === "line" && data.nextStepIndex !== undefined) stepIndexRef.current = data.nextStepIndex;
       if (isDrawGoal) setHeld((h) => h + 1);
+      else movesCorrectRef.current += 1;
       if (data.fenAfterReply) {
         chess.load(data.fenAfterReply);
         setFen(chess.fen());
@@ -133,7 +159,7 @@ export function RushBoard({
 
       if (data.positionConcluded) {
         setConcluded(true);
-        await delay(500);
+        await delay(120);
         onConcluded({
           correct: true,
           nextPosition: data.nextPosition ?? null,

@@ -65,13 +65,62 @@
       "body": "1 000+ positions réparties en 7 familles. Le parcours « Fondamentaux » — 40 positions — est gratuit.",
       "positionsLabel": "positions",
       "families": [
-        { "num": "01", "name": "Finales de pions", "themes": "Opposition, cases clés, règle du carré, triangulation, pion passé éloigné, percée.", "count": "90", "free": "20 gratuites", "glyph": "♟" },
-        { "num": "02", "name": "Finales de tours", "themes": "Lucena, Philidor, défense frontale, Vancura, roi coupé, tour derrière le pion.", "count": "80", "free": "Premium", "glyph": "♜" },
-        { "num": "03", "name": "Pièces mineures", "themes": "Fou contre pions, couleurs opposées, cavalier contre pions, mauvais fou.", "count": "55", "free": "Premium", "glyph": "♝" },
-        { "num": "04", "name": "Finales de dame", "themes": "Dame contre pion en 7e, dame contre tour, dame et pion contre dame.", "count": "25", "free": "Premium", "glyph": "♛" },
-        { "num": "05", "name": "Mats élémentaires", "themes": "Mat avec la dame, la tour, les deux fous, puis fou et cavalier.", "count": "20", "free": "20 gratuites", "glyph": "♚" },
-        { "num": "06", "name": "Tour contre pièce mineure", "themes": "Tour contre fou, tour contre cavalier, tour et fou contre tour.", "count": "20", "free": "Premium", "glyph": "♞" },
-        { "num": "07", "name": "Études célèbres", "themes": "Réti, Saavedra, Troitzky et autres classiques à rejouer.", "count": "10", "free": "Premium", "glyph": "★" }
+        {
+          "num": "01",
+          "name": "Finales de pions",
+          "themes": "Opposition, cases clés, règle du carré, triangulation, pion passé éloigné, percée.",
+          "count": "90",
+          "free": "20 gratuites",
+          "glyph": "♟"
+        },
+        {
+          "num": "02",
+          "name": "Finales de tours",
+          "themes": "Lucena, Philidor, défense frontale, Vancura, roi coupé, tour derrière le pion.",
+          "count": "80",
+          "free": "Premium",
+          "glyph": "♜"
+        },
+        {
+          "num": "03",
+          "name": "Pièces mineures",
+          "themes": "Fou contre pions, couleurs opposées, cavalier contre pions, mauvais fou.",
+          "count": "55",
+          "free": "Premium",
+          "glyph": "♝"
+        },
+        {
+          "num": "04",
+          "name": "Finales de dame",
+          "themes": "Dame contre pion en 7e, dame contre tour, dame et pion contre dame.",
+          "count": "25",
+          "free": "Premium",
+          "glyph": "♛"
+        },
+        {
+          "num": "05",
+          "name": "Mats élémentaires",
+          "themes": "Mat avec la dame, la tour, les deux fous, puis fou et cavalier.",
+          "count": "20",
+          "free": "20 gratuites",
+          "glyph": "♚"
+        },
+        {
+          "num": "06",
+          "name": "Tour contre pièce mineure",
+          "themes": "Tour contre fou, tour contre cavalier, tour et fou contre tour.",
+          "count": "20",
+          "free": "Premium",
+          "glyph": "♞"
+        },
+        {
+          "num": "07",
+          "name": "Études célèbres",
+          "themes": "Réti, Saavedra, Troitzky et autres classiques à rejouer.",
+          "count": "10",
+          "free": "Premium",
+          "glyph": "★"
+        }
       ]
     },
     "progression": {
@@ -80,16 +129,48 @@
       "titleEm": "juste avant de l'oublier.",
       "body": "Votre séance quotidienne propose d'abord les positions dues, puis des nouvelles adaptées à votre niveau. La note est calculée automatiquement à partir de vos coups : vous n'avez rien à évaluer.",
       "cards": [
-        { "label": "Elo de finales", "value": "1524", "sub": "+24", "body": "Une cote Glicko-2 propre aux finales. Les positions ont aussi la leur : la difficulté se calibre seule." },
-        { "label": "Série", "value": "12", "sub": "jours", "body": "Un gel de série gagné tous les 7 jours protège un jour manqué. Un rappel à 19 h si la série est en danger." },
-        { "label": "Maîtrise par thème", "value": "", "sub": "", "body": "Un blason par thème, selon la solidité de votre mémoire : 7, 21, 60 puis 180 jours." },
-        { "label": "Trophées et classements", "value": "30", "sub": "trophées", "body": "Classement global et hebdomadaire. La régularité et la précision sont récompensées, jamais le volume brut." }
+        {
+          "label": "Elo de finales",
+          "value": "1524",
+          "sub": "+24",
+          "body": "Une cote Glicko-2 propre aux finales. Les positions ont aussi la leur : la difficulté se calibre seule."
+        },
+        {
+          "label": "Série",
+          "value": "12",
+          "sub": "jours",
+          "body": "Un gel de série gagné tous les 7 jours protège un jour manqué. Un rappel à 19 h si la série est en danger."
+        },
+        {
+          "label": "Maîtrise par thème",
+          "value": "",
+          "sub": "",
+          "body": "Un blason par thème, selon la solidité de votre mémoire : 7, 21, 60 puis 180 jours."
+        },
+        {
+          "label": "Trophées et classements",
+          "value": "30",
+          "sub": "trophées",
+          "body": "Classement global et hebdomadaire. La régularité et la précision sont récompensées, jamais le volume brut."
+        }
       ],
       "features": [
-        { "title": "Table locale", "body": "Roi et pion contre roi, calculé dans votre navigateur. Fonctionne hors ligne." },
-        { "title": "Tables Syzygy", "body": "Jugement exact jusqu'à 7 pièces, via les tables de finales de Lichess." },
-        { "title": "Lignes de méthode", "body": "Lucena, Philidor, Vancura : la suite attendue, commentée coup par coup." },
-        { "title": "Stockfish", "body": "Au-delà de 7 pièces, le moteur évalue chaque coup dans le navigateur." }
+        {
+          "title": "Table locale",
+          "body": "Roi et pion contre roi, calculé dans votre navigateur. Fonctionne hors ligne."
+        },
+        {
+          "title": "Tables Syzygy",
+          "body": "Jugement exact jusqu'à 7 pièces, via les tables de finales de Lichess."
+        },
+        {
+          "title": "Lignes de méthode",
+          "body": "Lucena, Philidor, Vancura : la suite attendue, commentée coup par coup."
+        },
+        {
+          "title": "Stockfish",
+          "body": "Au-delà de 7 pièces, le moteur évalue chaque coup dans le navigateur."
+        }
       ]
     },
     "pricing": {
@@ -102,7 +183,14 @@
         "name": "Gratuit",
         "price": "0 €",
         "priceSub": "pour toujours",
-        "features": ["Parcours Fondamentaux (40 positions)", "3 nouvelles positions par jour", "20 révisions par jour", "Première leçon de chaque famille", "3 explications d'erreur par jour", "Série, XP, Elo, classements"],
+        "features": [
+          "Parcours Fondamentaux (40 positions)",
+          "3 nouvelles positions par jour",
+          "20 révisions par jour",
+          "Première leçon de chaque famille",
+          "3 explications d'erreur par jour",
+          "Série, XP, Elo, classements"
+        ],
         "cta": "Créer un compte"
       },
       "premium": {
@@ -111,7 +199,14 @@
         "priceMonthlySub": "par mois",
         "priceAnnual": "59 €",
         "priceAnnualSub": "par an · soit 4,92 € / mois",
-        "features": ["Toutes les positions (1 000+) et toutes les nouvelles", "Nouvelles positions et révisions illimitées", "Toutes les leçons", "Jeu libre depuis n'importe quelle FEN", "Explications d'erreur illimitées", "Maîtrise par thème, historique, points faibles"],
+        "features": [
+          "Toutes les positions (1 000+) et toutes les nouvelles",
+          "Nouvelles positions et révisions illimitées",
+          "Toutes les leçons",
+          "Jeu libre depuis n'importe quelle FEN",
+          "Explications d'erreur illimitées",
+          "Maîtrise par thème, historique, points faibles"
+        ],
         "cta": "Passer Premium"
       },
       "founder": {
@@ -230,7 +325,18 @@
       "xpGuideNew": "Nouvelle position réussie",
       "xpGuideSession": "Séance complète",
       "xpGuideWrongAnnounce": "Annonce incorrecte",
-      "xpGuideErrors": "Erreur de jeu"
+      "xpGuideErrors": "Erreur de jeu",
+      "masteryTitle": "Maîtrise par thème",
+      "masteryLegendMastered": "Maîtrisé",
+      "masteryLegendFamiliar": "Familier",
+      "weakSpotsTitle": "Points à travailler",
+      "weakSpotsHint": "Ces thèmes cumulent le plus d'erreurs dans vos révisions.",
+      "rushStatsTitle": "Zug Rush",
+      "rushStatsBest": "meilleur score",
+      "rushStatsRuns": "parties",
+      "rushStatsAccuracy": "précision",
+      "statsLevelLabel": "Niveau",
+      "masteryEmpty": "Jouez votre première séance pour voir votre progression."
     },
     "Families": {
       "pions": "Pions",
@@ -256,6 +362,7 @@
       "personalRecord": "record personnel",
       "quotaReached": "Partie gratuite du jour déjà jouée. Reviens demain, ou passe Premium pour un Rush illimité.",
       "held": "Tenir : {current} / {total}",
+      "blunder": "RATÉ",
       "doneBadge": "Terminé",
       "finishedTitle": "Partie terminée !",
       "summaryScore": "positions résolues",
@@ -455,7 +562,8 @@
         "plan": "Offre",
         "status": "Statut",
         "founder": "Fondateur",
-        "createdAt": "Inscrit le"
+        "createdAt": "Inscrit le",
+        "identity": "Identifiant"
       },
       "prev": "Précédent",
       "next": "Suivant",

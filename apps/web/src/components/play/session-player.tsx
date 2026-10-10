@@ -167,14 +167,6 @@ export function SessionPlayer({ items, locale, initialTotalXp = 0 }: Props) {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <span className="animate-pulse font-brandMono text-xs text-brand-muted">···</span>
-      </div>
-    );
-  }
-
   if (summary) {
     return (
       <div className="flex flex-col items-center gap-8 py-12 text-center">
@@ -304,7 +296,13 @@ export function SessionPlayer({ items, locale, initialTotalXp = 0 }: Props) {
         </div>
       </div>
 
-      {position && <SessionCard position={position} onComplete={handleComplete} />}
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <span className="animate-pulse font-brandMono text-xs text-brand-muted">···</span>
+        </div>
+      ) : (
+        position && <SessionCard position={position} onComplete={handleComplete} />
+      )}
     </div>
   );
 }

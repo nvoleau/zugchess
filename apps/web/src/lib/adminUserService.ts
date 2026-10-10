@@ -22,7 +22,12 @@ export async function listUsers({
   page?: number;
   pageSize?: number;
 }): Promise<{ items: AdminUserSummary[]; total: number; page: number; pageSize: number }> {
-  const where = query ? { email: { contains: query, mode: "insensitive" as const } } : {};
+  const where = query
+    ? { OR: [
+        { email: { contains: query, mode: "insensitive" as const } },
+        { name:  { contains: query, mode: "insensitive" as const } },
+      ]}
+    : {};
 
   const [rows, total] = await Promise.all([
     prisma.user.findMany({

@@ -12,6 +12,7 @@ const bodySchema = z.object({
   uci: z.string().regex(UCI_PATTERN),
   stepIndex: z.number().int().min(0).optional(),
   heldSoFar: z.number().int().min(0).optional(),
+  movesSoFar: z.number().int().min(0).optional(),
   moveDurationsMs: z.array(z.number().int().min(0)),
 });
 

@@ -574,6 +574,46 @@ const POSITIONS: PositionSeed[] = [
     },
   },
   {
+    id: "pat-rush",
+    themeSlug: "pat",
+    kind: "kpk",
+    fen: "5k2/8/4KP2/8/8/8/8/8 w - - 0 1",
+    userSide: "white",
+    expectedResult: "white",
+    texts: {
+      fr: {
+        title: "Pousser ou manœuvrer ?",
+        intro: "Le pion est en f6, le roi en e6. Un coup de roi — même naturel — laisse filer le gain : le roi noir rejoint le coin et c'est pat.",
+        goal: "Gagne. Un seul coup convient.",
+      },
+      en: {
+        title: "Push or manoeuvre?",
+        intro: "The pawn is on f6, the king on e6. A king move — even a natural one — throws away the win: the black king reaches the corner and it's stalemate.",
+        goal: "Win. Only one move works.",
+      },
+    },
+  },
+  {
+    id: "pat-corner-c",
+    themeSlug: "pat",
+    kind: "kpk",
+    fen: "k7/8/K1P5/8/8/8/8/8 w - - 0 1",
+    userSide: "white",
+    expectedResult: "white",
+    texts: {
+      fr: {
+        title: "Le piège du coin",
+        intro: "Pion en c6, rois en a6 et a8. S'approcher trop vite avec le roi mène au pat : après Rb6 Rb8 c7+ Rc8 Rc6, le roi noir n'a plus aucune case.",
+        goal: "Gagne sans donner le pat.",
+      },
+      en: {
+        title: "The corner trap",
+        intro: "Pawn on c6, kings on a6 and a8. Approaching too fast with the king leads to stalemate: after Kb6 Kb8 c7+ Kc8 Kc6, the black king has no legal move.",
+        goal: "Win without giving stalemate.",
+      },
+    },
+  },
+  {
     id: "square-def",
     themeSlug: "carre",
     kind: "kpk",
@@ -655,6 +695,66 @@ const POSITIONS: PositionSeed[] = [
         title: "Réti's study",
         intro: "Réti's study (1921). Your king looks too far from the h-pawn, and your c-pawn looks lost.",
         goal: "Draw by aiming at two targets at once.",
+      },
+    },
+  },
+  {
+    id: "etude-chemin-roi",
+    themeSlug: "etudes",
+    kind: "kpk",
+    fen: "5k2/1K6/8/8/8/8/5P2/8 w - - 0 1",
+    userSide: "white",
+    expectedResult: "white",
+    texts: {
+      fr: {
+        title: "Le bon chemin",
+        intro: "Roi en b7, pion en f2, roi noir en f8. Le roi blanc est loin du pion — mais avancer vers lui n'est pas la bonne idée. Il n'existe qu'un seul coup gagnant.",
+        goal: "Gagne. Trouve le bon chemin pour le roi.",
+      },
+      en: {
+        title: "The right path",
+        intro: "King on b7, pawn on f2, Black King on f8. The White King is far from the pawn — but marching toward it is not the right idea. Only one move wins.",
+        goal: "Win. Find the right path for the king.",
+      },
+    },
+  },
+  {
+    id: "etude-cases-critiques",
+    themeSlug: "etudes",
+    kind: "kpk",
+    fen: "8/8/4k3/8/8/2K5/4P3/8 w - - 0 1",
+    userSide: "white",
+    expectedResult: "white",
+    texts: {
+      fr: {
+        title: "La case critique",
+        intro: "Roi en c3, pion en e2, roi noir en e6. Avancer le pion semble naturel — mais les cases critiques du pion e sont d4, e4 et f4. Y amener le roi d'abord est la clé. Un seul coup gagne.",
+        goal: "Gagne en prenant la case critique.",
+      },
+      en: {
+        title: "The key square",
+        intro: "King on c3, pawn on e2, Black King on e6. Advancing the pawn seems natural — but the key squares for the e-pawn are d4, e4 and f4. Getting the king there first is the key. Only one move wins.",
+        goal: "Win by seizing the key square.",
+      },
+    },
+  },
+  {
+    id: "etude-retrait",
+    themeSlug: "etudes",
+    kind: "kpk",
+    fen: "2k5/5K2/8/8/8/8/1P6/8 w - - 0 1",
+    userSide: "white",
+    expectedResult: "white",
+    texts: {
+      fr: {
+        title: "Le roi recule",
+        intro: "Roi en f7, pion en b2, roi noir en c8. Rester haut ou avancer vers b8 semble logique. Pourtant le roi doit reculer pour créer la bonne configuration. Un seul coup gagne.",
+        goal: "Gagne en reculant le roi.",
+      },
+      en: {
+        title: "The king steps back",
+        intro: "King on f7, pawn on b2, Black King on c8. Staying high or advancing toward b8 seems logical. Yet the king must step back to create the right configuration. Only one move wins.",
+        goal: "Win by retreating the king.",
       },
     },
   },

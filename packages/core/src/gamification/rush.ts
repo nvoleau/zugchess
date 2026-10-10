@@ -20,6 +20,15 @@ export const RUSH_MAX_ERRORS = 3;
  */
 export const RUSH_HELD_TO_DRAW = 5;
 
+/**
+ * Nombre de coups corrects consécutifs pour valider une position de victoire (KPK attaquant,
+ * Syzygy gagner), en mode Rush. Évite de devoir jouer l'intégralité d'une finale jusqu'au mat ou
+ * à la promotion dans un mode chronométré : après ce seuil, la position est considérée résolue
+ * (le joueur a prouvé qu'il maîtrisait la technique). Pour les lignes de méthode, c'est la
+ * complétion de la ligne qui fait foi, pas ce seuil.
+ */
+export const RUSH_WIN_THRESHOLD = 3;
+
 export const RUSH_START_RATING = 1200;
 export const RUSH_RATING_STEP = 35;
 export const RUSH_MAX_RATING = 2200;
